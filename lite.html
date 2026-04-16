@@ -15,18 +15,28 @@ body{
     padding:20px;
 }
 
+/* Container */
 .container{
-    max-width:800px;
+    max-width:900px;
     margin:auto;
 }
 
+/* Title */
+h1{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+/* Box */
 .box{
     background:#1e293b;
     padding:25px;
     border-radius:15px;
+    margin-top:20px;
     line-height:1.9;
 }
 
+/* Button */
 .btn{
     display:inline-block;
     margin-top:20px;
@@ -35,6 +45,59 @@ body{
     color:#000;
     border-radius:25px;
     text-decoration:none;
+    transition:0.3s;
+}
+
+.btn:hover{
+    background:#16a34a;
+    transform:scale(1.05);
+}
+
+/* ===== Gallery ===== */
+.gallery{
+    margin-top:30px;
+    display:grid;
+    grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
+    gap:15px;
+}
+
+.gallery img{
+    width:100%;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.gallery img:hover{
+    transform:scale(1.08);
+    box-shadow:0 0 15px rgba(34,197,94,0.5);
+}
+
+/* ===== Lightbox ===== */
+.lightbox{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.9);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:999;
+}
+
+.lightbox img{
+    max-width:90%;
+    max-height:90%;
+    border-radius:10px;
+}
+
+/* Responsive */
+@media(max-width:600px){
+    .gallery{
+        grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
+    }
 }
 </style>
 </head>
@@ -50,10 +113,9 @@ body{
 <p><strong>تفاصيل بسيطة للتفاصيل الكاملة يتم التواصل مع الدعم</strong></p>
 
 <p>
-إيزي فوش لايت هو برنامج احترافي لإدارة وإنشاء كروت المايكروتك،
-يدعم أنظمة هوتسبوت فقط،
+إيزي فوش لايت هو برنامج احترافي لإدارة الهوتسبوت فقط،
 ويتميز بسرعة الاتصال مع السيرفرات البعيدة، سهولة الإنشاء، وإدارة ذكية للكروت والباقات،
-فحص السيرفر عن المشاكل، تهيئة الرواترات الجديدة،
+فحص السيرفرات، وتهيئة الرواترات الجديدة،
 مع إمكانية العمل على عدد غير محدود من الراوترات من خلال ترخيص واحد للكمبيوتر.
 </p>
 
@@ -62,17 +124,50 @@ body{
 <h3>✔️ المميزات العامة</h3>
 
 <p>
+✔️ إدارة Hotspot فقط بشكل احترافي<br>
 ✔️ يدعم جميع إصدارات مايكروتك<br>
-✔️ لا يوجد حد لعدد السيرفرات أو الراوترات<br>
-✔️ مناسب للفنيين وشركات الإنترنت والمستخدمين الأفراد<br>
-✔️ العمل على عدد غير محدود من الراوترات بدون قيود
+✔️ لا يوجد حد لعدد السيرفرات<br>
+✔️ مناسب للمشاريع الصغيرة والمتوسطة<br>
+✔️ أداء سريع وخفيف جداً
 </p>
+
+</div>
+
+<!-- ===== Screenshot Gallery ===== -->
+<div class="box">
+<h3>📸 صور من داخل البرنامج</h3>
+
+<div class="gallery">
+
+<img src="screenshot/l1.png" onclick="openImg(this)">
+<img src="screenshot/l2.png" onclick="openImg(this)">
+<img src="screenshot/l3.png" onclick="openImg(this)">
+<img src="screenshot/l4.png" onclick="openImg(this)">
+<img src="screenshot/l5.png" onclick="openImg(this)">
+
+</div>
 
 <a href="index.html" class="btn">⬅ العودة للرئيسية</a>
 
 </div>
 
 </div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeImg()">
+    <img id="lightbox-img">
+</div>
+
+<script>
+function openImg(img){
+    document.getElementById("lightbox").style.display="flex";
+    document.getElementById("lightbox-img").src=img.src;
+}
+
+function closeImg(){
+    document.getElementById("lightbox").style.display="none";
+}
+</script>
 
 </body>
 </html>
