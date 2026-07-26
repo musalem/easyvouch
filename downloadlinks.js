@@ -1,7 +1,7 @@
 const DOWNLOAD_LINKS = {
     mini: {
-        url: "https://bit.ly/4wkdc5y",
-        version: "1.18"
+        url: "https://bit.ly/3RSwZKC",
+        version: "1.19"
     },
     lite: {
         url: "https://bit.ly/48jeQKO",
