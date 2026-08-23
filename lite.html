@@ -8,103 +8,341 @@
 
 <title>إيزي فوش لايت</title>
 
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-body{
-    margin:0;
-    font-family:'Cairo',sans-serif;
-    background:#020617;
-    color:#fff;
-    padding:20px;
+:root {
+    --green: #22c55e;
+    --green-hover: #16a34a;
+    --bg: #030712;
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-border-light: rgba(255, 255, 255, 0.25);
+    --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Cairo', sans-serif;
+    background-color: var(--bg);
+    color: var(--text-primary);
+    padding: 40px 20px;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background Architecture (Animated Orbs) */
+.background-orbs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.45;
+    animation: floatOrb 18s ease-in-out infinite alternate;
+}
+
+.orb-1 {
+    top: -10%;
+    right: 10%;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, #22c55e 0%, #15803d 100%);
+    animation-duration: 16s;
+}
+
+.orb-2 {
+    bottom: -15%;
+    left: -5%;
+    width: 550px;
+    height: 550px;
+    background: radial-gradient(circle, #0d9488 0%, #115e59 100%);
+    animation-duration: 22s;
+}
+
+.orb-3 {
+    top: 40%;
+    left: 30%;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, #10b981 0%, #047857 100%);
+    animation-duration: 19s;
+}
+
+@keyframes floatOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(60px, 80px) scale(1.15); }
+    100% { transform: translate(-40px, -50px) scale(0.9); }
+}
+
+/* Mouse Glow Trail */
+.mouse-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    transition: width 0.3s, height 0.3s;
 }
 
 /* Container */
-.container{
-    max-width:900px;
-    margin:auto;
+.container {
+    max-width: 900px;
+    margin: auto;
 }
 
-/* Title */
-h1{
-    text-align:center;
-    margin-bottom:20px;
+/* Header Title */
+h1 {
+    text-align: center;
+    font-size: 48px;
+    font-weight: 800;
+    margin: 0 0 25px 0;
+    background: linear-gradient(135deg, #ffffff 0%, #22c55e 50%, #4ade80 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 6s linear infinite;
+    letter-spacing: -1px;
 }
 
-/* Box */
-.box{
-    background:#1e293b;
-    padding:25px;
-    border-radius:15px;
-    margin-top:20px;
-    line-height:1.9;
+@keyframes shimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+/* Box System (Glassmorphism) */
+.box {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    padding: 30px;
+    border-radius: 24px;
+    margin-top: 25px;
+    line-height: 1.9;
+    border: 1px solid var(--glass-border);
+    border-top: 1px solid var(--glass-border-light);
+    border-left: 1px solid var(--glass-border-light);
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.box:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(34, 197, 94, 0.15);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.box p {
+    color: #e2e8f0;
+    font-size: 16px;
+    margin: 0 0 15px 0;
+}
+
+.box p:last-child {
+    margin-bottom: 0;
+}
+
+.box strong {
+    color: var(--green);
+    font-size: 17px;
+}
+
+hr {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    margin: 25px 0;
+}
+
+/* Section title */
+h3 {
+    color: var(--green);
+    font-size: 22px;
+    font-weight: 700;
+    margin-top: 0;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 /* Button */
-.btn{
-    display:inline-block;
-    margin-top:20px;
-    padding:12px 20px;
-    background:#22c55e;
-    color:#000;
-    border-radius:25px;
-    text-decoration:none;
-    transition:0.3s;
+.btn {
+    display: inline-block;
+    margin-top: 25px;
+    padding: 13px 28px;
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    color: #030712;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.25);
+    position: relative;
+    overflow: hidden;
 }
 
-.btn:hover{
-    background:#16a34a;
-    transform:scale(1.05);
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+    color: #000;
 }
 
 /* ===== Gallery ===== */
-.gallery{
-    margin-top:30px;
-    display:grid;
-    grid-template-columns: repeat(auto-fill,minmax(150px,1fr));
-    gap:15px;
+.gallery {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 16px;
 }
 
-.gallery img{
-    width:100%;
-    border-radius:10px;
-    cursor:pointer;
-    transition:0.3s;
+.gallery img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 14px;
+    cursor: pointer;
+    border: 1px solid var(--glass-border);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.gallery img:hover{
-    transform:scale(1.08);
-    box-shadow:0 0 15px rgba(34,197,94,0.5);
+.gallery img:hover {
+    transform: scale(1.06) translateY(-4px);
+    border-color: rgba(34, 197, 94, 0.5);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(34, 197, 94, 0.3);
 }
 
 /* ===== Lightbox ===== */
-.lightbox{
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.9);
-    display:none;
-    justify-content:center;
-    align-items:center;
-    z-index:999;
+.lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(3, 7, 18, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
 }
 
-.lightbox img{
-    max-width:90%;
-    max-height:90%;
-    border-radius:10px;
+.lightbox img {
+    max-width: 90%;
+    max-height: 90vh;
+    border-radius: 16px;
+    border: 1px solid var(--glass-border-light);
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 40px rgba(34, 197, 94, 0.2);
+    animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Glassmorphism Loader */
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(3, 7, 18, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.loader span {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(34, 197, 94, 0.2);
+    border-top: 4px solid var(--green);
+    border-radius: 50%;
+    animation: spin 0.9s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
 /* Responsive */
 @media(max-width:600px){
-    .gallery{
-        grid-template-columns: repeat(auto-fill,minmax(120px,1fr));
+    body { padding: 25px 12px; }
+    h1 { font-size: 36px; }
+    .box { padding: 20px; border-radius: 18px; }
+    .gallery {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 10px;
     }
+    .gallery img { height: 90px; }
+    .orb-1 { width: 280px; height: 280px; }
+    .orb-2 { width: 320px; height: 320px; }
+    .orb-3 { width: 220px; height: 220px; }
+    .mouse-glow { display: none; }
 }
 </style>
 </head>
 
 <body>
+
+<!-- Background Orbs -->
+<div class="background-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+
+<!-- Mouse Glow Trail -->
+<div class="mouse-glow" id="mouseGlow"></div>
+
+<!-- Loader -->
+<div class="loader" id="loader">
+    <span></span>
+</div>
 
 <div class="container">
 
@@ -169,6 +407,20 @@ function openImg(img){
 function closeImg(){
     document.getElementById("lightbox").style.display="none";
 }
+
+// Loader with smooth fade out
+window.onload = () => {
+    const loader = document.getElementById("loader");
+    loader.style.opacity = "0";
+    loader.style.visibility = "hidden";
+};
+
+// Mouse Glow Trail Effect
+const mouseGlow = document.getElementById("mouseGlow");
+document.addEventListener("mousemove", (e) => {
+    mouseGlow.style.left = e.clientX + "px";
+    mouseGlow.style.top = e.clientY + "px";
+});
 </script>
 
 </body>
