@@ -18,7 +18,7 @@
 
 <title>إيزي فوش لإدارة كروت المايكروتك | EasyVouch</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
 <link rel="canonical" href="https://musalem.github.io/easyvouch/">
 
@@ -42,154 +42,458 @@
 </script>
 
 <style>
-:root{
-    --main:#38bdf8;
-    --green:#22c55e;
-    --bg:#020617;
-    --card:rgba(30,41,59,0.6);
+:root {
+    --main: #38bdf8;
+    --main-hover: #0284c7;
+    --green: #22c55e;
+    --green-hover: #16a34a;
+    --bg: #030712;
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-border-light: rgba(255, 255, 255, 0.25);
+    --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
 }
 
-body{
-    margin:0;
-    font-family:'Cairo',sans-serif;
-    background:linear-gradient(135deg,#0b1220,#020617);
-    color:#fff;
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: 'Cairo', sans-serif;
+    background-color: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Background Architecture (Animated Orbs) */
+.background-orbs {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.5;
+    animation: floatOrb 18s ease-in-out infinite alternate;
+}
+
+.orb-1 {
+    top: -10%;
+    right: 10%;
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, #38bdf8 0%, #0284c7 100%);
+    animation-duration: 16s;
+}
+
+.orb-2 {
+    bottom: -15%;
+    left: -5%;
+    width: 550px;
+    height: 550px;
+    background: radial-gradient(circle, #6366f1 0%, #4338ca 100%);
+    animation-duration: 22s;
+}
+
+.orb-3 {
+    top: 40%;
+    left: 30%;
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, #a855f7 0%, #7e22ce 100%);
+    animation-duration: 19s;
+}
+
+@keyframes floatOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(60px, 80px) scale(1.15); }
+    100% { transform: translate(-40px, -50px) scale(0.9); }
+}
+
+/* Mouse Glow Trail */
+.mouse-glow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 350px;
+    height: 350px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+    transition: width 0.3s, height 0.3s;
 }
 
 /* Header */
-header{
-    text-align:center;
-    padding:80px 20px 40px;
+header {
+    text-align: center;
+    padding: 90px 20px 40px;
+    position: relative;
 }
 
-header h1{
-    font-size:44px;
+header h1 {
+    font-size: 52px;
+    font-weight: 800;
+    margin: 0 0 15px 0;
+    background: linear-gradient(135deg, #ffffff 0%, #38bdf8 50%, #818cf8 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 6s linear infinite;
+    letter-spacing: -1px;
 }
 
-header p{
-    color:#94a3b8;
+@keyframes shimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+
+header p {
+    color: var(--text-muted);
+    font-size: 19px;
+    font-weight: 400;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 /* Container */
-.container{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:25px;
-    padding:30px;
+.container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 30px 20px 60px;
+    max-width: 1280px;
+    margin: 0 auto;
 }
 
-/* Card */
-.card{
-    background:var(--card);
+/* Card System (Glassmorphism) */
+.card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
+    border-top: 1px solid var(--glass-border-light);
+    border-left: 1px solid var(--glass-border-light);
+    width: 350px;
+    border-radius: 24px;
+    padding: 35px 25px;
+    text-align: center;
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease, border-color 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Floating animation for cards */
+.card:nth-child(1) { animation: floatCard 6s ease-in-out infinite; }
+.card:nth-child(2) { animation: floatCard 7s ease-in-out 1s infinite; }
+.card:nth-child(3) { animation: floatCard 6.5s ease-in-out 0.5s infinite; }
+
+@keyframes floatCard {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.card:hover {
+    animation-play-state: paused;
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(56, 189, 248, 0.3);
+    border-color: rgba(56, 189, 248, 0.4);
+}
+
+.logo {
+    width: 95px;
+    height: auto;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4));
+    transition: transform 0.3s ease;
+}
+
+.card:hover .logo {
+    transform: scale(1.08);
+}
+
+.card h2 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 10px 0;
+}
+
+.version {
+    margin-top: 4px;
+    margin-bottom: 15px;
+    font-size: 13px;
+    color: var(--main);
+    background: rgba(56, 189, 248, 0.1);
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    display: inline-block;
+}
+
+.card-desc {
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.card-features {
+    font-size: 14px;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.btn-container {
+    margin-top: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Buttons Styling */
+.btn {
+    display: block;
+    width: 100%;
+    padding: 13px 20px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+    color: #030712;
+    font-weight: 700;
+    font-size: 15px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    transition: 0.5s;
+}
+
+.btn:hover::before {
+    left: 100%;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
+    color: #000;
+}
+
+.btn.green {
+    background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.25);
+}
+
+.btn.green:hover {
+    box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
+}
+
+/* Section styling */
+.section {
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 35px 30px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--glass-border);
+    border-top: 1px solid var(--glass-border-light);
+    border-radius: 24px;
+    text-align: center;
+    box-shadow: var(--glass-shadow);
+}
+
+.section h2 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 25px;
+    color: var(--text-primary);
+}
+
+/* Features flex grid */
+.features-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.feature-pill {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 22px;
+    border-radius: 50px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #e2e8f0;
     backdrop-filter: blur(10px);
-    border:1px solid rgba(255,255,255,0.05);
-    width:340px;
-    border-radius:20px;
-    padding:25px;
-    text-align:center;
-    transition:0.4s;
+    transition: 0.3s;
 }
 
-.card:hover{
-    transform:translateY(-12px) scale(1.02);
-    box-shadow:0 0 40px rgba(56,189,248,0.25);
+.feature-pill:hover {
+    background: rgba(56, 189, 248, 0.15);
+    border-color: rgba(56, 189, 248, 0.4);
+    transform: translateY(-3px);
 }
 
-.logo{
-    width:90px;
-    margin-bottom:10px;
+/* Support Cards */
+.support-cards {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 20px;
 }
 
-/* Version text */
-.version{
-    margin-top:8px;
-    font-size:12px;
-    color:#94a3b8;
+.support-item {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--glass-border);
+    padding: 20px 30px;
+    border-radius: 18px;
+    flex: 1;
+    min-width: 250px;
+    max-width: 350px;
+    transition: 0.3s;
 }
 
-/* Buttons */
-.btn{
-    display:inline-block;
-    margin-top:12px;
-    padding:12px 20px;
-    border-radius:30px;
-    background:var(--main);
-    color:#000;
-    font-weight:bold;
-    text-decoration:none;
-    transition:0.3s;
+.support-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: var(--glass-border-light);
+    transform: translateY(-4px);
 }
 
-.btn:hover{
-    transform:scale(1.08);
+.support-item p {
+    margin: 0;
+    font-size: 16px;
 }
 
-.green{
-    background:var(--green);
+.support-item a {
+    color: #f43f5e;
+    font-weight: 700;
+    text-decoration: none;
+    margin-right: 8px;
+    display: inline-block;
+    transition: 0.3s;
 }
 
-/* Section */
-.section{
-    text-align:center;
-    padding:40px 20px;
+.support-item a:hover {
+    color: #fb7185;
+    transform: scale(1.05);
+    text-decoration: underline;
 }
 
 /* Footer */
-footer{
-    text-align:center;
-    padding:20px;
-    color:#64748b;
+footer {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+    position: relative;
 }
 
-/* Loader */
-.loader{
-    position:fixed;
-    width:100%;
-    height:100%;
-    background:#020617;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:999;
+.footer-logo {
+    width: 75px;
+    display: block;
+    margin: 0 auto 15px;
+    opacity: 0.85;
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
 }
 
-.loader span{
-    width:40px;
-    height:40px;
-    border:5px solid #38bdf8;
-    border-top:5px solid transparent;
-    border-radius:50%;
-    animation:spin 1s linear infinite;
+.footer-logo:hover {
+    transform: scale(1.15) rotate(2deg);
+    opacity: 1;
 }
 
-@keyframes spin{
-    to{transform:rotate(360deg);}
+/* Glassmorphism Loader */
+.loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(3, 7, 18, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
-/* Support links red */
-.support a{
-    color:red;
-    font-weight:bold;
+.loader span {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(56, 189, 248, 0.2);
+    border-top: 4px solid var(--main);
+    border-radius: 50%;
+    animation: spin 0.9s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
 }
 
-.footer-logo{
-    width:70px;
-    display:block;
-    margin:0 auto 10px;
-    opacity:0.9;
-    transition:0.3s;
+@keyframes spin {
+    to { transform: rotate(360deg); }
 }
 
-.footer-logo:hover{
-    transform:scale(1.1);
-    opacity:1;
+/* Responsiveness */
+@media (max-width: 768px) {
+    header h1 { font-size: 36px; }
+    header p { font-size: 16px; }
+    .container { padding: 10px; }
+    .card { width: 100%; max-width: 380px; }
+    .orb-1 { width: 280px; height: 280px; }
+    .orb-2 { width: 320px; height: 320px; }
+    .orb-3 { width: 220px; height: 220px; }
+    .mouse-glow { display: none; }
 }
 </style>
 
 </head>
 
 <body>
+
+<!-- Background Orbs -->
+<div class="background-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+</div>
+
+<!-- Mouse Glow Trail -->
+<div class="mouse-glow" id="mouseGlow"></div>
 
 <!-- Loader -->
 <div class="loader" id="loader">
@@ -208,23 +512,25 @@ footer{
         <img src="mini.png" class="logo" alt="برنامج إيزي فوش ميني لإدارة المايكروتك">
         <h2>⚡ إيزي فوش ميني</h2>
 
-        <p>نظام احترافي لإدارة كروت المايكروتك</p>
+        <p style="margin: 0 0 8px 0; font-weight: 600;">نظام احترافي لإدارة كروت المايكروتك</p>
 
         <p class="version" id="miniVersion">جارٍ التحميل...</p>
 
-        <p style="color:#94a3b8;">
+        <p class="card-desc">
         Hotspot + User Manager + Broadband<br>
         أداء قوي – تحكم كامل – سرعة اتصال عالية
         </p>
 
-        <p>
+        <div class="card-features">
         ✔ إدارة غير محدودة<br>
         ✔ سرعة عالية<br>
         ✔ استقرار قوي
-        </p>
+        </div>
 
-        <a href="mini.html" class="btn">📄 عرض التفاصيل</a><br>
-        <a id="miniDownload" class="btn">⬇ تحميل النسخة التجريبية</a>
+        <div class="btn-container">
+            <a href="mini.html" class="btn">📄 عرض التفاصيل</a>
+            <a id="miniDownload" class="btn">⬇ تحميل النسخة التجريبية</a>
+        </div>
     </div>
 
     <!-- STUDIO (NEW) -->
@@ -232,20 +538,22 @@ footer{
         <img src="studio.png" class="logo" alt="إيزي لوجن ستوديو لتصميم صفحات الهوتسبوت">
         <h2>🎨 إيزي لوجن ستوديو</h2>
 
-        <p>أداة سهلة لتصميم وإنشاء صفحات الهوتسبوت بدون تعقيد أو كتابة أكواد.</p>
+        <p style="margin: 0 0 15px 0; font-weight: 600;">أداة سهلة لتصميم وإنشاء صفحات الهوتسبوت بدون تعقيد أو كتابة أكواد.</p>
 
-        <p style="color:#94a3b8;">
+        <p class="card-desc">
         🎨 قوالب جاهزة وقابلة للتعديل<br>
         📂 إضافة واستيراد القوالب<br>
         🖥️ تصميم عصري ومتجاوب<br>
         ⚡ واجهة بسيطة وسريعة
         </p>
 
-        <p style="color:#eab308; font-weight:bold;">
+        <p style="color:#eab308; font-weight:bold; margin-bottom: 20px;">
         🚀 المشروع حاليًا تجريبي وقيد التطوير.
         </p>
 
-        <a href="https://mikrotik-artisan.lovable.app" target="_blank" class="btn">جــرّبه الآن</a>
+        <div class="btn-container">
+            <a href="https://mikrotik-artisan.lovable.app" target="_blank" class="btn">جــرّبه الآن</a>
+        </div>
     </div>
 
     <!-- LITE -->
@@ -253,23 +561,25 @@ footer{
         <img src="lite.png" class="logo" alt="برنامج إيزي فوش لايت لإدارة الهوتسبوت">
         <h2>🌐 إيزي فوش لايت</h2>
 
-        <p>نسخة خفيفة للهوتسبوت</p>
+        <p style="margin: 0 0 8px 0; font-weight: 600;">نسخة خفيفة للهوتسبوت</p>
 
         <p class="version" id="liteVersion">جارٍ التحميل...</p>
 
-        <p style="color:#94a3b8;">
+        <p class="card-desc">
         Hotspot فقط<br>
         خفيف – سريع – مناسب للمشاريع الصغيرة
         </p>
 
-        <p>
+        <div class="card-features">
         ✔ خفيف وسريع<br>
         ✔ مناسب للمشاريع الصغيرة<br>
         ✔ استهلاك منخفض
-        </p>
+        </div>
 
-        <a href="lite.html" class="btn green">📄 عرض التفاصيل</a><br>
-        <a id="liteDownload" class="btn green">⬇ تحميل النسخة التجريبية</a>
+        <div class="btn-container">
+            <a href="lite.html" class="btn green">📄 عرض التفاصيل</a>
+            <a id="liteDownload" class="btn green">⬇ تحميل النسخة التجريبية</a>
+        </div>
     </div>
 
 </div>
@@ -278,27 +588,32 @@ footer{
 <div class="section">
     <h2>⭐ المميزات المشتركة</h2>
 
-    <p>
-    ✔️ يدعم جميع إصدارات مايكروتك<br>
-    ✔️ لا يوجد حد لعدد السيرفرات أو الراوترات<br>
-    ✔️ مناسب للفنيين وشركات الإنترنت والمستخدمين الأفراد<br>
-    ✔️ العمل على عدد غير محدود من راوترات مايكروتك دون أي قيود
-    </p>
+    <div class="features-grid">
+        <div class="feature-pill">✔️ يدعم جميع إصدارات مايكروتك</div>
+        <div class="feature-pill">✔️ لا يوجد حد لعدد السيرفرات أو الراوترات</div>
+        <div class="feature-pill">✔️ مناسب للفنيين وشركات الإنترنت والمستخدمين الأفراد</div>
+        <div class="feature-pill">✔️ العمل على عدد غير محدود من راوترات مايكروتك دون أي قيود</div>
+    </div>
 </div>
 
 <!-- الدعم -->
 <div class="section support">
     <h2>📌 التواصل مع الدعم</h2>
 
-    <p>
-        💬 واتساب:
-        <a href="https://wa.me/201223084810">اضغط هنا</a>
-    </p>
-
-    <p>
-        💬 تيليجرام:
-        <a href="https://t.me/EasyVouch">انضم للجروب</a>
-    </p>
+    <div class="support-cards">
+        <div class="support-item">
+            <p>
+                💬 واتساب:
+                <a href="https://wa.me/201223084810">اضغط هنا</a>
+            </p>
+        </div>
+        <div class="support-item">
+            <p>
+                💬 تيليجرام:
+                <a href="https://t.me/EasyVouch">انضم للجروب</a>
+            </p>
+        </div>
+    </div>
 </div>
 
 <footer>
@@ -325,10 +640,19 @@ if (typeof DOWNLOAD_LINKS !== "undefined") {
 
 }
 
-// Loader
+// Loader with smooth fade out
 window.onload = () => {
-    document.getElementById("loader").style.display = "none";
+    const loader = document.getElementById("loader");
+    loader.style.opacity = "0";
+    loader.style.visibility = "hidden";
 };
+
+// Mouse Glow Trail Effect
+const mouseGlow = document.getElementById("mouseGlow");
+document.addEventListener("mousemove", (e) => {
+    mouseGlow.style.left = e.clientX + "px";
+    mouseGlow.style.top = e.clientY + "px";
+});
 
 </script>
 
