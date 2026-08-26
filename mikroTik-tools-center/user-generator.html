@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سكربت مولد مستخدمين الهوتسبوت</title>
+    
+    <!-- Google Fonts: Cairo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Pro Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-shadow: 0 20px 40px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.05);
+            --input-bg: #f8fafc;
+            --border-color: #cbd5e1;
+            --border-focus: #0284c7;
+            --glow-color: rgba(2, 132, 199, 0.15);
+            --text-main: #0f172a;
+            --text-sub: #475569;
+            --accent-blue: #0284c7;
+            --accent-hover: #0369a1;
+            --code-bg: #0f172a;
+            --code-color: #38bdf8;
+            --error-bg: #fef2f2;
+            --error-border: #fca5a5;
+            --error-text: #dc2626;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+            transition: all 0.25s ease;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 24px;
+        }
+
+        /* Container */
+        .app-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Header Bar */
+        header {
+            padding: 24px 32px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-text h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .brand-text p {
+            font-size: 13px;
+            color: var(--accent-blue);
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        /* Workspace Grid */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            min-height: 560px;
+        }
+
+        @media (max-width: 960px) {
+            .workspace-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Control Form Panel */
+        .form-panel {
+            padding: 32px;
+            background: #f8fafc;
+            border-left: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* Alert Box */
+        .alert-box {
+            display: none;
+            background: var(--error-bg);
+            border: 1px solid var(--error-border);
+            color: var(--error-text);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            align-items: center;
+            gap: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group label i {
+            color: var(--accent-blue);
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: var(--text-main);
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 0 4px var(--glow-color);
+        }
+
+        .form-group .hint {
+            font-size: 11px;
+            color: var(--text-sub);
+            font-weight: 600;
+        }
+
+        .btn-generate {
+            background: var(--accent-blue);
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 12px var(--glow-color);
+            margin-top: 8px;
+        }
+
+        .btn-generate:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Output Script Area */
+        .output-panel {
+            padding: 32px;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .output-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .output-title i {
+            color: var(--accent-blue);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-action {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: var(--text-main);
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action:hover {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            background: #ffffff;
+        }
+
+        .code-container {
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Placeholder State */
+        .empty-placeholder {
+            flex-grow: 1;
+            min-height: 420px;
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-sub);
+            text-align: center;
+            padding: 20px;
+        }
+
+        .empty-placeholder i {
+            font-size: 44px;
+            color: var(--accent-blue);
+            opacity: 0.8;
+        }
+
+        .empty-placeholder p {
+            font-size: 14px;
+            font-weight: 600;
+            max-width: 360px;
+        }
+
+        textarea {
+            width: 100%;
+            flex-grow: 1;
+            min-height: 420px;
+            background: var(--code-bg);
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 20px;
+            color: var(--code-color);
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 13.5px;
+            line-height: 1.6;
+            resize: vertical;
+            outline: none;
+            direction: ltr;
+            display: none;
+        }
+
+        /* Footer */
+        footer {
+            padding: 20px 32px;
+            background: #f8fafc;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 13px;
+            color: var(--text-sub);
+            font-weight: 600;
+            gap: 6px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        <!-- Header -->
+        <header>
+            <div class="brand-text">
+                <h1>سكربت مولد مستخدمين الهوتسبوت</h1>
+                <p>سكربت مخصص لإنشاء وإدارة مستخدمين الهوتسبوت</p>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <div class="workspace-grid">
+            <!-- Form Controls -->
+            <div class="form-panel">
+                <div class="alert-box" id="alertBox">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="alertMessage">يرجى التأكد من تصحيح المدخلات!</span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-users"></i> عدد المستخدمين</label>
+                    <input type="number" id="user-count" value="50" min="1" max="2000" placeholder="مثال: 50">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-id-card"></i> اسم البروفايل (Profile)</label>
+                    <input type="text" id="profile-name" value="default" placeholder="مثال: default">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-font"></i> بادئة اسم المستخدم (Prefix)</label>
+                    <input type="text" id="username-prefix" value="usr" placeholder="مثال: vip-">
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-key"></i> نمط كلمة السر</label>
+                    <select id="password-type">
+                        <option value="same">نفس اسم المستخدم</option>
+                        <option value="random4_num">4 أرقام عشوائية</option>
+                        <option value="random6_num">6 أرقام عشوائية</option>
+                        <option value="random6_alpha">6 أرقام وحروف عشوائية</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-regular fa-clock"></i> حد الوقت (Limit Uptime)</label>
+                    <input type="text" id="limit-uptime" placeholder="مثال: 1d أو 12h">
+                    <span class="hint">d = يوم | h = ساعة | m = دقيقة (اتركه فارغاً للإنفنتي)</span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-database"></i> حد البيانات (Data Limit)</label>
+                    <input type="text" id="limit-bytes" placeholder="مثال: 1000M أو 2G">
+                    <span class="hint">M = ميجابايت | G = جيجابايت</span>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-regular fa-comment-dots"></i> تعليق الدفعة (Comment)</label>
+                    <input type="text" id="batch-comment" value="Batch-Generated">
+                </div>
+
+                <button class="btn-generate" id="generateBtn">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>توليد السكريبت الاحترافي</span>
+                </button>
+            </div>
+
+            <!-- Code Preview Area -->
+            <div class="output-panel">
+                <div class="output-header">
+                    <div class="output-title">
+                        <i class="fa-solid fa-code"></i>
+                        <span>مخرجات سكريبت MikroTik (.rsc)</span>
+                    </div>
+                    <div class="action-btns">
+                        <button class="btn-action" id="copyBtn">
+                            <i class="fa-regular fa-copy"></i> <span id="btn-copy-text">نسخ السكريبت</span>
+                        </button>
+                        <button class="btn-action" id="downloadBtn">
+                            <i class="fa-solid fa-download"></i> <span>تحميل (.rsc)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="code-container">
+                    <div class="empty-placeholder" id="placeholderView">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <p>قم بضبط المدخلات ثم اضغط على "توليد السكريبت الاحترافي" لإظهار الأوامر البرمجية هنا.</p>
+                    </div>
+                    <textarea id="scriptOutput" readonly></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <div>
+                برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+            </div>
+            <div id="statusCount">جاهز للتوليد</div>
+        </footer>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            const $ = (id) => document.getElementById(id);
+
+            // Validation Helper
+            function validateInputs() {
+                const count = parseInt($('user-count').value, 10);
+                const profile = $('profile-name').value.trim();
+                const prefix = $('username-prefix').value.trim();
+                const uptime = $('limit-uptime').value.trim();
+                const bytes = $('limit-bytes').value.trim();
+
+                const uptimeRegex = /^(\d+[dDhHmM]?)*$/;
+                const bytesRegex = /^(\d+[kKmMgGtT]?)*$/;
+
+                const alertBox = $('alertBox');
+                const alertMessage = $('alertMessage');
+
+                function showError(msg) {
+                    alertMessage.textContent = msg;
+                    alertBox.style.display = 'flex';
+                    return false;
+                }
+
+                alertBox.style.display = 'none';
+
+                if (isNaN(count) || count < 1 || count > 2000) {
+                    return showError('يرجى إدخال عدد مستخدمين صحيح بين 1 و 2000');
+                }
+                if (!profile || /[^\w\s-]/gi.test(profile)) {
+                    return showError('اسم البروفايل مطلوب بدون رموز غير مدعومة');
+                }
+                if (prefix && /[^\w-]/gi.test(prefix)) {
+                    return showError('بادئة اسم المستخدم غير صحيحة');
+                }
+                if (uptime && !uptimeRegex.test(uptime)) {
+                    return showError('صيغة حد الوقت غير صحيحة (مثال: 1d أو 12h)');
+                }
+                if (bytes && !bytesRegex.test(bytes)) {
+                    return showError('صيغة حد البيانات غير صحيحة (مثال: 1G أو 500M)');
+                }
+
+                return true;
+            }
+
+            function getRandomString(length, chars) {
+                let res = '';
+                for (let i = 0; i < length; i++) {
+                    res += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return res;
+            }
+
+            // Main Generator Function
+            function generateScript() {
+                if (!validateInputs()) return;
+
+                const count = parseInt($('user-count').value, 10);
+                const profile = $('profile-name').value.trim() || 'default';
+                const prefix = $('username-prefix').value.trim();
+                const pType = $('password-type').value;
+                const uptime = $('limit-uptime').value.trim();
+                const bytes = $('limit-bytes').value.trim();
+                const comment = $('batch-comment').value.trim() || 'Batch-User';
+
+                const lines = [];
+                const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
+
+                lines.push('# ===================================================');
+                lines.push('# MikroTik Hotspot Batch User Generator');
+                lines.push('# Generated At: ' + now);
+                lines.push('# Total Users: ' + count);
+                lines.push('# ===================================================');
+                lines.push('');
+
+                for (let i = 1; i <= count; i++) {
+                    const uname = prefix + String(i).padStart(3, '0');
+                    let pass = uname;
+
+                    if (pType === 'random4_num') pass = getRandomString(4, '0123456789');
+                    if (pType === 'random6_num') pass = getRandomString(6, '0123456789');
+                    if (pType === 'random6_alpha') pass = getRandomString(6, '23456789abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ');
+
+                    let cmd = `/ip hotspot user add name="${uname}" password="${pass}" profile="${profile}" comment="${comment}"`;
+
+                    if (uptime) cmd += ` limit-uptime=${uptime}`;
+                    if (bytes) cmd += ` limit-bytes-total=${bytes}`;
+
+                    lines.push(cmd);
+                }
+
+                // Show Script View, Hide Placeholder
+                $('placeholderView').style.display = 'none';
+                $('scriptOutput').style.display = 'block';
+                $('scriptOutput').value = lines.join('\n');
+
+                $('statusCount').textContent = `تم توليد ${count} مستخدم بنجاح`;
+            }
+
+            // Event Listeners
+            $('generateBtn').addEventListener('click', generateScript);
+
+            $('copyBtn').addEventListener('click', () => {
+                const code = $('scriptOutput').value;
+                if (!code) return;
+                navigator.clipboard.writeText(code).then(() => {
+                    const btnText = $('btn-copy-text');
+                    const orig = btnText.textContent;
+                    btnText.textContent = 'تم النسخ!';
+                    setTimeout(() => btnText.textContent = orig, 1500);
+                });
+            });
+
+            $('downloadBtn').addEventListener('click', () => {
+                const code = $('scriptOutput').value;
+                if (!code) return;
+                const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = `hotspot_users_${Date.now()}.rsc`;
+                a.click();
+            });
+        })();
+    </script>
+</body>
+</html>

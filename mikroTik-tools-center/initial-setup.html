@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تهيئة أولية للهوتسبوت</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --accent-color: #0284c7;
+            --accent-hover: #0369a1;
+            --input-bg: #ffffff;
+            --input-border: rgba(0, 0, 0, 0.15);
+            --code-bg: #1e293b;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .stepper {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .stepper::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--input-border);
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .step-dot {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-color);
+            border: 2px solid var(--input-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            z-index: 2;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .step-dot.active {
+            border-color: var(--accent-color);
+            background: var(--accent-color);
+            color: #fff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            background: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-color);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent-color);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent-color);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--input-border);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--input-border);
+        }
+
+        .code-container {
+            position: relative;
+            background: var(--code-bg);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 10px;
+            direction: ltr;
+            text-align: left;
+            overflow-x: auto;
+            max-height: 400px;
+        }
+
+        pre {
+            font-family: 'Courier New', Courier, monospace;
+            color: #38bdf8;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .cmt { color: #94a3b8; }
+        .cmd { color: #f43f5e; }
+        .arg { color: #fbbf24; }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 15px 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--card-border);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>تهيئة أولية للهوتسبوت</h1>
+            <p>مولد إعدادات شبكة الهوتسبوت لجهاز الميكروتك بسهولة</p>
+        </header>
+
+        <div class="stepper">
+            <div class="step-dot active" data-step="0">1</div>
+            <div class="step-dot" data-step="1">2</div>
+            <div class="step-dot" data-step="2">3</div>
+            <div class="step-dot" data-step="3">4</div>
+        </div>
+
+        <form id="wizardForm">
+            <!-- Step 1: Basic Config -->
+            <div class="tab-content active">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="hs-interface">اسم الواجهة (Interface)</label>
+                        <input type="text" id="hs-interface" value="ether2">
+                        <small class="hint">المنفذ المربوط بشبكة المشتركين داخل الميكروتك.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="hs-name">اسم السيرفر (Server Name)</label>
+                        <input type="text" id="hs-name" value="MusaleM-Hotspot">
+                        <small class="hint">اسم تعريفي لسيرفر الهوتسبوت داخل الجهاز.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="hs-ip">عنوان IP الواجهة</label>
+                        <input type="text" id="hs-ip" value="192.168.88.1/24">
+                        <small class="hint">عنوان الـ IP الرئيسي للبوابة متبوعاً بقناع الشبكة.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="hs-dns">اسم النطاق (DNS Name)</label>
+                        <input type="text" id="hs-dns" value="login.net">
+                        <small class="hint">العنوان الذي يظهر للمستخدم في المتصفح لفتح صفحة الدخول.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Network & Pool -->
+            <div class="tab-content">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="pool-name">اسم التجمع (IP Pool Name)</label>
+                        <input type="text" id="pool-name" value="hs-pool-1">
+                        <small class="hint">اسم خزان العناوين المخصص للمشتركين.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="pool-range">نطاق العناوين (IP Range)</label>
+                        <input type="text" id="pool-range" value="192.168.88.10-192.168.88.254">
+                        <small class="hint">مدى العناوين التي سيتم توزيعها تلقائياً على الأجهزة المتصلة.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="dns-servers">سيرفرات DNS الخارجي</label>
+                        <input type="text" id="dns-servers" value="8.8.8.8,1.1.1.1">
+                        <small class="hint">خوادم تحويل الأسماء لتأمين الاتصال بالإنترنت.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Wireless & Profiles -->
+            <div class="tab-content">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="profile-name">بروفايل المستخدم الافتراضي</label>
+                        <input type="text" id="profile-name" value="default-user">
+                        <small class="hint">اسم الباقة أو البروفايل الذي يحدد خصائص الاشتراك.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="rate-limit">تحديد السرعة (Rate Limit)</label>
+                        <input type="text" id="rate-limit" value="2M/5M">
+                        <small class="hint">سرعة الرفع/التحميل للمستخدم (مثال: رفع 2 ميجا / تحميل 5 ميجا).</small>
+                    </div>
+                    <div class="form-group full-width">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="setup-wifi">
+                            <label for="setup-wifi">إعداد شبكة لا سلكية (Wi-Fi) مخصصة للهوتسبوت</label>
+                        </div>
+                        <small class="hint">قم بالتفعيل إذا كنت تستخدم كرت واي فاي داخلي في الميكروتك.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="ssid-hs">اسم شبكة الواي فاي (SSID)</label>
+                        <input type="text" id="ssid-hs" value="MusaleM_Free_WiFi" disabled>
+                        <small class="hint">الاسم الذي يظهر للمستخدمين عند البحث عن شبكات الواي فاي.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Output Script -->
+            <div class="tab-content">
+                <div class="code-container">
+                    <button type="button" class="copy-btn" id="copyBtn"><i class="fa-regular fa-copy"></i> نسخ السكربت</button>
+                    <pre id="scriptOutput"></pre>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">السابق</button>
+                <button type="button" class="btn" id="nextBtn">التالي</button>
+            </div>
+        </form>
+    </div>
+
+    <footer>
+        برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+    </footer>
+
+    <script>
+        const tabs = document.querySelectorAll('.tab-content');
+        const dots = document.querySelectorAll('.step-dot');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const setupWifi = document.getElementById('setup-wifi');
+        const ssidInput = document.getElementById('ssid-hs');
+        const scriptOutput = document.getElementById('scriptOutput');
+        const copyBtn = document.getElementById('copyBtn');
+
+        let currentTab = 0;
+
+        function showTab(n) {
+            tabs.forEach((tab, index) => {
+                tab.classList.toggle('active', index === n);
+                dots[index].classList.toggle('active', index <= n);
+            });
+
+            prevBtn.style.display = n === 0 ? 'none' : 'block';
+            nextBtn.textContent = n === tabs.length - 1 ? 'إعادة التوليد' : 'التالي';
+            
+            if (n === tabs.length - 1) {
+                generateScript();
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentTab > 0) {
+                currentTab--;
+                showTab(currentTab);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentTab < tabs.length - 1) {
+                currentTab++;
+                showTab(currentTab);
+            } else {
+                generateScript();
+            }
+        });
+
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                currentTab = index;
+                showTab(currentTab);
+            });
+        });
+
+        setupWifi.addEventListener('change', (e) => {
+            ssidInput.disabled = !e.target.checked;
+        });
+
+        const sanitize = (str) => str.replace(/[^a-zA-Z0-9_-]/g, '_');
+
+        function generateScript() {
+            const iface = document.getElementById('hs-interface').value;
+            const hsName = sanitize(document.getElementById('hs-name').value);
+            const hsIp = document.getElementById('hs-ip').value;
+            const dnsName = document.getElementById('hs-dns').value;
+            const poolName = sanitize(document.getElementById('pool-name').value);
+            const poolRange = document.getElementById('pool-range').value;
+            const dnsServers = document.getElementById('dns-servers').value;
+            const profName = sanitize(document.getElementById('profile-name').value);
+            const rateLimit = document.getElementById('rate-limit').value;
+            const isWifi = setupWifi.checked;
+            const ssid = document.getElementById('ssid-hs').value;
+
+            const ipOnly = hsIp.split('/')[0];
+
+            let script = `<span class="cmt"># ============================================</span>\n`;
+            script += `<span class="cmt"># Generated by تهيئة أولية للهوتسبوت 2026</span>\n`;
+            script += `<span class="cmt"># ============================================</span>\n\n`;
+            
+            script += `<span class="cmt"># 1. IP Pool Setup</span>\n`;
+            script += `<span class="cmd">/ip pool</span> add <span class="arg">name</span>=${poolName} <span class="arg">ranges</span>=${poolRange}\n\n`;
+
+            script += `<span class="cmt"># 2. Assign IP to Interface</span>\n`;
+            script += `<span class="cmd">/ip address</span> add <span class="arg">address</span>=${hsIp} <span class="arg">interface</span>=${iface}\n\n`;
+
+            script += `<span class="cmt"># 3. Hotspot Profile & Server Setup</span>\n`;
+            script += `<span class="cmd">/ip hotspot profile</span> add <span class="arg">name</span>="${hsName}-prof" <span class="arg">dns-name</span>="${dnsName}" <span class="arg">hotspot-address</span>=${ipOnly}\n`;
+            script += `<span class="cmd">/ip hotspot</span> add <span class="arg">name</span>="${hsName}" <span class="arg">interface</span>=${iface} <span class="arg">address-pool</span>=${poolName} <span class="arg">profile</span>="${hsName}-prof" <span class="arg">disabled</span>=no\n\n`;
+
+            script += `<span class="cmt"># 4. User Profile & Rate Limits</span>\n`;
+            script += `<span class="cmd">/ip hotspot user profile</span> add <span class="arg">name</span>="${profName}" <span class="arg">rate-limit</span>="${rateLimit}"\n\n`;
+
+            if (isWifi) {
+                script += `<span class="cmt"># 5. Wireless Network Setup</span>\n`;
+                script += `<span class="cmd">/interface wireless</span> set [ find default-name=wlan1 ] <span class="arg">ssid</span>="${ssid}" <span class="arg">mode</span>=ap-bridge <span class="arg">disabled</span>=no\n`;
+            }
+
+            scriptOutput.innerHTML = script;
+            return scriptOutput.innerText;
+        }
+
+        copyBtn.addEventListener('click', () => {
+            const rawText = generateScript();
+            navigator.clipboard.writeText(rawText).then(() => {
+                copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> تم النسخ!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> نسخ السكربت';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>

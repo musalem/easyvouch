@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset='utf-8' />
+    <meta name='viewport' content='width=device-width, initial-scale=1, maximum-scale=1' />
+    <title>صفحة انتهاء الخدمة / الاشتراك للمايكروتيك (Hotspot, PPPoE, Static-IP)</title>
+    <meta name='description' content='أداة احترافية لتوليد سكربتات المايكروتيك لتوجيه المشتركين المنتهية باقاتهم وإظهار صفحة الانتهاء.' />
+    
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #eff6ff;
+            --accent-color: #0d9488;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+            --success-color: #10b981;
+            --success-hover: #059669;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -1px rgba(0,0,0,0.04);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -2px rgba(0,0,0,0.03);
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            transition: all 0.2s ease-in-out;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 30px 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Header Style */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .header h1 {
+            color: var(--text-main);
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .header h1 i {
+            color: var(--primary-color);
+            background: var(--primary-light);
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        /* Layout Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 992px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Card System */
+        .card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .card-header h2, .card-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .card-header i {
+            color: var(--primary-color);
+            font-size: 20px;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--text-main);
+            font-size: 14px;
+        }
+
+        label span {
+            font-weight: 500;
+            font-size: 12px;
+            color: var(--text-muted);
+            display: block;
+            margin-top: 2px;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            background-color: #fafafa;
+            color: var(--text-main);
+        }
+
+        input[type="text"]:focus, textarea:focus {
+            outline: none;
+            background-color: #ffffff;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: var(--success-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: var(--danger-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .actions-row {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        /* Terminal Box */
+        .terminal-box {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13.5px;
+            line-height: 1.6;
+            direction: ltr;
+            text-align: left;
+            overflow-x: auto;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+            min-height: 120px;
+        }
+
+        .terminal-placeholder {
+            color: #64748b;
+            text-align: center;
+            direction: rtl;
+            font-family: 'Tajawal', sans-serif;
+            padding: 30px 0;
+            font-size: 14px;
+        }
+
+        .terminal-box b {
+            color: #38bdf8;
+            font-weight: normal;
+        }
+
+        .terminal-box span.highlight {
+            color: #f43f5e;
+            font-weight: 600;
+        }
+
+        /* Preview Box */
+        .preview-box {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 40px 20px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            margin-top: 15px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .preview-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 15px;
+        }
+
+        .preview-body {
+            font-size: 16px;
+            line-height: 1.8;
+            margin: 0 auto 20px auto;
+            max-width: 90%;
+            opacity: 0.95;
+        }
+
+        .preview-contact {
+            font-size: 15px;
+            font-weight: 700;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 10px 20px;
+            border-radius: 30px;
+            display: inline-block;
+            backdrop-filter: blur(4px);
+        }
+
+        /* Instructions */
+        .instructions {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: var(--primary-light);
+            border: 1px solid #bfdbfe;
+            border-radius: var(--radius-md);
+        }
+        
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .instructions ul {
+            padding-right: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #1e3a8a;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>
+            <i class="fa-solid fa-network-wired"></i>
+            صفحة انتهاء الخدمة / الاشتراك للمايكروتيك (Hotspot, PPPoE, Static-IP)
+        </h1>
+    </div>
+
+    <div class="main-grid">
+        <!-- لوحة التحكم / المدخلات -->
+        <div class="card sidebar">
+            <div class="card-header">
+                <i class="fa-solid fa-sliders"></i>
+                <h2>إعدادات المعلمات</h2>
+            </div>
+
+            <div class="form-group">
+                <label>اسم المنفذ (Ether Name) للهوت سبوت فقط <span>مثال: bridge1 أو ether2</span></label>
+                <input type="text" id="interface-name" value="bridge1">
+            </div>
+
+            <div class="form-group">
+                <label>نطاق الـ IP لصفحة الانتهاء <span>(يجب أن يكون بصيغة Subnet /24)</span></label>
+                <input type="text" id="ip-address" value="10.20.20.1/24">
+            </div>
+
+            <div class="form-group">
+                <label>منفذ البروكسي (Proxy Port) <span>لا تستخدم 3128 أو 8080 لتجنب التعارض</span></label>
+                <input type="text" id="proxy-port" value="8082">
+            </div>
+
+            <div class="form-group">
+                <label>عنوان صفحة الانتهاء <span>يدعم وسوم HTML</span></label>
+                <input type="text" id="input-msg-title" value="تنبيه: اشتراك منتهي!">
+            </div>
+
+            <div class="form-group">
+                <label>رسالة صفحة الانتهاء</label>
+                <textarea id="input-msg-body">عميلنا العزيز، نود إعلامك بأن خدمة الإنترنت معلقة حالياً بسبب تأخر السداد. يرجى المبادرة بدفع الفاتورة لضمان عودة الخدمة. شكراً لتفهمكم.</textarea>
+            </div>
+
+            <div class="form-group">
+                <label>بيانات التواصل (أسفل الصفحة)</label>
+                <input type="text" id="input-msg-contact" value="للتواصل مع الدعم الفني: 0100000000">
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="generateScript()">
+                <i class="fa-solid fa-plus"></i>
+                انشاء السكربت
+            </button>
+        </div>
+
+        <!-- منطقة العرض / المخرجات -->
+        <div class="card content">
+            <div class="card-header">
+                <i class="fa-solid fa-code"></i>
+                <h3>السكربت الجاهز (انسخ والصق في الـ Terminal):</h3>
+            </div>
+            
+            <div class="terminal-box" id="showScript">
+                <div class="terminal-placeholder">اضغط على زر <b>"انشاء السكربت"</b> لعرض الكود وتوليده هنا.</div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn btn-success" onclick="copyScript()">
+                    <i class="fa-regular fa-copy"></i>
+                    نسخ الكود
+                </button>
+                <a id="download-link" href="#" download="error.html" class="btn btn-danger">
+                    <i class="fa-solid fa-download"></i>
+                    تحميل ملف error.html
+                </a>
+            </div>
+
+            <div class="card-header" style="margin-top: 30px;">
+                <i class="fa-solid fa-desktop"></i>
+                <h3>معاينة صفحة الانتهاء (error.html):</h3>
+            </div>
+            <div class="preview-box">
+                <div class="preview-title" id="msg-title">تنبيه: اشتراك منتهي!</div>
+                <div class="preview-body" id="msg-body">عميلنا العزيز، نود إعلامك بأن خدمة الإنترنت معلقة حالياً بسبب تأخر السداد. يرجى المبادرة بدفع الفاتورة لضمان عودة الخدمة. شكراً لتفهمكم.</div>
+                <div class="preview-contact" id="msg-contact">للتواصل مع الدعم الفني: 0100000000</div>
+            </div>
+            
+            <div class="instructions">
+                <h3><i class="fa-solid fa-circle-info"></i> طريقة الاستخدام:</h3>
+                <ul>
+                    <li>اضغط على زر <b>تحميل ملف error.html</b> ثم قم برفع الملف للراوتر من خلال Winbox (قائمة Files) بداخل مجلد <code>webproxy/</code>.</li>
+                    <li>لتفعيل صفحة الانتهاء لأي مستخدم، قم بتغيير الـ Profile الخاص به إلى <b>EXPIRED</b> (ينطبق على Hotspot أو PPPoE).</li>
+                    <li>لتوجيه المستخدم يدويًا (Static-IP)، قم بإضافة عنوان الـ IP الخاص به في Firewall -> Address Lists باسم <b>EXPIRED</b>.</li>
+                </ul>
+                
+                <h4 style="margin-top: 20px; color: var(--danger-color); font-size: 14px; font-weight: 700;">
+                    <i class="fa-solid fa-trash-can"></i> سكربت حذف كافة الإعدادات (في حال أردت الإلغاء):
+                </h4>
+                <div class="terminal-box" style="margin-top: 10px; padding: 12px;">
+                    /ip proxy set enabled=no<br>
+                    /ip pool remove [find comment="EXPIRED By Script"]<br>
+                    /ip firewall nat remove [find comment="EXPIRED By Script"]<br>
+                    /ip firewall filter remove [find comment="EXPIRED By Script"]<br>
+                    /ip firewall address-list remove [find comment="EXPIRED By Script"]<br>
+                    /ppp profile remove [find comment="EXPIRED By Script"]<br>
+                    /ip proxy access remove [find comment="EXPIRED By Script"]<br>
+                    /ip hotspot walled-garden ip remove [find comment="EXPIRED By Script"]<br>
+                    /ip hotspot user profile remove [find name="EXPIRED"]<br>
+                    /ip address remove [find comment="EXPIRED By Script"]
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+    </div>
+</div>
+
+<script>
+    function utf8_to_b64(str) {
+        return window.btoa(unescape(encodeURIComponent(str)));
+    }
+
+    function generateScript() {
+        // جلب المدخلات
+        const interfaceName = document.getElementById('interface-name').value;
+        const ipAddressFull = document.getElementById('ip-address').value;
+        const proxyPort = document.getElementById('proxy-port').value;
+        const msgTitle = document.getElementById('input-msg-title').value;
+        const msgBody = document.getElementById('input-msg-body').value;
+        const msgContact = document.getElementById('input-msg-contact').value;
+
+        // معالجة الـ IP (استخراج الشبكة الأساسية)
+        const ipBase = ipAddressFull.substring(0, ipAddressFull.lastIndexOf('.'));
+        const currentDateTime = new Date().toLocaleString('en-US');
+
+        // بناء وتحديث محتوى الـ Terminal
+        const scriptHTML = `###############################################################<br>` +
+`# Mikrotik Notification Expired Script Generator<br>` +
+`# Date/Time: <span>${currentDateTime}</span><br>` +
+`###############################################################<br><br>` +
+`<b>/ip proxy set enabled=yes port=<span class="highlight">${proxyPort}</span> max-cache-size=none</b><br>` +
+`<b>/ip proxy access</b><br>` +
+`add action=allow dst-port=<span class="highlight">${proxyPort}</span> src-address=<span class="highlight">${ipBase}.0/24</span> comment="EXPIRED By Script"<br>` +
+`add action=deny local-port=<span class="highlight">${proxyPort}</span> comment="EXPIRED By Script"<br>` +
+`<b>/ip address</b><br>` +
+`add address=<span class="highlight">${ipBase}.1/24</span> interface=<span class="highlight">${interfaceName}</span> comment="EXPIRED By Script"<br>` +
+`<b>/ip firewall address-list</b><br>` +
+`add list=EXPIRED address=<span class="highlight">${ipBase}.0/24</span> comment="EXPIRED By Script"<br>` +
+`<b>/ip pool</b><br>` +
+`add name=EXPIRED ranges=<span class="highlight">${ipBase}.2-${ipBase}.254</span> comment="EXPIRED By Script"<br>` +
+`<b>/ip firewall filter</b><br>` +
+`add chain=forward src-address-list=EXPIRED action=drop comment="EXPIRED By Script"<br>` +
+`<b>/ip firewall nat</b><br>` +
+`add chain=dstnat src-address-list=EXPIRED protocol=tcp dst-port=80,443 action=redirect to-ports=<span class="highlight">${proxyPort}</span> comment="EXPIRED By Script"<br>` +
+`<b>/ppp profile</b><br>` +
+`add name=EXPIRED local-address=<span class="highlight">${ipBase}.1</span> remote-address=EXPIRED comment="EXPIRED By Script" on-down=":local username \\$\\"user\\";\\r\\n/ip proxy access remove [find comment=\\"ppp-\\$username\\"];" on-up=":local username \\$\\"user\\";\\r\\n:local address \\$\\"remote-address\\";\\r\\n/ip proxy access add action=deny src-address=\\$address comment=\\"ppp-\\$username\\";"<br>` +
+`<b>/ip hotspot user profile</b><br>` +
+`add address-pool=EXPIRED !mac-cookie-timeout transparent-proxy=no on-login=":local username \\$\\"user\\";\\r\\n:local ipaddress \\$\\"address\\";\\r\\n/ip proxy access add action=deny src-address=\\$ipaddress comment=\\"hs-\$username\\";" on-logout=":local username \\$user;\\r\\n/ip hotspot cookie remove [find user=\\$username]\\r\\n/ip proxy access remove [find comment=\\"hs-\\$username\\"]" name=EXPIRED shared-users=100<br>` +
+`<b>/ip hotspot walled-garden ip</b><br>` +
+`add action=accept disabled=no !dst-address !dst-address-list dst-port=<span class="highlight">${proxyPort}</span> protocol=tcp !src-address !src-address-list comment="EXPIRED By Script"<br>`;
+
+        document.getElementById('showScript').innerHTML = scriptHTML;
+
+        // تحديث المعاينة
+        document.getElementById('msg-title').innerText = msgTitle;
+        document.getElementById('msg-body').innerText = msgBody;
+        document.getElementById('msg-contact').innerText = msgContact;
+
+        // إنشاء محتوى صفحة HTML قابلة للتحميل
+        const htmlTemplate = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #dc3545; color: #fff; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; text-align: center; }
+        .container { padding: 40px; }
+        h1 { font-size: 8vw; margin-bottom: 20px; }
+        p { font-size: 2vw; line-height: 2; margin-bottom: 20px; }
+        .contact { font-size: 2vw; font-weight: bold; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; display: inline-block;}
+        @media (max-width: 768px) {
+            h1 { font-size: 40px; }
+            p, .contact { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>${msgTitle}</h1>
+        <p>${msgBody}</p>
+        <div class="contact">${msgContact}</div>
+    </div>
+</body>
+</html>`;
+
+        // تحويل النص إلى Base64 وتعيينه لزر التحميل
+        const downloadLink = document.getElementById('download-link');
+        downloadLink.href = 'data:text/html;charset=utf-8;base64,' + utf8_to_b64(htmlTemplate);
+    }
+
+    function copyScript() {
+        const scriptElement = document.getElementById('showScript');
+        if (scriptElement.querySelector('.terminal-placeholder')) {
+            alert('يرجى الضغط على زر "انشاء السكربت" أولاً لتوليد الكود!');
+            return;
+        }
+
+        const range = document.createRange();
+        range.selectNode(scriptElement);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        
+        try {
+            document.execCommand('copy');
+            alert('تم نسخ السكربت بنجاح!');
+        } catch (err) {
+            alert('حدث خطأ أثناء النسخ.');
+        }
+        
+        window.getSelection().removeAllRanges();
+    }
+</script>
+
+</body>
+</html>

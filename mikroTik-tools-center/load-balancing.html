@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مولد سكربت دمج خطوط ميكروتك (PCC)</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(0, 0, 0, 0.08);
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --accent-color: #0284c7;
+            --accent-hover: #0369a1;
+            --reset-bg: #e2e8f0;
+            --reset-hover: #cbd5e1;
+            --input-bg: #ffffff;
+            --input-border: rgba(0, 0, 0, 0.15);
+            --code-bg: #1e293b;
+            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            background: var(--input-bg);
+            color: var(--text-color);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-color);
+        }
+
+        /* تنسيق أزرار التحكم */
+        .actions-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            flex: 2;
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            background: var(--reset-bg);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--reset-hover);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        /* حاوية الكود المخرجة */
+        .code-container {
+            display: none; /* مخفي افتراضياً */
+            position: relative;
+            background: var(--code-bg);
+            border-radius: 14px;
+            padding: 24px;
+            margin-top: 25px;
+            direction: ltr;
+            text-align: left;
+            overflow-x: auto;
+            max-height: 450px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        pre {
+            font-family: 'Courier New', Courier, monospace;
+            color: #38bdf8;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .cmt { color: #94a3b8; }
+        .cmd { color: #f43f5e; }
+        .arg { color: #fbbf24; }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        footer {
+            width: 100%;
+            text-align: center;
+            padding: 18px 0;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--card-border);
+            margin-top: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>مولد سكربت دمج خطوط ميكروتك</h1>
+            <p>إنشاء سكربت دمج الخطوط بتوزيع الأحمال (PCC) بسرعة لإصدارات RouterOS v6 و v7</p>
+        </header>
+
+        <form id="bondingForm" onsubmit="event.preventDefault(); handleGenerate();">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="ros-version">إصدار RouterOS</label>
+                    <select id="ros-version">
+                        <option value="7" selected>RouterOS v7.x</option>
+                        <option value="6">RouterOS v6.x</option>
+                    </select>
+                    <small class="hint">حدد إصدار نظام الميكروتك الذي تستخدمه.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="iface-prefix">سابقة اسم واجهات الخروج (WAN Prefix)</label>
+                    <input type="text" id="iface-prefix" value="ether" required>
+                    <small class="hint">الاسم الأساسي للمنافذ (مثال: ether سينتج ether1, ether2...).</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="start-port">رقم أول خط (Start Port)</label>
+                    <input type="number" id="start-port" value="1" min="1" required>
+                    <small class="hint">بداية ترقيم المنافذ المستخدمة للدمج.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="end-port">رقم آخر خط (End Port)</label>
+                    <input type="number" id="end-port" value="4" min="1" required>
+                    <small class="hint">إجمالي عدد الخطوط المدموجة أو نهاية الترقيم.</small>
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="out-interface">واجهة الخروج للشبكة المحلية (Local / LAN Interface)</label>
+                    <input type="text" id="out-interface" value="bridge-lan" required>
+                    <small class="hint">اسم المنفذ أو البريدج المربوط بشبكة المشتركين أو الهوتسبوت.</small>
+                </div>
+            </div>
+
+            <!-- أزرار التحكم بعد التحسين والترتيب -->
+            <div class="actions-group">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> إنشاء سكربت الدمج
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="resetForm()">
+                    <i class="fa-solid fa-rotate-right"></i> إعادة ضبط
+                </button>
+            </div>
+        </form>
+
+        <!-- منطقة الكود (مخفية حتى يتم الضغط على إنشاء السكربت) -->
+        <div class="code-container" id="codeContainer">
+            <button type="button" class="copy-btn" id="copyBtn">
+                <i class="fa-regular fa-copy"></i> نسخ السكربت
+            </button>
+            <pre id="scriptOutput"></pre>
+        </div>
+    </div>
+
+    <footer>
+        برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+    </footer>
+
+    <script>
+        function generateScript(version, start, end, out, interfaceName) {
+            let script;
+
+            if (version === "6") {
+                script = `{
+:local f [(${start}) ];
+:local t [(${end}) ];
+:local o [("${out}") ];
+
+:for e from $f to $t do={
+
+:local k [("${interfaceName}$e") ];
+
+:local p [($e - 1) ];
+
+# Firewall configuration
+/ip firewall mangle
+add action=mark-connection chain=input in-interface=("$k") new-connection-mark=("CON_$e") passthrough=yes
+add action=mark-routing chain=output connection-mark=("CON_$e") new-routing-mark=("TO_$e") passthrough=yes
+add action=mark-connection chain=prerouting dst-address-type=!local in-interface=$o new-connection-mark=("CON_$e") passthrough=yes per-connection-classifier=("both-addresses-and-ports:$t/$p")
+add action=mark-routing chain=prerouting connection-mark=("CON_$e") in-interface=$o new-routing-mark=("TO_$e") passthrough=yes
+
+/ip firewall nat
+add action=masquerade chain=srcnat out-interface=("$k")
+/ip route
+add distance=1 gateway=("192.168.$e.1") routing-mark=("TO_$e")
+add distance=("$e") gateway=("192.168.$e.1")
+
+}}`;
+            } else {
+                script = `{
+:local f [(${start}) ];
+:local t [(${end}) ];
+:local o [("${out}") ];
+
+:for e from $f to $t do={
+
+:local k [("${interfaceName}$e") ];
+:local p [($e - 1) ];
+:local tbl [("TO_$e") ];
+
+# Create a dedicated routing table (required on RouterOS v7.1+)
+/routing table
+add name=$tbl fib
+
+# Firewall configuration
+/ip firewall mangle
+add action=mark-connection chain=input in-interface=("$k") new-connection-mark=("CON_$e") passthrough=yes
+add action=mark-routing chain=output connection-mark=("CON_$e") new-routing-mark=$tbl passthrough=yes
+add action=mark-connection chain=prerouting dst-address-type=!local in-interface=$o new-connection-mark=("CON_$e") passthrough=yes per-connection-classifier=("both-addresses-and-ports:$t/$p")
+add action=mark-routing chain=prerouting connection-mark=("CON_$e") in-interface=$o new-routing-mark=$tbl passthrough=yes
+
+/ip firewall nat
+add action=masquerade chain=srcnat out-interface=("$k")
+
+/ip route
+add distance=1 gateway=("192.168.$e.1") routing-table=$tbl
+add distance=("$e") gateway=("192.168.$e.1")
+
+}}`;
+            }
+            return script;
+        }
+
+        function handleGenerate() {
+            const version = document.getElementById('ros-version').value;
+            const prefix = document.getElementById('iface-prefix').value.trim();
+            const start = parseInt(document.getElementById('start-port').value);
+            const end = parseInt(document.getElementById('end-port').value);
+            const outIface = document.getElementById('out-interface').value.trim();
+
+            if (start > end) {
+                alert('يجب أن يكون رقم أول خط أصغر من أو يساوي رقم آخر خط.');
+                return;
+            }
+
+            const rawScript = generateScript(version, start, end, outIface, prefix);
+            
+            // Syntax Highlight Simulation
+            let highlighted = rawScript
+                .replace(/(#.*)/g, '<span class="cmt">$1</span>')
+                .replace(/(\/ip firewall mangle|\/ip firewall nat|\/ip route|\/routing table)/g, '<span class="cmd">$1</span>')
+                .replace(/(\badd\b|\baction\b|\bchain\b|\bin-interface\b|\bout-interface\b|\bnew-connection-mark\b|\bnew-routing-mark\b|\bpassthrough\b|\bper-connection-classifier\b|\bdst-address-type\b|\bgateway\b|\brouting-table\b|\brouting-mark\b|\bdistance\b|\bname\b|\bfib\b)/g, '<span class="arg">$1</span>');
+
+            document.getElementById('scriptOutput').innerHTML = highlighted;
+            window.latestScript = rawScript;
+
+            // إظهار صندوق الكود والتمرير إليه بنعومة
+            const codeContainer = document.getElementById('codeContainer');
+            codeContainer.style.display = 'block';
+            codeContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetForm() {
+            document.getElementById('bondingForm').reset();
+            const codeContainer = document.getElementById('codeContainer');
+            codeContainer.style.display = 'none';
+            document.getElementById('scriptOutput').innerHTML = '';
+            window.latestScript = null;
+        }
+
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            const textToCopy = window.latestScript;
+            if (!textToCopy) return;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> تم النسخ!';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-regular fa-copy"></i> نسخ السكربت';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
