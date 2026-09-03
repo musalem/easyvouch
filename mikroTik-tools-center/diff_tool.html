@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مُقارِن | أداة مقارنة إعدادات ميكروتك الاحترافية (RouterOS 6 و 7)</title>
+    <meta name="description" content="مُقارِن: أداة احترافية تعمل بالكامل داخل المتصفح لمقارنة ملفات إعدادات (export) أجهزة ميكروتك، تدعم RouterOS v6 و v7، وتوضح الإضافات والحذف والتعديلات بدقة.">
+    <link rel="icon" href="data:,">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Cairo & JetBrains Mono Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Professional Day (Light) Theme — the only theme in the app */
+            --bg-primary: #f4f6f9;
+            --bg-secondary: #ffffff;
+            --bg-card: #f8fafc;
+            --bg-card-hover: #eef2f7;
+            --border-color: #dfe4ea;
+            --border-highlight: #b6c0cc;
+            --text-primary: #0f172a;
+            --text-secondary: #4b5768;
+            --text-muted: #7c8896;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --accent-glow: rgba(37, 99, 235, 0.15);
+
+            /* Status Colors */
+            --added-bg: #ecfdf5;
+            --added-border: #10b981;
+            --added-text: #047857;
+            --added-badge: #059669;
+
+            --removed-bg: #fef2f2;
+            --removed-border: #ef4444;
+            --removed-text: #b91c1c;
+            --removed-badge: #dc2626;
+
+            --modified-bg: #fffbeb;
+            --modified-border: #f59e0b;
+            --modified-text: #92400e;
+            --modified-badge: #d97706;
+
+            --unchanged-bg: #f1f5f9;
+            --unchanged-border: #dfe4ea;
+            --unchanged-text: #55606e;
+
+            --code-bg: #ffffff;
+            --code-inline-del: #fee2e2;
+            --code-inline-add: #d1fae5;
+            --code-inline-mod: #fef3c7;
+
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+            --shadow-md: 0 4px 10px -2px rgba(15, 23, 42, 0.10);
+            --shadow-lg: 0 12px 28px -6px rgba(15, 23, 42, 0.16);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+        }
+
+        body {
+            font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 40px;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            direction: ltr;
+            text-align: left;
+        }
+
+        /* Container Layout */
+        .app-container {
+            width: 96%;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px 10px;
+            flex: 1;
+        }
+
+        /* Header Styling */
+        header {
+            background-color: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            background: rgba(37, 99, 235, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent);
+            font-size: 1.4rem;
+        }
+
+        .brand-title h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-title h1 span.badge-beta {
+            font-size: 0.7rem;
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .brand-title p {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Toggle Switches & Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+            font-family: 'Cairo', sans-serif;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: #ffffff;
+            box-shadow: 0 2px 8px var(--accent-glow);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            border-color: var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--bg-card-hover);
+            border-color: var(--border-highlight);
+        }
+
+        .btn-outline-danger {
+            background: transparent;
+            color: var(--removed-text);
+            border-color: var(--removed-border);
+        }
+
+        .btn-outline-danger:hover {
+            background: var(--removed-bg);
+        }
+
+        .toggle-btn {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 7px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .toggle-btn:hover {
+            border-color: var(--border-highlight);
+            background-color: var(--bg-card-hover);
+        }
+
+        /* Upload Panels Zone */
+        .upload-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 24px;
+            margin-top: 20px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .upload-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .upload-header h2 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+            gap: 20px;
+        }
+
+        .upload-card {
+            background-color: var(--bg-card);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            position: relative;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .upload-card.drag-over {
+            border-color: var(--accent);
+            background-color: var(--accent-glow);
+        }
+
+        .upload-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .upload-card-title {
+            font-weight: 700;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tag-router-a {
+            background: #1e3a8a;
+            color: #93c5fd;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .tag-router-b {
+            background: #065f46;
+            color: #a7f3d0;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .tab-switcher {
+            display: flex;
+            background: var(--bg-secondary);
+            padding: 3px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tab-btn {
+            padding: 4px 12px;
+            font-size: 0.8rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .drop-zone {
+            text-align: center;
+            padding: 25px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        .drop-zone svg {
+            width: 42px;
+            height: 42px;
+            stroke: var(--text-muted);
+            margin-bottom: 10px;
+            fill: none;
+        }
+
+        .drop-zone p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .drop-zone span.highlight {
+            color: var(--accent);
+            font-weight: 700;
+            text-decoration: underline;
+        }
+
+        .paste-area {
+            display: none;
+            width: 100%;
+            height: 140px;
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            resize: vertical;
+            direction: ltr;
+        }
+
+        .file-info-badge {
+            display: none;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .version-tag {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: var(--border-color);
+            color: var(--text-primary);
+            font-weight: bold;
+        }
+
+        /* Notice Boxes */
+        .notice-box {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .notice-warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--modified-border);
+            color: var(--modified-text);
+        }
+
+        .notice-info {
+            background-color: rgba(59, 130, 246, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--text-primary);
+        }
+
+        .notice-icon {
+            font-size: 1.4rem;
+            line-height: 1;
+        }
+
+        .notice-content h4 {
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .notice-content p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .notice-content ul {
+            margin-right: 20px;
+            margin-top: 6px;
+            font-size: 0.83rem;
+            color: var(--text-secondary);
+        }
+
+        /* Summary & Filter Bar */
+        .summary-bar {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-badges {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: 1px solid transparent;
+            user-select: none;
+            transition: transform 0.15s ease;
+        }
+
+        .stat-chip:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-chip.active {
+            ring: 2px solid var(--accent);
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .stat-all { background: var(--bg-card); color: var(--text-primary); border-color: var(--border-color); }
+        .stat-added { background: var(--added-bg); color: var(--added-text); border-color: var(--added-border); }
+        .stat-removed { background: var(--removed-bg); color: var(--removed-text); border-color: var(--removed-border); }
+        .stat-modified { background: var(--modified-bg); color: var(--modified-text); border-color: var(--modified-border); }
+        .stat-unchanged { background: var(--unchanged-bg); color: var(--unchanged-text); border-color: var(--unchanged-border); }
+
+        .search-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            flex: 1;
+            max-width: 650px;
+            justify-content: flex-end;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 36px 8px 12px;
+            color: var(--text-primary);
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.88rem;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .search-box svg {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            stroke: var(--text-muted);
+            fill: none;
+        }
+
+        .select-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            max-width: 220px;
+        }
+
+        /* Diff Results Main Section */
+        .results-container {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .section-accordion {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .accordion-header {
+            padding: 14px 20px;
+            background: var(--bg-card);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            border-bottom: 1px solid transparent;
+        }
+
+        .accordion-header:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .accordion-header.open {
+            border-bottom-color: var(--border-color);
+        }
+
+        .accordion-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 0.98rem;
+        }
+
+        .accordion-title .path-badge {
+            font-family: 'JetBrains Mono', monospace;
+            direction: ltr;
+            color: var(--accent);
+            background: rgba(59, 130, 246, 0.1);
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .accordion-counts {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-count {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .badge-add { background: var(--added-badge); color: #ffffff; }
+        .badge-del { background: var(--removed-badge); color: #ffffff; }
+        .badge-mod { background: var(--modified-badge); color: #ffffff; }
+
+        .accordion-content {
+            display: block;
+            padding: 0;
+            overflow-x: auto;
+        }
+
+        .accordion-content.collapsed {
+            display: none;
+        }
+
+        /* Diff Rows Styling */
+        .diff-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.83rem;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .diff-row {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .diff-row:last-child {
+            border-bottom: none;
+        }
+
+        .diff-row.row-added {
+            background-color: var(--added-bg);
+            color: var(--added-text);
+        }
+
+        .diff-row.row-removed {
+            background-color: var(--removed-bg);
+            color: var(--removed-text);
+        }
+
+        .diff-row.row-modified {
+            background-color: var(--modified-bg);
+            color: var(--modified-text);
+        }
+
+        .diff-row.row-unchanged {
+            background-color: var(--unchanged-bg);
+            color: var(--unchanged-text);
+            opacity: 0.75;
+        }
+
+        .diff-cell-sign {
+            width: 30px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+            user-select: none;
+            padding: 8px 4px;
+        }
+
+        .diff-cell-content {
+            padding: 8px 12px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+
+        /* Word Highlighting in Modified Rows */
+        .hl-del {
+            background-color: var(--code-inline-del);
+            color: #b91c1c;
+            padding: 1px 4px;
+            border-radius: 3px;
+            text-decoration: line-through;
+            font-weight: 600;
+        }
+
+        .hl-add {
+            background-color: var(--code-inline-add);
+            color: #047857;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .hl-mod-key {
+            color: #b45309;
+            font-weight: bold;
+        }
+
+        /* Empty State & Loader */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-top: 20px;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            stroke: var(--text-muted);
+            margin-bottom: 16px;
+            fill: none;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            max-width: 500px;
+            margin: 0 auto 20px auto;
+        }
+
+        .spinner {
+            border: 4px solid rgba(15, 23, 42, 0.08);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--accent);
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer Styling */
+        footer {
+            margin-top: 50px;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+
+        footer span.rights {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Utility Classes */
+        .hidden { display: none !important; }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 900px) {
+            .upload-grid {
+                grid-template-columns: 1fr;
+            }
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .summary-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-filter-group {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <div class="header-content">
+            <div class="brand">
+                <div class="brand-logo">
+                    <i class="fa-solid fa-code-compare"></i>
+                </div>
+                <div class="brand-title">
+                    <h1>مُقارِن <span class="badge-beta">PRO</span></h1>
+                    <p>أداة احترافية لمقارنة إعدادات ميكروتك — تكتشف الفروقات بدقة بين RouterOS v6 و v7</p>
+                </div>
+            </div>
+
+            <div class="header-controls">
+                <!-- Privacy Mode Switch -->
+                <button class="toggle-btn" id="privacyBtn" onclick="togglePrivacyMode()" title="إخفاء/تمويه كلمات المرور والبيانات الحساسة">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    <span id="privacyStatusText">وضع الخصوصية: مفعل</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Application Container -->
+    <div class="app-container">
+
+        <!-- Upload & Input Panels -->
+        <section class="upload-section" id="uploadSection">
+            <div class="upload-header">
+                <h2>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    رفع أو لصق ملفات الإعدادات (.rsc / .txt)
+                </h2>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-secondary" onclick="loadSampleDemoData()">
+                        ⚡ تحميل مثال توضيحي (v6 vs v7)
+                    </button>
+                    <button class="btn btn-outline-danger" onclick="resetAll()">
+                        🗑️ مسح الكل
+                    </button>
+                </div>
+            </div>
+
+            <div class="upload-grid">
+                <!-- Router A Panel -->
+                <div class="upload-card" id="cardA" ondragover="handleDragOver(event, 'cardA')" ondragleave="handleDragLeave('cardA')" ondrop="handleFileDrop(event, 'fileA')">
+                    <div class="upload-card-header">
+                        <div class="upload-card-title">
+                            <span class="tag-router-a">Router A / قبل</span>
+                            <span>الملف الأول</span>
+                        </div>
+                        <div class="tab-switcher">
+                            <button class="tab-btn active" onclick="switchInputType('A', 'file')">ملف</button>
+                            <button class="tab-btn" onclick="switchInputType('A', 'text')">نص</button>
+                        </div>
+                    </div>
+
+                    <!-- Drop Zone A -->
+                    <div class="drop-zone" id="dropA" onclick="document.getElementById('inputA').click()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="12" y1="18" x2="12" y2="12"/>
+                            <line x1="9" y1="15" x2="15" y2="15"/>
+                        </svg>
+                        <p>أسقط ملف <span class="mono">.rsc</span> هنا أو <span class="highlight">انقر للاختيار</span></p>
+                        <input type="file" id="inputA" accept=".rsc,.txt" style="display:none;" onchange="handleFileSelect(event, 'A')">
+                    </div>
+
+                    <!-- Paste Textarea A -->
+                    <textarea class="paste-area" id="textA" placeholder="إلصق نص التصدير (/export) هنا..." oninput="handleTextChange('A')"></textarea>
+
+                    <!-- File Info Status Badge A -->
+                    <div class="file-info-badge" id="badgeA">
+                        <span id="fileNameA" style="font-weight: bold; overflow: hidden; text-overflow: ellipsis;">-</span>
+                        <span class="version-tag" id="verTagA">ROS --</span>
+                    </div>
+                </div>
+
+                <!-- Router B Panel -->
+                <div class="upload-card" id="cardB" ondragover="handleDragOver(event, 'cardB')" ondragleave="handleDragLeave('cardB')" ondrop="handleFileDrop(event, 'fileB')">
+                    <div class="upload-card-header">
+                        <div class="upload-card-title">
+                            <span class="tag-router-b">Router B / بعد</span>
+                            <span>الملف الثاني</span>
+                        </div>
+                        <div class="tab-switcher">
+                            <button class="tab-btn active" onclick="switchInputType('B', 'file')">ملف</button>
+                            <button class="tab-btn" onclick="switchInputType('B', 'text')">نص</button>
+                        </div>
+                    </div>
+
+                    <!-- Drop Zone B -->
+                    <div class="drop-zone" id="dropB" onclick="document.getElementById('inputB').click()">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="12" y1="18" x2="12" y2="12"/>
+                            <line x1="9" y1="15" x2="15" y2="15"/>
+                        </svg>
+                        <p>أسقط ملف <span class="mono">.rsc</span> هنا أو <span class="highlight">انقر للاختيار</span></p>
+                        <input type="file" id="inputB" accept=".rsc,.txt" style="display:none;" onchange="handleFileSelect(event, 'B')">
+                    </div>
+
+                    <!-- Paste Textarea B -->
+                    <textarea class="paste-area" id="textB" placeholder="إلصق نص التصدير (/export) هنا..." oninput="handleTextChange('B')"></textarea>
+
+                    <!-- File Info Status Badge B -->
+                    <div class="file-info-badge" id="badgeB">
+                        <span id="fileNameB" style="font-weight: bold; overflow: hidden; text-overflow: ellipsis;">-</span>
+                        <span class="version-tag" id="verTagB">ROS --</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Compare Button -->
+            <div style="margin-top:20px; text-align:center;">
+                <button class="btn btn-primary" style="padding: 12px 36px; font-size:1.05rem;" onclick="runDiffAnalysis()">
+                    🔍 بدء مقارنة الإعدادات وتوليد التقرير
+                </button>
+            </div>
+        </section>
+
+        <!-- Version Migration Notice Box (v6 vs v7) -->
+        <div id="migrationNotice" class="notice-box notice-warning hidden">
+            <div class="notice-icon">💡</div>
+            <div class="notice-content">
+                <h4>تنبيه ترحيل الإصدار (Version Migration Notice)</h4>
+                <p>تم اكتشاف مقارنة بين نسختين مختلفين من RouterOS (v6 ↔ v7). بعض الفروقات الناتجة هي تغييرات بنيوية في نظام MikroTik وليست تعديلات يدوية:</p>
+                <ul>
+                    <li>تغير مسار الـ Wireless من <span class="mono">/interface wireless</span> إلى <span class="mono">/interface wifi</span> أو <span class="mono">wifiwave2</span>.</li>
+                    <li>إعادة هيكلة كليّة لبروتوكولات التوجيه (Routing v2) مثل OSPF و BGP.</li>
+                    <li>إضافة خصائص افتراضية جديدة في v7 غير موجودة في v6.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Firewall Rule Order Notice Box -->
+        <div id="orderNotice" class="notice-box notice-info hidden">
+            <div class="notice-icon">⚠️</div>
+            <div class="notice-content">
+                <h4>تنبيه اختلاف ترتيب القواعد (Rule Sequence Notice)</h4>
+                <p>توجد قواعد فايروول أو جدار حماية متطابقة تمامًا في المحتوى ولكن تم تغيير **ترتيب تنفيذها** بين الملفين. في RouterOS، ترتيب القواعد حاسم جدًا في المعالجة وقد يكون هو السبب في اختلاف السلوك!</p>
+            </div>
+        </div>
+
+        <!-- Summary & Filter Bar -->
+        <section class="summary-bar hidden" id="summaryBar">
+            <div class="stat-badges">
+                <span class="stat-chip stat-all active" id="chipAll" onclick="setFilterStatus('ALL')">الكل: <span id="cntAll">0</span></span>
+                <span class="stat-chip stat-added" id="chipAdded" onclick="setFilterStatus('ADDED')">🟢 مضاف: <span id="cntAdded">0</span></span>
+                <span class="stat-chip stat-removed" id="chipRemoved" onclick="setFilterStatus('REMOVED')">🔴 محذوف: <span id="cntRemoved">0</span></span>
+                <span class="stat-chip stat-modified" id="chipModified" onclick="setFilterStatus('MODIFIED')">🟡 معدّل: <span id="cntModified">0</span></span>
+                <span class="stat-chip stat-unchanged" id="chipUnchanged" onclick="setFilterStatus('UNCHANGED')">⚪ متطابق: <span id="cntUnchanged">0</span></span>
+            </div>
+
+            <div class="search-filter-group">
+                <!-- Search Box -->
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="بحث نصي أو IP أو أمر..." oninput="handleSearch()">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </div>
+
+                <!-- Section Selector -->
+                <select class="select-section" id="sectionSelect" onchange="handleSectionSelect()">
+                    <option value="ALL">كل الأقسام</option>
+                </select>
+
+                <!-- Export Buttons -->
+                <button class="btn btn-secondary" onclick="exportHtmlReport()" title="تصدير التقرير كملف HTML مستقل">
+                    📥 HTML
+                </button>
+                <button class="btn btn-secondary" onclick="exportGitDiffText()" title="تصدير التقرير بتنسيق Plain Git Diff">
+                    📄 Diff
+                </button>
+            </div>
+        </section>
+
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="spinner hidden"></div>
+
+        <!-- Diff Results Area -->
+        <main class="results-container" id="resultsContainer">
+            <div class="empty-state" id="initialEmptyState">
+                <svg viewBox="0 0 24 24">
+                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h3>لم يتم إجراء أي مقارنة بعد</h3>
+                <p>يرجى رفع ملفي إعدادات RouterOS (.rsc) في المنطقة أعلاه والضغط على "بدء المقارنة".</p>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+    </footer>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        /* ==========================================================================
+           GLOBAL STATE & CONFIGURATION
+           ========================================================================== */
+        const state = {
+            privacyMode: true,
+            inputTypes: { A: 'file', B: 'file' },
+            fileData: {
+                A: { name: '', text: '', version: 'Unk', majorVer: '6' },
+                B: { name: '', text: '', version: 'Unk', majorVer: '7' }
+            },
+            diffResults: [],
+            activeStatusFilter: 'ALL',
+            activeSectionFilter: 'ALL',
+            searchQuery: '',
+            hasOrderNotice: false,
+            v6v7Migration: false
+        };
+
+        // RouterOS Path Mapping Table (v6 <-> v7) — used by computeDiff() to treat
+        // renamed/restructured sections as the SAME logical section across versions,
+        // instead of reporting a full "removed" + full "added" block.
+        const PATH_MAPPING_V6_V7 = {
+            '/interface wireless': '/interface wifi',
+            '/interface wireless security-profiles': '/interface wifi security',
+            '/interface wireless cap': '/interface wifi cap',
+            '/caps-man': '/interface wifi capsman',
+            '/routing ospf instance': '/routing ospf',
+            '/routing ospf area': '/routing ospf area',
+            '/routing bgp peer': '/routing bgp connection',
+            '/routing bgp instance': '/routing bgp template'
+        };
+
+        // Properties containing sensitive data for Privacy Masking
+        const SENSITIVE_KEYS = [
+            'password', 'secret', 'private-key', 'wpa2-pre-shared-key',
+            'wpa-pre-shared-key', 'passphrase', 'pcap-password', 'auth-password', 'key'
+        ];
+
+        /* ==========================================================================
+           ROUTEROS PARSER ENGINE
+           ========================================================================== */
+
+        /**
+         * Parses header comment to extract RouterOS Version
+         */
+        function detectRouterOSVersion(text) {
+            if (!text) return { full: 'غير معروف', major: '7' };
+            const lines = text.split(String.fromCharCode(10)).slice(0, 15);
+            for (let line of lines) {
+                // Match e.g. # jan/01/2026 10:00:00 by RouterOS 7.15.3
+                const match = line.match(/by\s+RouterOS\s+([0-9]+\.[0-9]+(?:\.[0-9]+)?)/i);
+                if (match) {
+                    const full = match[1];
+                    const major = full.startsWith('6') ? '6' : '7';
+                    return { full, major };
+                }
+            }
+            return { full: 'v6/v7 عام', major: '7' };
+        }
+
+        /**
+         * Cleans script and merges multi-line statements ending with backslash          */
+        function preprocessRouterOSScript(rawText) {
+            if (!rawText) return [];
+            const lines = rawText.replace(/\r\n/g, '\n').split('\n');
+            const mergedLines = [];
+            let currentLine = '';
+
+            for (let i = 0; i < lines.length; i++) {
+                let line = lines[i].trim();
+
+                // Ignore pure comment lines (unless header handled earlier)
+                if (line.startsWith('#') || line.length === 0) continue;
+
+                if (line.endsWith('\\')) {
+                    currentLine += line.slice(0, -1).trim() + ' ';
+                } else {
+                    currentLine += line;
+                    mergedLines.push(currentLine.trim());
+                    currentLine = '';
+                }
+            }
+            if (currentLine) mergedLines.push(currentLine.trim());
+            return mergedLines;
+        }
+
+        /**
+         * Extracts key=value pairs from a command line handling quoted strings
+         */
+        function parseProperties(paramString) {
+            const props = {};
+            if (!paramString) return props;
+
+            // Regex for key="quoted value" OR key=value OR standalone flags
+            const regex = /([a-zA-Z0-9\-\_]+)=(?:"([^"]*)"|([^\s]+))/g;
+            let match;
+            while ((match = regex.exec(paramString)) !== null) {
+                const key = match[1];
+                const val = match[2] !== undefined ? match[2] : match[3];
+                props[key] = val;
+            }
+            return props;
+        }
+
+        /**
+         * Resolves a section path to its version-independent canonical form
+         * using PATH_MAPPING_V6_V7, so that e.g. "/interface wireless" (v6)
+         * and "/interface wifi" (v7) are treated as the same logical section.
+         */
+        function canonicalizePath(path) {
+            return PATH_MAPPING_V6_V7[path] || path;
+        }
+
+        /**
+         * Structural Parser: Converts raw export lines into Section-Grouped Data Structures
+         */
+        function parseRouterOSExport(rawText) {
+            const rawLines = preprocessRouterOSScript(rawText);
+            const sections = {};
+            let currentPath = '/general';
+
+            for (let line of rawLines) {
+                if (line.startsWith('/')) {
+                    // It's a path context switch (e.g., /ip firewall filter)
+                    currentPath = line.trim();
+                    if (!sections[currentPath]) {
+                        sections[currentPath] = [];
+                    }
+                } else {
+                    // Command inside current path
+                    if (!sections[currentPath]) {
+                        sections[currentPath] = [];
+                    }
+
+                    // Parse parameters & generate unique fingerprint key using the
+                    // CANONICAL path, so matching works across RouterOS versions
+                    // even when the section itself was renamed (v6 -> v7).
+                    const props = parseProperties(line);
+                    const canonicalPath = canonicalizePath(currentPath);
+                    const fp = generateFingerprint(canonicalPath, line, props);
+
+                    sections[currentPath].push({
+                        raw: line,
+                        props: props,
+                        fingerprint: fp
+                    });
+                }
+            }
+            return sections;
+        }
+
+        /**
+         * Generates a unique key for line comparison regardless of property sequence
+         */
+        function generateFingerprint(path, rawLine, props) {
+            // Identifier properties priority list — extended to cover firewall,
+            // NAT, queue, routing and wireless/wifi rules more precisely, so two
+            // genuinely different rules don't collapse into the same fingerprint.
+            const idKeys = [
+                'name', 'chain', 'action', 'protocol',
+                'src-address', 'dst-address', 'src-port', 'dst-port',
+                'in-interface', 'out-interface', 'interface',
+                'address', 'network', 'gateway', 'table', 'list',
+                'ssid', 'default-name', 'type', 'value-name',
+                'disabled', 'comment'
+            ];
+            let idParts = [];
+
+            for (let k of idKeys) {
+                if (props[k] !== undefined) {
+                    idParts.push(`${k}=${props[k]}`);
+                }
+            }
+
+            if (idParts.length > 0) {
+                return `${path} | ${idParts.join(' | ')}`;
+            }
+
+            // Fallback: sanitized raw line without spaces
+            return `${path} | ${rawLine.replace(/\s+/g, '')}`;
+        }
+
+        /* ==========================================================================
+           DIFF ENGINE
+           ========================================================================== */
+
+        /**
+         * Groups a file's parsed sections by their CANONICAL (version-independent)
+         * path, remembering which original path name(s) contributed to each group.
+         */
+        function buildCanonicalGroups(data) {
+            const groups = {};
+            Object.keys(data).forEach(origPath => {
+                const canon = canonicalizePath(origPath);
+                if (!groups[canon]) {
+                    groups[canon] = { items: [], originalPaths: new Set() };
+                }
+                groups[canon].items = groups[canon].items.concat(data[origPath]);
+                groups[canon].originalPaths.add(origPath);
+            });
+            return groups;
+        }
+
+        /**
+         * Primary Diff Engine: Compares File A vs File B
+         */
+        function computeDiff(dataA, dataB) {
+            const groupsA = buildCanonicalGroups(dataA);
+            const groupsB = buildCanonicalGroups(dataB);
+            const allCanonicalPaths = new Set([...Object.keys(groupsA), ...Object.keys(groupsB)]);
+            const diffTree = [];
+            state.hasOrderNotice = false;
+
+            allCanonicalPaths.forEach(canonPath => {
+                const itemsA = (groupsA[canonPath] && groupsA[canonPath].items) || [];
+                const itemsB = (groupsB[canonPath] && groupsB[canonPath].items) || [];
+
+                // Figure out the original section name as it appeared in each file,
+                // so we can show the real name(s) instead of only the canonical key.
+                const origPathsA = groupsA[canonPath] ? [...groupsA[canonPath].originalPaths] : [];
+                const origPathsB = groupsB[canonPath] ? [...groupsB[canonPath].originalPaths] : [];
+                const labelA = origPathsA[0];
+                const labelB = origPathsB[0];
+
+                let displayPath = canonPath;
+                let renamed = false;
+                if (labelA && labelB && labelA !== labelB) {
+                    // The section was structurally renamed between versions
+                    // (e.g. /interface wireless -> /interface wifi)
+                    displayPath = `${labelA}  ⇄  ${labelB}`;
+                    renamed = true;
+                } else if (labelA || labelB) {
+                    displayPath = labelB || labelA;
+                }
+
+                // Check for order mismatch in Firewall / Queue sections
+                if (canonPath.includes('firewall') || canonPath.includes('queue')) {
+                    const fpA = itemsA.map(x => x.fingerprint).join(';');
+                    const fpB = itemsB.map(x => x.fingerprint).join(';');
+                    if (fpA !== fpB && itemsA.length === itemsB.length && itemsA.length > 1) {
+                        const setA = new Set(itemsA.map(x => x.fingerprint));
+                        const setB = new Set(itemsB.map(x => x.fingerprint));
+                        if ([...setA].every(x => setB.has(x))) {
+                            state.hasOrderNotice = true;
+                        }
+                    }
+                }
+
+                const mapA = new Map();
+                itemsA.forEach((item, idx) => mapA.set(item.fingerprint, { ...item, idx }));
+
+                const mapB = new Map();
+                itemsB.forEach((item, idx) => mapB.set(item.fingerprint, { ...item, idx }));
+
+                const sectionDiffs = [];
+                const processedFpB = new Set();
+
+                // Evaluate Items in A
+                itemsA.forEach(itemA => {
+                    const itemB = mapB.get(itemA.fingerprint);
+                    if (!itemB) {
+                        // REMOVED in B
+                        sectionDiffs.push({
+                            status: 'REMOVED',
+                            rawA: itemA.raw,
+                            rawB: null,
+                            propsA: itemA.props,
+                            propsB: null,
+                            fingerprint: itemA.fingerprint
+                        });
+                    } else {
+                        processedFpB.add(itemA.fingerprint);
+                        // Compare properties for MODIFIED or UNCHANGED
+                        const propDiff = compareProperties(itemA.props, itemB.props);
+
+                        if (propDiff.isModified) {
+                            sectionDiffs.push({
+                                status: 'MODIFIED',
+                                rawA: itemA.raw,
+                                rawB: itemB.raw,
+                                propsA: itemA.props,
+                                propsB: itemB.props,
+                                propChanges: propDiff.changes,
+                                fingerprint: itemA.fingerprint
+                            });
+                        } else {
+                            sectionDiffs.push({
+                                status: 'UNCHANGED',
+                                rawA: itemA.raw,
+                                rawB: itemB.raw,
+                                propsA: itemA.props,
+                                propsB: itemB.props,
+                                fingerprint: itemA.fingerprint
+                            });
+                        }
+                    }
+                });
+
+                // Evaluate Items remaining in B (ADDED)
+                itemsB.forEach(itemB => {
+                    if (!processedFpB.has(itemB.fingerprint)) {
+                        sectionDiffs.push({
+                            status: 'ADDED',
+                            rawA: null,
+                            rawB: itemB.raw,
+                            propsA: null,
+                            propsB: itemB.props,
+                            fingerprint: itemB.fingerprint
+                        });
+                    }
+                });
+
+                if (sectionDiffs.length > 0) {
+                    diffTree.push({
+                        path: displayPath,
+                        renamed: renamed,
+                        diffs: sectionDiffs
+                    });
+                }
+            });
+
+            return diffTree;
+        }
+
+        /**
+         * Compares property key-value dictionaries
+         */
+        function compareProperties(propsA, propsB) {
+            const allKeys = new Set([...Object.keys(propsA || {}), ...Object.keys(propsB || {})]);
+            const changes = [];
+            let isModified = false;
+
+            allKeys.forEach(k => {
+                const valA = propsA ? propsA[k] : undefined;
+                const valB = propsB ? propsB[k] : undefined;
+
+                if (valA !== valB) {
+                    isModified = true;
+                    changes.push({ key: k, oldVal: valA, newVal: valB });
+                }
+            });
+
+            return { isModified, changes };
+        }
+
+        /* ==========================================================================
+           UI RENDERING & EVENT HANDLERS
+           ========================================================================== */
+
+        function maskSensitiveValue(key, val) {
+            if (!val) return val;
+            if (!state.privacyMode) return val;
+            if (SENSITIVE_KEYS.some(sk => key.toLowerCase().includes(sk))) {
+                return '••••••••';
+            }
+            return val;
+        }
+
+        function formatLineWithPrivacy(line) {
+            if (!state.privacyMode || !line) return line;
+            let masked = line;
+            SENSITIVE_KEYS.forEach(sk => {
+                const regex = new RegExp(`(${sk}=)(?:"[^"]*"|[^\s]+)`, 'gi');
+                masked = masked.replace(regex, `$1"••••••••"`);
+            });
+            return masked;
+        }
+
+        function runDiffAnalysis() {
+            // Get inputs
+            const textA = state.inputTypes.A === 'file' ? state.fileData.A.text : document.getElementById('textA').value;
+            const textB = state.inputTypes.B === 'file' ? state.fileData.B.text : document.getElementById('textB').value;
+
+            if (!textA.trim() || !textB.trim()) {
+                alert('⚠️ يرجى توفير كلا الملفين أو إلصاق النص للمقارنة.');
+                return;
+            }
+
+            // Show Loader
+            document.getElementById('loadingSpinner').classList.remove('hidden');
+
+            setTimeout(() => {
+                // Detect Versions
+                state.fileData.A.versionInfo = detectRouterOSVersion(textA);
+                state.fileData.B.versionInfo = detectRouterOSVersion(textB);
+
+                state.v6v7Migration = (state.fileData.A.versionInfo.major !== state.fileData.B.versionInfo.major);
+
+                // Show Migration Notice if v6 vs v7
+                const migBox = document.getElementById('migrationNotice');
+                if (state.v6v7Migration) {
+                    migBox.classList.remove('hidden');
+                } else {
+                    migBox.classList.add('hidden');
+                }
+
+                // Parse both files
+                const parsedA = parseRouterOSExport(textA);
+                const parsedB = parseRouterOSExport(textB);
+
+                // Run Diff algorithm
+                state.diffResults = computeDiff(parsedA, parsedB);
+
+                // Show Rule Order Notice
+                const ordBox = document.getElementById('orderNotice');
+                if (state.hasOrderNotice) {
+                    ordBox.classList.remove('hidden');
+                } else {
+                    ordBox.classList.add('hidden');
+                }
+
+                // Hide Loader & Render
+                document.getElementById('loadingSpinner').classList.add('hidden');
+                document.getElementById('summaryBar').classList.remove('hidden');
+
+                populateSectionDropdown();
+                renderResults();
+            }, 100);
+        }
+
+        function renderResults() {
+            const container = document.getElementById('resultsContainer');
+            container.innerHTML = '';
+
+            let totalCount = 0, addCount = 0, delCount = 0, modCount = 0, unchCount = 0;
+
+            if (state.diffResults.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>🎉 لا يوجد أي فروقات!</h3>
+                        <p>ملفا الإعدادات متطابقان تمامًا 100%.</p>
+                    </div>
+                `;
+                updateCounters(0, 0, 0, 0, 0);
+                return;
+            }
+
+            state.diffResults.forEach((sec, secIdx) => {
+                // Filter by Section Dropdown
+                if (state.activeSectionFilter !== 'ALL' && sec.path !== state.activeSectionFilter) {
+                    return;
+                }
+
+                // Filter diff items inside section
+                const filteredDiffs = sec.diffs.filter(d => {
+                    // Status Filter
+                    if (state.activeStatusFilter !== 'ALL' && d.status !== state.activeStatusFilter) {
+                        return false;
+                    }
+                    // Search Query Filter
+                    if (state.searchQuery.trim() !== '') {
+                        const q = state.searchQuery.toLowerCase();
+                        const matchA = d.rawA && d.rawA.toLowerCase().includes(q);
+                        const matchB = d.rawB && d.rawB.toLowerCase().includes(q);
+                        return matchA || matchB;
+                    }
+                    return true;
+                });
+
+                // Count stats for global chips
+                sec.diffs.forEach(d => {
+                    totalCount++;
+                    if (d.status === 'ADDED') addCount++;
+                    if (d.status === 'REMOVED') delCount++;
+                    if (d.status === 'MODIFIED') modCount++;
+                    if (d.status === 'UNCHANGED') unchCount++;
+                });
+
+                if (filteredDiffs.length === 0) return;
+
+                // Section Counts for Badges
+                const sAdd = filteredDiffs.filter(x => x.status === 'ADDED').length;
+                const sDel = filteredDiffs.filter(x => x.status === 'REMOVED').length;
+                const sMod = filteredDiffs.filter(x => x.status === 'MODIFIED').length;
+
+                // Build Accordion Element
+                const accordion = document.createElement('div');
+                accordion.className = 'section-accordion';
+
+                const header = document.createElement('div');
+                header.className = 'accordion-header open';
+                header.onclick = () => toggleAccordion(secIdx);
+
+                header.innerHTML = `
+                    <div class="accordion-title">
+                        <span>📂</span>
+                        <span class="path-badge">${sec.path}</span>
+                        ${sec.renamed ? `<span class="badge-count" style="background: var(--accent); color:#fff;" title="تم دمج هذا القسم تلقائيًا لأن اسمه تغيّر بين إصداري RouterOS">🔄 ترحيل نسخة</span>` : ''}
+                    </div>
+                    <div class="accordion-counts">
+                        ${sAdd > 0 ? `<span class="badge-count badge-add">+${sAdd}</span>` : ''}
+                        ${sDel > 0 ? `<span class="badge-count badge-del">-${sDel}</span>` : ''}
+                        ${sMod > 0 ? `<span class="badge-count badge-mod">~${sMod}</span>` : ''}
+                        <span style="font-size:0.8rem; color:var(--text-muted); margin-right:8px;">▼</span>
+                    </div>
+                `;
+
+                const content = document.createElement('div');
+                content.className = 'accordion-content';
+                content.id = `accordion-content-${secIdx}`;
+
+                const table = document.createElement('table');
+                table.className = 'diff-table';
+
+                filteredDiffs.forEach(item => {
+                    const row = document.createElement('tr');
+
+                    if (item.status === 'ADDED') {
+                        row.className = 'diff-row row-added';
+                        row.innerHTML = `
+                            <td class="diff-cell-sign">+</td>
+                            <td class="diff-cell-content">${formatLineWithPrivacy(item.rawB)}</td>
+                        `;
+                    } else if (item.status === 'REMOVED') {
+                        row.className = 'diff-row row-removed';
+                        row.innerHTML = `
+                            <td class="diff-cell-sign">-</td>
+                            <td class="diff-cell-content">${formatLineWithPrivacy(item.rawA)}</td>
+                        `;
+                    } else if (item.status === 'MODIFIED') {
+                        row.className = 'diff-row row-modified';
+                        let modHtml = buildModifiedDiffHtml(item);
+                        row.innerHTML = `
+                            <td class="diff-cell-sign">~</td>
+                            <td class="diff-cell-content">${modHtml}</td>
+                        `;
+                    } else {
+                        row.className = 'diff-row row-unchanged';
+                        row.innerHTML = `
+                            <td class="diff-cell-sign">=</td>
+                            <td class="diff-cell-content">${formatLineWithPrivacy(item.rawA)}</td>
+                        `;
+                    }
+
+                    table.appendChild(row);
+                });
+
+                content.appendChild(table);
+                accordion.appendChild(header);
+                accordion.appendChild(content);
+                container.appendChild(accordion);
+            });
+
+            updateCounters(totalCount, addCount, delCount, modCount, unchCount);
+
+            if (container.children.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>🔍 لا توجد نتائج مطابقة</h3>
+                        <p>لا توجد عناصر مطابقة لفلتر البحث المحدد.</p>
+                    </div>
+                `;
+            }
+        }
+
+        function buildModifiedDiffHtml(item) {
+            let html = `<div><span style="color:var(--removed-text); font-weight:bold;">[قبل]:</span> ${formatLineWithPrivacy(item.rawA)}</div>`;
+            html += `<div style="margin-top:4px;"><span style="color:var(--added-text); font-weight:bold;">[بعد]:</span> ${formatLineWithPrivacy(item.rawB)}</div>`;
+
+            if (item.propChanges && item.propChanges.length > 0) {
+                html += `<div style="margin-top:6px; font-size:0.8rem; border-top:1px dashed var(--border-color); padding-top:4px;">`;
+                html += `<span class="hl-mod-key">التغييرات التفصيلية:</span> `;
+                item.propChanges.forEach(pc => {
+                    const oldV = maskSensitiveValue(pc.key, pc.oldVal !== undefined ? pc.oldVal : 'غير محدد');
+                    const newV = maskSensitiveValue(pc.key, pc.newVal !== undefined ? pc.newVal : 'غير محدد');
+                    html += `<span style="margin-left:8px;"><code class="hl-mod-key">${pc.key}</code>: <span class="hl-del">${oldV}</span> ➔ <span class="hl-add">${newV}</span></span> `;
+                });
+                html += `</div>`;
+            }
+            return html;
+        }
+
+        function updateCounters(total, add, del, mod, unch) {
+            document.getElementById('cntAll').innerText = total;
+            document.getElementById('cntAdded').innerText = add;
+            document.getElementById('cntRemoved').innerText = del;
+            document.getElementById('cntModified').innerText = mod;
+            document.getElementById('cntUnchanged').innerText = unch;
+        }
+
+        function toggleAccordion(idx) {
+            const content = document.getElementById(`accordion-content-${idx}`);
+            if (content) {
+                content.classList.toggle('collapsed');
+            }
+        }
+
+        function populateSectionDropdown() {
+            const sel = document.getElementById('sectionSelect');
+            sel.innerHTML = '<option value="ALL">كل الأقسام</option>';
+            state.diffResults.forEach(sec => {
+                const opt = document.createElement('option');
+                opt.value = sec.path;
+                opt.innerText = sec.path;
+                sel.appendChild(opt);
+            });
+        }
+
+        function setFilterStatus(status) {
+            state.activeStatusFilter = status;
+            document.querySelectorAll('.stat-chip').forEach(el => el.classList.remove('active'));
+            if (status === 'ALL') document.getElementById('chipAll').classList.add('active');
+            if (status === 'ADDED') document.getElementById('chipAdded').classList.add('active');
+            if (status === 'REMOVED') document.getElementById('chipRemoved').classList.add('active');
+            if (status === 'MODIFIED') document.getElementById('chipModified').classList.add('active');
+            if (status === 'UNCHANGED') document.getElementById('chipUnchanged').classList.add('active');
+            renderResults();
+        }
+
+        function handleSearch() {
+            state.searchQuery = document.getElementById('searchInput').value;
+            renderResults();
+        }
+
+        function handleSectionSelect() {
+            state.activeSectionFilter = document.getElementById('sectionSelect').value;
+            renderResults();
+        }
+
+        /* ==========================================================================
+           INPUT HANDLING & DEMO DATA
+           ========================================================================== */
+
+        function switchInputType(routerKey, type) {
+            state.inputTypes[routerKey] = type;
+            const drop = document.getElementById(`drop${routerKey}`);
+            const text = document.getElementById(`text${routerKey}`);
+
+            if (type === 'file') {
+                drop.style.display = 'block';
+                text.style.display = 'none';
+            } else {
+                drop.style.display = 'none';
+                text.style.display = 'block';
+            }
+        }
+
+        function handleFileSelect(evt, routerKey) {
+            const file = evt.target.files[0];
+            if (!file) return;
+            processSelectedFile(file, routerKey);
+        }
+
+        function handleDragOver(evt, cardId) {
+            evt.preventDefault();
+            document.getElementById(cardId).classList.add('drag-over');
+        }
+
+        function handleDragLeave(cardId) {
+            document.getElementById(cardId).classList.remove('drag-over');
+        }
+
+        function handleFileDrop(evt, routerKey) {
+            evt.preventDefault();
+            const cardId = routerKey === 'fileA' ? 'cardA' : 'cardB';
+            document.getElementById(cardId).classList.remove('drag-over');
+
+            if (evt.dataTransfer.files && evt.dataTransfer.files[0]) {
+                const key = routerKey === 'fileA' ? 'A' : 'B';
+                processSelectedFile(evt.dataTransfer.files[0], key);
+            }
+        }
+
+        function processSelectedFile(file, key) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                state.fileData[key].name = file.name;
+                state.fileData[key].text = content;
+
+                const ver = detectRouterOSVersion(content);
+                state.fileData[key].version = ver.full;
+
+                const badge = document.getElementById(`badge${key}`);
+                const nameEl = document.getElementById(`fileName${key}`);
+                const verEl = document.getElementById(`verTag${key}`);
+
+                badge.style.display = 'flex';
+                nameEl.innerText = file.name;
+                verEl.innerText = `RouterOS ${ver.full}`;
+            };
+            reader.readAsText(file);
+        }
+
+        function handleTextChange(key) {
+            const text = document.getElementById(`text${key}`).value;
+            state.fileData[key].text = text;
+            state.fileData[key].name = `Manual_Paste_${key}.rsc`;
+        }
+
+        function togglePrivacyMode() {
+            state.privacyMode = !state.privacyMode;
+            document.getElementById('privacyStatusText').innerText = state.privacyMode ? 'وضع الخصوصية: مفعل' : 'وضع الخصوصية: معطل';
+            if (state.diffResults.length > 0) renderResults();
+        }
+
+        function resetAll() {
+            state.fileData = {
+                A: { name: '', text: '', version: 'Unk' },
+                B: { name: '', text: '', version: 'Unk' }
+            };
+            state.diffResults = [];
+            state.activeStatusFilter = 'ALL';
+            state.activeSectionFilter = 'ALL';
+            state.searchQuery = '';
+
+            document.getElementById('textA').value = '';
+            document.getElementById('textB').value = '';
+            document.getElementById('badgeA').style.display = 'none';
+            document.getElementById('badgeB').style.display = 'none';
+
+            // Clear file inputs so re-selecting the same file still fires onchange
+            const inputA = document.getElementById('inputA');
+            const inputB = document.getElementById('inputB');
+            if (inputA) inputA.value = '';
+            if (inputB) inputB.value = '';
+
+            // Switch both cards back to "file" tab view
+            switchInputType('A', 'file');
+            switchInputType('B', 'file');
+            document.querySelectorAll('.tab-switcher').forEach(sw => {
+                sw.children[0].classList.add('active');
+                sw.children[1].classList.remove('active');
+            });
+
+            // Reset search box and section dropdown
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) searchInput.value = '';
+            const sectionSelect = document.getElementById('sectionSelect');
+            if (sectionSelect) sectionSelect.innerHTML = '<option value="ALL">كل الأقسام</option>';
+
+            // Reset status filter chips back to "الكل"
+            document.querySelectorAll('.stat-chip').forEach(el => el.classList.remove('active'));
+            const chipAll = document.getElementById('chipAll');
+            if (chipAll) chipAll.classList.add('active');
+
+            document.getElementById('summaryBar').classList.add('hidden');
+            document.getElementById('migrationNotice').classList.add('hidden');
+            document.getElementById('orderNotice').classList.add('hidden');
+            document.getElementById('resultsContainer').innerHTML = `
+                <div class="empty-state">
+                    <h3>لم يتم إجراء أي مقارنة بعد</h3>
+                    <p>يرجى رفع ملفي إعدادات RouterOS (.rsc) في المنطقة أعلاه والضغط على "بدء المقارنة".</p>
+                </div>
+            `;
+        }
+
+        function loadSampleDemoData() {
+            const sampleA = `# aug/20/2026 10:15:30 by RouterOS 6.49.10
+# software id = MusaleM-ROS6
+/system identity
+set name="Main-Branch-Router"
+
+/interface wireless
+set [ find default-name=wlan1 ] ssid="Company-WiFi" disabled=no mode=ap-bridge
+
+/ip address
+add address=192.168.1.1/24 interface=ether1 comment="LAN Gateway"
+add address=10.0.0.1/30 interface=ether2 comment="WAN Link"
+
+/ip firewall filter
+add chain=input action=accept protocol=icmp comment="Allow Ping"
+add chain=input action=drop in-interface=ether2 comment="Drop Unwanted WAN"
+add chain=forward action=accept connection-state=established,related
+
+/ip service
+set winbox port=8291 disabled=no
+set api-ssl port=8729 disabled=yes
+
+/ppp secret
+add name="vpn_user1" password="SuperSecretPassword123" service=ipsec
+`;
+
+            const sampleB = `# aug/25/2026 14:20:00 by RouterOS 7.15.3
+# software id = MusaleM-ROS7
+/system identity
+set name="Main-Branch-Router-v7"
+
+/interface wifi
+set [ find default-name=wifi1 ] ssid="Company-WiFi-5G" disabled=no
+
+/ip address
+add address=192.168.1.1/24 interface=ether1 comment="LAN Gateway"
+add address=10.0.0.2/30 interface=ether2 comment="WAN Link Updated"
+
+/ip firewall filter
+add chain=input action=drop in-interface=ether2 comment="Drop Unwanted WAN"
+add chain=input action=accept protocol=icmp comment="Allow Ping"
+add chain=forward action=accept connection-state=established,related
+add chain=forward action=drop dst-port=80,443 protocol=tcp comment="Block Social Web"
+
+/ip service
+set winbox port=8291 disabled=no
+set api-ssl port=8729 disabled=no
+
+/ppp secret
+add name="vpn_user1" password="SuperSecretPassword123" service=ipsec
+`;
+
+            switchInputType('A', 'text');
+            switchInputType('B', 'text');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-switcher').forEach(sw => sw.children[1].classList.add('active'));
+
+            document.getElementById('textA').value = sampleA;
+            document.getElementById('textB').value = sampleB;
+            handleTextChange('A');
+            handleTextChange('B');
+
+            runDiffAnalysis();
+        }
+
+        /* ==========================================================================
+           EXPORT REPORTS ENGINE
+           ========================================================================== */
+
+        function exportHtmlReport() {
+            // Reuse the app's own stylesheet so the exported file keeps the exact
+            // same colors, badges and accordion layout as the live results.
+            const appStyles = document.querySelector('style') ? document.querySelector('style').innerHTML : '';
+            const fileALabel = state.fileData.A.name || 'الملف الأول';
+            const fileBLabel = state.fileData.B.name || 'الملف الثاني';
+            const verA = (state.fileData.A.versionInfo && state.fileData.A.versionInfo.full) || '—';
+            const verB = (state.fileData.B.versionInfo && state.fileData.B.versionInfo.full) || '—';
+
+            const htmlContent = `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تقرير مقارنة مُقارِن - إعدادات ميكروتك</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>${appStyles}</style>
+    <style>
+        body { padding: 24px; }
+        .app-container { width: 100%; max-width: 1100px; }
+        .report-head { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+        .report-head h1 { color: var(--accent); font-size: 1.4rem; margin-bottom: 6px; }
+        .report-head .meta { color: var(--text-secondary); font-size: 0.9rem; display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="report-head">
+            <h1>📊 تقرير مقارنة إعدادات ميكروتك — مُقارِن</h1>
+            <p>تاريخ توليد التقرير: ${new Date().toLocaleString('ar-EG')}</p>
+            <div class="meta">
+                <span><strong>الملف الأول:</strong> ${fileALabel} (RouterOS ${verA})</span>
+                <span><strong>الملف الثاني:</strong> ${fileBLabel} (RouterOS ${verB})</span>
+            </div>
+        </div>
+        <main class="results-container">
+            ${document.getElementById('resultsContainer').innerHTML}
+        </main>
+    </div>
+    <footer>
+        برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+    </footer>
+</body>
+</html>`;
+
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Muqarin_Diff_Report_${Date.now()}.html`;
+            a.click();
+        }
+
+        function exportGitDiffText() {
+            let diffText = `--- Router_A.rsc (${state.fileData.A.version})
++++ Router_B.rsc (${state.fileData.B.version})
+
+`;
+
+            state.diffResults.forEach(sec => {
+                diffText += `@@ ${sec.path} @@
+`;
+                sec.diffs.forEach(d => {
+                    if (d.status === 'ADDED') diffText += `+ ${d.rawB}
+`;
+                    if (d.status === 'REMOVED') diffText += `- ${d.rawA}
+`;
+                    if (d.status === 'MODIFIED') {
+                        diffText += `- ${d.rawA}
+`;
+                        diffText += `+ ${d.rawB}
+`;
+                    }
+                });
+                diffText += `
+`;
+            });
+
+            const blob = new Blob([diffText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Muqarin_Diff_${Date.now()}.patch`;
+            a.click();
+        }
+    </script>
+</body>
+</html>

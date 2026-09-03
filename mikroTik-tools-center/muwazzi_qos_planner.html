@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مُوزِّع — حاسبة QoS/Queue الاحترافية</title>
+    <meta name="description" content="مُوزِّع: أداة احترافية لتخطيط توزيع الباندويدث على أجهزة ميكروتك، تدعم التوزيع المتساوي والأولوية والحد الأدنى/الأقصى، وتولّد أوامر RouterOS جاهزة متوافقة مع v6 وv7.">
+    <link rel="icon" href="data:,">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #f8fafc;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --danger-bg: #fee2e2;
+            --warning: #f59e0b;
+            --warning-bg: #fef3c7;
+            --success: #10b981;
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { color: var(--primary); font-weight: 800; font-size: 2.5rem; }
+        header p { color: var(--text-muted); font-size: 1.1rem; }
+
+        .header-icon-wrapper {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+        }
+
+        .card {
+            background-color: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 600; margin-bottom: 5px; font-size: 0.95rem; }
+        input[type="number"], input[type="text"], select {
+            width: 100%; padding: 10px; border: 1px solid var(--border);
+            border-radius: var(--radius); font-family: 'Cairo', sans-serif;
+            transition: border-color 0.3s;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+        
+        .radio-group { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
+        .radio-label {
+            display: flex; align-items: center; gap: 5px; cursor: pointer;
+            padding: 10px 15px; border: 1px solid var(--border); border-radius: var(--radius);
+            background: var(--secondary); transition: all 0.2s;
+        }
+        .radio-label:hover { border-color: var(--primary); }
+        input[type="radio"]:checked + span { font-weight: 700; color: var(--primary); }
+
+        .checkbox-group { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+
+        .btn {
+            padding: 10px 20px; border: none; border-radius: var(--radius);
+            font-family: 'Cairo', sans-serif; font-weight: 700; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); }
+        .btn-outline { background-color: transparent; border: 1px solid var(--border); color: var(--text-dark); }
+        .btn-outline:hover { background-color: var(--secondary); }
+        .btn-danger { background-color: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); padding: 5px 10px;}
+        .btn-danger:hover { background-color: var(--danger); color: white; }
+        .btn-block { width: 100%; font-size: 1.1rem; padding: 15px; }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; text-align: right; }
+        th, td { padding: 12px; border-bottom: 1px solid var(--border); }
+        th { background-color: var(--secondary); font-weight: 700; }
+        
+        .table-input { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: 4px; }
+        
+        .summary-card { text-align: center; padding: 15px; background: var(--secondary); border-radius: var(--radius); border: 1px solid var(--border); }
+        .summary-value { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
+
+        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.8rem; font-weight: 700; }
+        .badge-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid var(--warning); }
+        
+        .alert { padding: 15px; border-radius: var(--radius); margin-bottom: 15px; font-weight: 600; display: none; }
+        .alert-danger { background-color: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger); }
+
+        /* Chart Styles */
+        .chart-container { width: 100%; overflow-x: auto; margin-top: 20px; }
+        svg { width: 100%; min-width: 600px; height: auto; display: block; }
+        .bar { transition: fill 0.3s, opacity 0.3s; cursor: pointer; }
+        .bar:hover { opacity: 0.8; }
+        .bar-bg { fill: #f1f5f9; }
+
+        /* Code Block Styles */
+        .tabs { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 1px solid var(--border); }
+        .tab-btn {
+            padding: 10px 20px; background: none; border: none; font-family: 'Cairo'; font-weight: 700;
+            cursor: pointer; border-bottom: 3px solid transparent; color: var(--text-muted);
+        }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        pre {
+            background-color: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 15px; overflow-x: auto; direction: ltr; text-align: left;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.5; color: #334155;
+        }
+        
+        /* Syntax Highlighting */
+        .stx-cmd { color: #d946ef; font-weight: bold; } /* pink */
+        .stx-prop { color: #0284c7; } /* blue */
+        .stx-val { color: #16a34a; } /* green */
+        .stx-comment { color: #94a3b8; font-style: italic; }
+
+        .hidden { display: none !important; }
+
+        footer {
+            text-align: center; padding: 18px; background: white; border-top: 1px solid var(--border);
+            margin-top: 40px; font-weight: 600; color: var(--text-muted);
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            table { display: block; overflow-x: auto; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-icon-wrapper">
+            <i class="fa-solid fa-gauge-high"></i>
+        </div>
+        <h1>مُوزِّع</h1>
+        <p>حاسبة QoS/Queue الاحترافية لتخطيط توزيع الباندويدث على أجهزة MikroTik</p>
+    </header>
+
+    <!-- SECTION 1: Link Settings -->
+    <div class="card" id="section-1">
+        <h2 class="card-title">1. إعدادات الرابط (Bandwidth)</h2>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>سرعة التنزيل (Download)</label>
+                <input type="number" id="totalDl" placeholder="مثال: 100" min="1">
+            </div>
+            <div class="form-group">
+                <label>سرعة الرفع (Upload)</label>
+                <input type="number" id="totalUl" placeholder="مثال: 20" min="1">
+            </div>
+            <div class="form-group">
+                <label>وحدة القياس</label>
+                <select id="unit">
+                    <option value="M">ميغابت/ثانية (Mbps)</option>
+                    <option value="K">كيلوبت/ثانية (Kbps)</option>
+                </select>
+            </div>
+            <div class="form-group" style="display: flex; flex-direction: column; justify-content: center;">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="enableReserve" checked>
+                    <label for="enableReserve" style="margin:0;">احجز نسبة احتياطية للـ Overhead</label>
+                </div>
+                <div id="reserveDiv" style="margin-top: 10px;">
+                    <input type="number" id="reservePct" value="10" min="0" max="99" style="width: 80px; display:inline-block"> %
+                </div>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 20px; font-size: 1.1rem;">طريقة التوزيع (Strategy)</h3>
+        <div class="radio-group">
+            <label class="radio-label">
+                <input type="radio" name="strategy" value="equal" checked onchange="updateUI()"> 
+                <span>توزيع متساوٍ</span>
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="strategy" value="priority" onchange="updateUI()"> 
+                <span>بالأولوية (Weights)</span>
+            </label>
+            <label class="radio-label">
+                <input type="radio" name="strategy" value="minmax" onchange="updateUI()"> 
+                <span>حد أدنى وأقصى (CIR/MIR)</span>
+            </label>
+        </div>
+        
+        <div class="checkbox-group hidden" id="burstOptionDiv" style="margin-top: 15px;">
+            <input type="checkbox" id="enableBurst">
+            <label for="enableBurst" style="margin:0;">تفعيل ميزة Burst تلقائياً في الكود المولّد (لإعطاء سرعة قصوى مؤقتة)</label>
+        </div>
+    </div>
+
+    <!-- SECTION 2: Users -->
+    <div class="card" id="section-2">
+        <h2 class="card-title">2. المستخدمون والأقسام</h2>
+        <div style="margin-bottom: 15px; display: flex; gap: 10px;">
+            <button class="btn btn-primary" onclick="addUserRow()">+ إضافة مستخدم/قسم</button>
+            <button class="btn btn-outline" onclick="loadExample()">⚡ تحميل مثال توضيحي</button>
+        </div>
+        
+        <div style="overflow-x: auto;">
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>IP / Interface (اختياري)</th>
+                        <th class="col-weight hidden">الوزن (1-10)</th>
+                        <th class="col-cir hidden">الحد الأدنى (CIR)</th>
+                        <th class="col-mir hidden">الحد الأقصى (MIR)</th>
+                        <th>إجراء</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTbody">
+                    <!-- Rows will be added dynamically -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="errorAlert" class="alert alert-danger"></div>
+    
+    <button class="btn btn-primary btn-block" onclick="calculateAndDistribute()">احسب ووزّع 🔍</button>
+
+    <!-- SECTION 3: Results -->
+    <div id="resultsSection" class="hidden">
+        <div class="card" style="margin-top: 25px;">
+            <h2 class="card-title">3. النتائج والتوزيع بصرياً</h2>
+            <div class="grid-4">
+                <div class="summary-card">
+                    <div>السعة الصافية للـ DL</div>
+                    <div class="summary-value" id="resNetDl">0</div>
+                </div>
+                <div class="summary-card">
+                    <div>السعة الصافية للـ UL</div>
+                    <div class="summary-value" id="resNetUl">0</div>
+                </div>
+                <div class="summary-card">
+                    <div>الاحتياطي المحجوز</div>
+                    <div class="summary-value" id="resReserved">0</div>
+                </div>
+                <div class="summary-card">
+                    <div>عدد الكيانات</div>
+                    <div class="summary-value" id="resCount">0</div>
+                </div>
+            </div>
+
+            <div class="chart-container" id="chartContainerDl"></div>
+            <div class="chart-container" id="chartContainerUl" style="margin-top: 15px;"></div>
+
+            <h3 style="margin-top: 25px; margin-bottom: 10px;">الجدول التفصيلي (تنزيل / رفع)</h3>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>الاسم</th>
+                        <th>Target</th>
+                        <th>Download المخصص</th>
+                        <th>Upload المخصص</th>
+                        <th>نسبة الاستحواذ</th>
+                        <th>ملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody id="resultsTbody"></tbody>
+            </table>
+        </div>
+
+        <!-- SECTION 4: RouterOS Commands -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;">
+                <h2 class="card-title" style="border:none; margin:0; padding:0;">4. أوامر RouterOS الجاهزة 📜</h2>
+                <select id="osVersion" style="width: auto; padding: 5px 10px;" onchange="generateCommands()">
+                    <option value="v7">إصدار: RouterOS v7</option>
+                    <option value="v6">إصدار: RouterOS v6</option>
+                </select>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('simple', this)">Simple Queue</button>
+                <button class="tab-btn" onclick="switchTab('tree', this)">Queue Tree (Mangle)</button>
+            </div>
+
+            <div id="tab-simple" class="tab-content active">
+                <p style="margin-bottom: 10px; color: var(--text-muted);">الطريقة الأبسط والأكثر شيوعاً لتحديد السرعات.</p>
+                <div style="margin-bottom: 10px; display: flex; gap: 10px;">
+                    <button class="btn btn-outline" onclick="copyCode('code-simple')">📋 نسخ الكود</button>
+                    <button class="btn btn-outline" onclick="downloadRsc('code-simple', 'simple_queues.rsc')">💾 تنزيل .rsc</button>
+                </div>
+                <pre id="code-simple"></pre>
+            </div>
+
+            <div id="tab-tree" class="tab-content">
+                <p style="margin-bottom: 10px; color: var(--text-muted);">هذه الطريقة أنسب لو عندك عدد كبير من المستخدمين وتحتاج تحكم دقيق (يعتمد على Mangle Global).</p>
+                <div style="margin-bottom: 10px; display: flex; gap: 10px;">
+                    <button class="btn btn-outline" onclick="copyCode('code-tree')">📋 نسخ الكود</button>
+                    <button class="btn btn-outline" onclick="downloadRsc('code-tree', 'queue_tree.rsc')">💾 تنزيل .rsc</button>
+                </div>
+                <pre id="code-tree"></pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+</footer>
+
+<script>
+    /* ===== STATE & DOM ELEMENTS ===== */
+    const UI = {
+        totalDl: document.getElementById('totalDl'),
+        totalUl: document.getElementById('totalUl'),
+        unit: document.getElementById('unit'),
+        enableReserve: document.getElementById('enableReserve'),
+        reservePct: document.getElementById('reservePct'),
+        reserveDiv: document.getElementById('reserveDiv'),
+        burstOptionDiv: document.getElementById('burstOptionDiv'),
+        usersTbody: document.getElementById('usersTbody'),
+        errorAlert: document.getElementById('errorAlert'),
+        resultsSection: document.getElementById('resultsSection')
+    };
+
+    let calculatedData = []; // Stores final calculation results for command generation
+
+    /* ===== EVENT LISTENERS ===== */
+    UI.enableReserve.addEventListener('change', (e) => {
+        UI.reserveDiv.style.display = e.target.checked ? 'block' : 'none';
+    });
+
+    /* ===== UI HANDLING ===== */
+    function updateUI() {
+        const strategy = document.querySelector('input[name="strategy"]:checked').value;
+        const colWeight = document.querySelectorAll('.col-weight');
+        const colCir = document.querySelectorAll('.col-cir');
+        const colMir = document.querySelectorAll('.col-mir');
+
+        // Toggle columns visibility based on strategy
+        colWeight.forEach(el => el.classList.toggle('hidden', strategy !== 'priority'));
+        colCir.forEach(el => el.classList.toggle('hidden', strategy !== 'minmax'));
+        colMir.forEach(el => el.classList.toggle('hidden', strategy !== 'minmax'));
+
+        // Show global burst option only if not minmax (minmax has its own logic based on mir/cir)
+        UI.burstOptionDiv.classList.toggle('hidden', strategy === 'minmax');
+    }
+
+    function addUserRow(data = null) {
+        const tr = document.createElement('tr');
+        const strategy = document.querySelector('input[name="strategy"]:checked').value;
+        
+        tr.innerHTML = `
+            <td><input type="text" class="table-input u-name" placeholder="اسم القسم/المستخدم" value="${data ? data.name : ''}"></td>
+            <td><input type="text" class="table-input u-target" placeholder="IP أو Interface" value="${data ? data.target : ''}"></td>
+            <td class="col-weight ${strategy !== 'priority' ? 'hidden' : ''}">
+                <input type="number" class="table-input u-weight" min="1" max="10" value="${data ? data.weight : 1}">
+            </td>
+            <td class="col-cir ${strategy !== 'minmax' ? 'hidden' : ''}">
+                <input type="number" class="table-input u-cir" placeholder="CIR" value="${data ? data.cir : ''}">
+            </td>
+            <td class="col-mir ${strategy !== 'minmax' ? 'hidden' : ''}">
+                <input type="number" class="table-input u-mir" placeholder="MIR" value="${data ? data.mir : ''}">
+            </td>
+            <td><button class="btn btn-danger" onclick="this.closest('tr').remove()">🗑️</button></td>
+        `;
+        UI.usersTbody.appendChild(tr);
+    }
+
+    function loadExample() {
+        UI.usersTbody.innerHTML = '';
+        document.querySelector('input[value="priority"]').checked = true;
+        UI.totalDl.value = 100;
+        UI.totalUl.value = 20;
+        UI.unit.value = 'M';
+        updateUI();
+
+        const examples = [
+            { name: "أحمد فتحي", target: "192.168.1.11", weight: 8, cir: 20, mir: 50 },
+            { name: "سارة كمال", target: "192.168.1.12", weight: 5, cir: 10, mir: 30 },
+            { name: "محمود عادل", target: "192.168.1.13", weight: 4, cir: 10, mir: 20 },
+            { name: "ياسمين طارق", target: "192.168.1.14", weight: 1, cir: 2, mir: 10 },
+            { name: "خالد الشريف", target: "192.168.1.15", weight: 10, cir: 30, mir: 100 }
+        ];
+
+        examples.forEach(ex => addUserRow(ex));
+    }
+
+    function showError(msg) {
+        UI.errorAlert.innerHTML = msg;
+        UI.errorAlert.style.display = 'block';
+        window.scrollTo({ top: UI.errorAlert.offsetTop - 20, behavior: 'smooth' });
+    }
+    
+    function hideError() { UI.errorAlert.style.display = 'none'; }
+
+    /* ===== CALCULATION ENGINE ===== */
+    function calculateAndDistribute() {
+        hideError();
+        
+        const totalDl = parseFloat(UI.totalDl.value);
+        const totalUl = parseFloat(UI.totalUl.value);
+        
+        if (!totalDl || totalDl <= 0 || !totalUl || totalUl <= 0) {
+            return showError("يرجى إدخال سعة تنزيل ورفع صحيحة أكبر من الصفر.");
+        }
+
+        const unitStr = UI.unit.value; // M or K
+        const multiplier = unitStr === 'M' ? 1024 : 1; // Base internal unit: Kbps
+        
+        let dlKbps = totalDl * multiplier;
+        let ulKbps = totalUl * multiplier;
+        
+        let reserveRatio = 0;
+        if (UI.enableReserve.checked) {
+            const pct = parseFloat(UI.reservePct.value) || 0;
+            reserveRatio = pct / 100;
+        }
+
+        const reservedDl = dlKbps * reserveRatio;
+        const reservedUl = ulKbps * reserveRatio;
+        
+        const netDlKbps = dlKbps - reservedDl;
+        const netUlKbps = ulKbps - reservedUl;
+
+        const rows = UI.usersTbody.querySelectorAll('tr');
+        if (rows.length === 0) {
+            return showError("يرجى إضافة مستخدم واحد أو قسم على الأقل لتوزيع الرابط.");
+        }
+
+        const strategy = document.querySelector('input[name="strategy"]:checked').value;
+        const users = [];
+        
+        let sumWeight = 0;
+        let sumCirDl = 0; let sumCirUl = 0;
+
+        // 1. Gather & Validate Inputs
+        for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            const name = row.querySelector('.u-name').value.trim() || `User-${i+1}`;
+            const target = row.querySelector('.u-target').value.trim() || `10.0.0.${i+1}`;
+            
+            const user = { name, target, rawName: name.replace(/\s+/g, '_') }; // Format name for RouterOS
+
+            if (strategy === 'priority') {
+                user.weight = parseFloat(row.querySelector('.u-weight').value) || 1;
+                sumWeight += user.weight;
+            } else if (strategy === 'minmax') {
+                user.cir = (parseFloat(row.querySelector('.u-cir').value) || 0) * multiplier;
+                user.mir = (parseFloat(row.querySelector('.u-mir').value) || 0) * multiplier;
+                
+                if (user.cir > user.mir) {
+                    return showError(`الحد الأقصى (MIR) يجب أن يكون أكبر من أو يساوي الحد الأدنى (CIR) لـ: ${name}`);
+                }
+                
+                sumCirDl += user.cir; // Using same ratio for DL/UL in CIR for simplicity
+                sumCirUl += (user.cir * (totalUl/totalDl)); // Adjust UL CIR proportionally
+            }
+            users.push(user);
+        }
+
+        // 2. Perform Calculations based on strategy
+        calculatedData = []; // reset
+        
+        if (strategy === 'equal') {
+            const allocDl = netDlKbps / users.length;
+            const allocUl = netUlKbps / users.length;
+            users.forEach(u => {
+                calculatedData.push({ ...u, dl: allocDl, ul: allocUl, maxDl: allocDl, maxUl: allocUl, pct: (allocDl/dlKbps)*100 });
+            });
+        } 
+        else if (strategy === 'priority') {
+            users.forEach(u => {
+                const ratio = u.weight / sumWeight;
+                const allocDl = netDlKbps * ratio;
+                const allocUl = netUlKbps * ratio;
+                calculatedData.push({ ...u, dl: allocDl, ul: allocUl, maxDl: allocDl, maxUl: allocUl, pct: (allocDl/dlKbps)*100 });
+            });
+        }
+        else if (strategy === 'minmax') {
+            if (sumCirDl > netDlKbps) {
+                return showError(`⚠️ مجموع الحدود الدنيا للتنزيل (${formatSpeed(sumCirDl)}) يتجاوز السعة الصافية المتاحة (${formatSpeed(netDlKbps)}). يرجى تقليل CIR أو زيادة الرابط.`);
+            }
+            if (sumCirUl > netUlKbps) {
+                return showError(`⚠️ مجموع الحدود الدنيا للرفع (${formatSpeed(sumCirUl)}) يتجاوز السعة الصافية المتاحة (${formatSpeed(netUlKbps)}). يرجى تقليل CIR أو زيادة الرابط.`);
+            }
+
+            // dl/ul = الحد الأدنى المضمون (CIR) — يُستخدم كـ limit-at في RouterOS
+            // maxDl/maxUl = الحد الأقصى (MIR) — يُستخدم كـ max-limit، والراوتر نفسه
+            // يسمح بالوصول له ديناميكيًا كلما كانت الطاقة متاحة (لا حاجة لحساب توزيع
+            // إضافي يدويًا، فهذه هي وظيفة نظام الـ Queue في RouterOS أصلًا)
+            users.forEach(u => {
+                u.dl = u.cir;
+                u.ul = u.cir * (totalUl / totalDl);
+
+                calculatedData.push({ ...u, dl: u.dl, ul: u.ul, maxDl: u.mir, maxUl: (u.mir * (totalUl / totalDl)), pct: (u.mir / dlKbps) * 100 });
+            });
+        }
+
+        renderResults(dlKbps, ulKbps, reservedDl, netDlKbps, netUlKbps, strategy);
+        generateCommands();
+        
+        UI.resultsSection.classList.remove('hidden');
+        window.scrollTo({ top: UI.resultsSection.offsetTop - 20, behavior: 'smooth' });
+    }
+
+    /* ===== UI RENDERING (RESULTS & CHART) ===== */
+    function formatSpeed(kbps) {
+        if (kbps >= 1024) return (kbps / 1024).toFixed(1) + ' Mbps';
+        return kbps.toFixed(0) + ' Kbps';
+    }
+
+    function renderResults(totalDl, totalUl, reservedDl, netDl, netUl, strategy) {
+        document.getElementById('resNetDl').innerText = formatSpeed(netDl);
+        document.getElementById('resNetUl').innerText = formatSpeed(netUl);
+        document.getElementById('resReserved').innerText = formatSpeed(reservedDl);
+        document.getElementById('resCount').innerText = calculatedData.length;
+
+        // Render Table
+        const tbody = document.getElementById('resultsTbody');
+        tbody.innerHTML = '';
+        
+        // Sort for table and chart
+        calculatedData.sort((a, b) => b.maxDl - a.maxDl);
+
+        calculatedData.forEach(u => {
+            const tr = document.createElement('tr');
+            
+            // Sanity checks
+            let warnings = '';
+            if (u.dl < 512) {
+                warnings += '<span class="badge badge-warning" title="سرعة بطيئة">⚠️ قد لا يكفي لتصفح مريح</span><br>';
+            }
+            if (strategy === 'priority' && u.pct > 50) {
+                warnings += '<span class="badge badge-warning" title="استحواذ عالي">🔔 يستحوذ على > 50% من الرابط</span>';
+            }
+
+            const isMinMax = strategy === 'minmax';
+            const dlDisplay = isMinMax ? `${formatSpeed(u.dl)} <small>(Max: ${formatSpeed(u.maxDl)})</small>` : formatSpeed(u.dl);
+            const ulDisplay = isMinMax ? `${formatSpeed(u.ul)} <small>(Max: ${formatSpeed(u.maxUl)})</small>` : formatSpeed(u.ul);
+
+            tr.innerHTML = `
+                <td><strong>${u.name}</strong></td>
+                <td style="direction:ltr; text-align:right;">${u.target}</td>
+                <td>${dlDisplay}</td>
+                <td>${ulDisplay}</td>
+                <td style="direction:ltr; text-align:right;">${u.pct.toFixed(1)}%</td>
+                <td>${warnings}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        renderSVGChart('maxDl', 'chartContainerDl', '📥 توزيع سعة التنزيل (Download)');
+        renderSVGChart('maxUl', 'chartContainerUl', '📤 توزيع سعة الرفع (Upload)');
+    }
+
+    function renderSVGChart(field, containerId, title) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = ''; // clear
+
+        const svgHeight = Math.max(250, calculatedData.length * 40 + 50);
+        // Computed via Math.max over the actual field being charted, rather than
+        // assuming item[0] of the (Download-sorted) array holds this field's max.
+        const maxVal = Math.max(...calculatedData.map(u => u[field]));
+
+        let svgStr = `<svg viewBox="0 0 800 ${svgHeight}" xmlns="http://www.w3.org/2000/svg" style="background:#fff; border-radius:8px; border:1px solid #e2e8f0; font-family:Cairo;">
+            <text x="780" y="30" font-size="16" font-weight="bold" fill="#0f172a" text-anchor="end">${title}</text>`;
+
+        calculatedData.forEach((u, index) => {
+            const y = 60 + (index * 40);
+            const val = u[field];
+            const barWidth = Math.max(10, (val / maxVal) * 500); // Max width 500px for bars
+
+            // Colors based on percentage (just for visual flair)
+            let color = '#2563eb';
+            if (u.pct > 50) color = '#ef4444'; // Red if >50%
+            else if (u.pct > 30) color = '#f59e0b'; // Yellow if >30%
+
+            svgStr += `
+                <g class="bar">
+                    <title>${u.name} - ${formatSpeed(val)}</title>
+                    <text x="780" y="${y + 15}" font-size="14" fill="#334155" text-anchor="end">${u.name}</text>
+                    <rect class="bar-bg" x="250" y="${y}" width="500" height="20" rx="4" />
+                    <rect x="${750 - barWidth}" y="${y}" width="${barWidth}" height="20" fill="${color}" rx="4" />
+                    <text x="${740 - barWidth}" y="${y + 14}" font-size="12" fill="#64748b" text-anchor="end">${formatSpeed(val)}</text>
+                </g>
+            `;
+        });
+
+        svgStr += `</svg>`;
+        container.innerHTML = svgStr;
+    }
+
+    /* ===== ROUTEROS COMMAND GENERATOR ===== */
+    function formatROSValue(kbps) {
+        kbps = Math.round(kbps);
+        if (kbps >= 1024) {
+            // Always express as a clean Mbps value (RouterOS accepts decimal
+            // suffixes like "33.33M"), instead of falling back to an
+            // unreadable raw Kbps number for non-exact-Mbps allocations.
+            const mbps = kbps / 1024;
+            const rounded = Math.round(mbps * 100) / 100; // up to 2 decimals
+            return `${rounded}M`;
+        }
+        return `${kbps}k`;
+    }
+
+    function generateCommands() {
+        if (!calculatedData.length) return;
+
+        const osVersion = document.getElementById('osVersion').value;
+        const strategy = document.querySelector('input[name="strategy"]:checked').value;
+        const enableBurstCheck = document.getElementById('enableBurst').checked;
+        const isV6 = osVersion === 'v6';
+        
+        let simpleCmds = "";
+        let treeCmds = "";
+
+        // Common Header
+        const header = `# ==========================================\n# Generated by Muzawwe3 QoS Calculator\n# OS Target: RouterOS ${osVersion.toUpperCase()}\n# Strategy: ${strategy.toUpperCase()}\n# ==========================================\n\n`;
+        
+        simpleCmds += header;
+        treeCmds += header;
+
+        if (isV6) {
+            simpleCmds += `# NOTE: v6 queue priority handling is slightly different from v7.\n# Standard limits apply perfectly.\n\n`;
+        }
+
+        /* --- SIMPLE QUEUE GENERATION --- */
+        simpleCmds += `/queue simple\n`;
+        
+        calculatedData.forEach((u, i) => {
+            const maxLimit = `${formatROSValue(u.maxUl)}/${formatROSValue(u.maxDl)}`;
+            let burstStr = "";
+
+            // Apply Burst Logic if MinMax or explicit Checkbox
+            if (strategy === 'minmax' || enableBurstCheck) {
+                // Burst limit = Max * 1.5, Threshold = Max * 0.8, Time = 8s
+                let bLimitDl = u.maxDl * 1.5; let bLimitUl = u.maxUl * 1.5;
+                let bThreshDl = u.maxDl * 0.8; let bThreshUl = u.maxUl * 0.8;
+                
+                burstStr = ` burst-limit=${formatROSValue(bLimitUl)}/${formatROSValue(bLimitDl)} burst-threshold=${formatROSValue(bThreshUl)}/${formatROSValue(bThreshDl)} burst-time=8s/8s`;
+            }
+
+            let priorityStr = "";
+            if (strategy === 'priority') {
+                // In ROS, lower number = higher priority (1 is highest, 8 is lowest).
+                // Our input weight: 10 is highest. Map 1-10 to ROS 1-8.
+                let p = Math.max(1, 9 - Math.round((u.weight / 10) * 8));
+                priorityStr = ` priority=${p}/${p}`;
+            }
+
+            let limitAtStr = "";
+            if (strategy === 'minmax') {
+                limitAtStr = ` limit-at=${formatROSValue(u.ul)}/${formatROSValue(u.dl)}`;
+            }
+
+            simpleCmds += `add name="Q-${u.rawName}" target="${u.target}" max-limit=${maxLimit}${limitAtStr}${burstStr}${priorityStr} comment="Auto-generated"\n`;
+        });
+
+        /* --- QUEUE TREE GENERATION --- */
+        treeCmds += `/ip firewall mangle\n`;
+        // Create mangle rules to mark connections then packets
+        calculatedData.forEach((u) => {
+            treeCmds += `add chain=forward src-address="${u.target}" action=mark-connection new-connection-mark="conn_${u.rawName}" passthrough=yes comment="Mark Conn ${u.rawName}"\n`;
+            treeCmds += `add chain=forward connection-mark="conn_${u.rawName}" action=mark-packet new-packet-mark="pkt_ul_${u.rawName}" src-address="${u.target}" passthrough=no\n`;
+            treeCmds += `add chain=forward connection-mark="conn_${u.rawName}" action=mark-packet new-packet-mark="pkt_dl_${u.rawName}" dst-address="${u.target}" passthrough=no\n`;
+        });
+
+        treeCmds += `\n/queue tree\n`;
+        // Create Parent Queues
+        treeCmds += `add name="TOTAL_DOWNLOAD" parent=global max-limit=${formatROSValue(calculatedData[0].maxDl * calculatedData.length)} comment="Adjust parent if needed"\n`;
+        treeCmds += `add name="TOTAL_UPLOAD" parent=global max-limit=${formatROSValue(calculatedData[0].maxUl * calculatedData.length)}\n\n`;
+
+        // Create Leaf Queues
+        calculatedData.forEach((u) => {
+            let limitAtDl = strategy === 'minmax' ? ` limit-at=${formatROSValue(u.dl)}` : "";
+            let limitAtUl = strategy === 'minmax' ? ` limit-at=${formatROSValue(u.ul)}` : "";
+            
+            let pStr = "";
+            if(strategy === 'priority') {
+                let p = Math.max(1, 9 - Math.round((u.weight / 10) * 8));
+                pStr = ` priority=${p}`;
+            }
+
+            treeCmds += `add name="DL_${u.rawName}" parent="TOTAL_DOWNLOAD" packet-mark="pkt_dl_${u.rawName}" max-limit=${formatROSValue(u.maxDl)}${limitAtDl}${pStr}\n`;
+            treeCmds += `add name="UL_${u.rawName}" parent="TOTAL_UPLOAD" packet-mark="pkt_ul_${u.rawName}" max-limit=${formatROSValue(u.maxUl)}${limitAtUl}${pStr}\n`;
+        });
+
+        // Apply syntax highlight
+        document.getElementById('code-simple').innerHTML = highlightROS(simpleCmds);
+        document.getElementById('code-tree').innerHTML = highlightROS(treeCmds);
+        
+        // Store raw strings for downloading/copying
+        document.getElementById('code-simple').setAttribute('data-raw', simpleCmds);
+        document.getElementById('code-tree').setAttribute('data-raw', treeCmds);
+    }
+
+    function highlightROS(text) {
+        return text
+            .replace(/^(#.*)$/gm, '<span class="stx-comment">$1</span>') // Comments
+            .replace(/\b(add|set|remove|enable|disable)\b/g, '<span class="stx-cmd">$1</span>') // Commands
+            .replace(/([a-zA-Z0-9-]+)=/g, '<span class="stx-prop">$1</span>=') // Properties
+            .replace(/=("?[a-zA-Z0-9.\/_-]+"?) /g, '=<span class="stx-val">$1</span> ') // Values
+            .replace(/=([0-9]+[kM]?\/[0-9]+[kM]?)/g, '=<span class="stx-val">$1</span>'); // Speed Values
+    }
+
+    /* ===== UTILS (TABS, COPY, DOWNLOAD) ===== */
+    function switchTab(tabName, btnEl) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        if (btnEl) btnEl.classList.add('active');
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+    }
+
+    function copyCode(elementId) {
+        const rawText = document.getElementById(elementId).getAttribute('data-raw');
+        navigator.clipboard.writeText(rawText).then(() => {
+            alert('تم نسخ الكود بنجاح! 📋');
+        }).catch(() => {
+            alert('⚠️ تعذّر نسخ الكود تلقائيًا (قد يكون المتصفح منع الوصول للحافظة). يرجى تحديد النص ونسخه يدويًا.');
+        });
+    }
+
+    function downloadRsc(elementId, filename) {
+        const rawText = document.getElementById(elementId).getAttribute('data-raw');
+        const blob = new Blob([rawText], { type: 'text/plain;charset=utf-8' });
+        const a = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // Init with one empty row
+    window.onload = () => { addUserRow(); };
+
+</script>
+
+</body>
+</html>
