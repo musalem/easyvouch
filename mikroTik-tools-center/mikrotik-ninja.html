@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إخفاء معلومات المايكروتك من مزود الخدمة</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg:#f1f5f9; --panel:#ffffff; --panel-2:#f8fafc; --card-bg:rgba(255,255,255,.9); --line:#e2e8f0;
+    --text:#0f172a; --muted:#64748b;
+    --brand:#0284c7; --brand-hover:#0369a1; --ok:#16a34a; --warn:#d97706; --danger:#dc2626;
+    --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+    --shadow-hover: 0 12px 40px 0 rgba(2, 132, 199, 0.15);
+    --mono:'JetBrains Mono', ui-monospace, monospace;
+    --sans:'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text); font-family:var(--sans); line-height:1.6; min-height:100vh;
+  }
+  a{color:inherit;}
+
+  .page-icon{
+    width:70px; height:70px; border-radius:50%;
+    background:rgba(2,132,199,.1); color:var(--brand);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.8rem; margin:0 auto 18px;
+  }
+
+  header{max-width:1180px; margin:0 auto; padding:44px 20px 22px; text-align:center;}
+  .eyebrow{display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:600; font-size:12.5px; letter-spacing:.02em; color:var(--brand); background:rgba(2,132,199,.10); border:1px solid rgba(2,132,199,.30); border-radius:999px; padding:5px 12px; margin-bottom:18px;}
+  h1{font-size:clamp(26px,4.2vw,40px); line-height:1.2; margin:0 0 14px; font-weight:800; letter-spacing:-.01em; color:var(--text);}
+  h1 span{color:var(--brand);}
+  .lede{color:var(--muted); font-size:16px; max-width:720px; margin:0 auto;}
+  .lede b{color:var(--text);}
+
+  .notice-wrap{max-width:1180px; margin:16px auto 0; padding:0 20px; display:grid; gap:10px;}
+  .notice{border-inline-start:3px solid var(--warn); background:#fffbeb; border-radius:8px; padding:13px 15px; font-size:13.5px; color:#92400e; box-shadow:var(--shadow);}
+  .notice b{color:var(--warn);}
+  .notice.danger{border-color:var(--danger); background:#fef2f2; color:#991b1b;}
+  .notice.danger b{color:var(--danger);}
+
+  .layout{max-width:1180px; margin:26px auto 70px; padding:0 20px; display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+  @media (max-width:960px){.layout{grid-template-columns:1fr;}}
+
+  .card{background:var(--card-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid var(--line); border-radius:20px; padding:26px; box-shadow:var(--shadow);}
+  .card h2{font-size:14px; letter-spacing:.02em; color:var(--text); margin:0 0 16px; font-weight:700; display:flex; align-items:center; gap:10px;}
+  .card h2 .n{font-family:var(--sans); color:var(--brand); background:rgba(2,132,199,.12); border-radius:6px; width:24px;height:24px; display:inline-flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:800;}
+
+  label.field{display:block; margin-bottom:16px;}
+  label.field span{display:block; font-size:13.5px; color:var(--text); margin-bottom:7px; font-weight:600;}
+  label.field small{display:block; color:var(--muted); font-size:11.5px; margin-top:5px; font-weight:400;}
+  .row-input{display:flex; gap:8px;}
+  input[type=text]{width:100%; background:#f8fafc; border:1px solid var(--line); color:var(--text); border-radius:9px; padding:11px 13px; font-family:var(--mono); font-size:13.5px; outline:none; transition:border-color .15s, box-shadow .15s;}
+  input[type=text]:focus{border-color:var(--brand); box-shadow:0 0 0 3px rgba(2,132,199,.12);}
+  input[type=text]::placeholder{color:#94a3b8;}
+  input[type=text].invalid{border-color:var(--danger);}
+  .btn-mini{flex:none; background:#f1f5f9; border:1px solid var(--line); color:var(--text); border-radius:9px; padding:0 14px; font-family:var(--sans); font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;}
+  .btn-mini:hover{border-color:var(--brand); color:var(--brand);}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:2px 18px;}
+  @media (max-width:520px){.grid2{grid-template-columns:1fr;}}
+
+  .opt{display:flex; align-items:flex-start; gap:10px; padding:9px 4px; border-radius:8px; cursor:pointer;}
+  .opt:hover{background:#f1f5f9;}
+  .opt input{appearance:none; width:18px; height:18px; margin-top:1px; flex:none; border:1.5px solid #cbd5e1; border-radius:5px; background:#fff; cursor:pointer; position:relative; transition:.15s;}
+  .opt input:checked{background:var(--brand); border-color:var(--brand);}
+  .opt input:checked::after{content:''; position:absolute; inset:0; margin:auto; width:5px; height:9px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(35deg) translate(-1px,-1px);}
+  .opt .t{font-size:13.5px; color:var(--text);}
+  .opt .d{font-size:11.5px; color:var(--muted); margin-top:1px;}
+  .opt.critical{background:#fef2f2; border:1px solid rgba(220,38,38,.25); border-radius:9px; margin-bottom:2px;}
+  .tag{display:inline-block; font-family:var(--sans); font-weight:700; font-size:10px; padding:2px 7px; border-radius:5px; margin-top:5px;}
+  .tag.risk{background:rgba(220,38,38,.12); color:var(--danger);}
+  .tag.info{background:rgba(2,132,199,.12); color:var(--brand);}
+
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 0;}
+  .btn{border-radius:10px; padding:11px 18px; font-weight:700; font-size:13.5px; border:1px solid transparent; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px; transition:all .2s ease;}
+  .btn-primary{background:var(--brand); color:#fff;}
+  .btn-primary:hover{background:var(--brand-hover);}
+  .btn-outline{background:transparent; border-color:var(--line); color:var(--text);}
+  .btn-outline:hover{border-color:var(--ok); color:var(--ok);}
+  .btn-outline.warn:hover{border-color:var(--brand); color:var(--brand);}
+
+  .output-card{grid-column:1/-1;}
+  .output-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;}
+  .output-head h2{margin:0;}
+  .term{background:#0f172a; border:1px solid var(--line); border-radius:12px; max-height:600px; overflow:auto; box-shadow:var(--shadow);}
+  .term-top{display:flex; align-items:center; gap:7px; padding:11px 14px; border-bottom:1px solid #1e293b; position:sticky; top:0; background:#111c30; z-index:2;}
+  .term-top i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .term-top .r{background:#ff5f57;} .term-top .y{background:#febc2e;} .term-top .g{background:#28c840;}
+  .term-top .path{margin-inline-start:8px; font-family:var(--mono); font-size:11.5px; color:#94a3b8;}
+  pre#output{margin:0; padding:18px 20px; font-family:var(--mono); font-size:12.6px; line-height:1.65; white-space:pre-wrap; word-break:break-word; direction:ltr; text-align:left; color:#e2e8f0;}
+  .c-comment{color:#64d69a;} .c-cmd{color:#e2e8f0;} .c-flag{color:#38bdf8;} .c-val{color:#fbbf24;}
+  .empty-hint{color:#64748b; font-family:var(--mono); font-size:13px; padding:40px 20px; text-align:center; display:block;}
+
+  .status{font-size:12.5px; margin-top:10px; font-weight:600; min-height:16px;}
+  .status.ok{color:var(--ok);} .status.error{color:var(--danger);}
+
+  .toast{position:fixed; bottom:24px; inset-inline-start:24px; z-index:50; background:var(--ok); color:#fff; font-weight:700; font-size:13.5px; padding:12px 18px; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.2); opacity:0; transform:translateY(10px); transition:.25s; pointer-events:none;}
+  .toast.show{opacity:1; transform:translateY(0);}
+
+  footer{width:100%; text-align:center; padding:15px 0; color:var(--muted); font-size:0.9rem; border-top:1px solid var(--line); margin-top:20px; max-width:1180px; margin-inline:auto;}
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="page-icon"><i class="fa-solid fa-user-ninja"></i></div>
+    <div class="eyebrow"><i class="fa-solid fa-shield-halved"></i> إخفاء بصمة الراوتر من مزوّد الخدمة (WAN)</div>
+    <h1>إخفاء معلومات المايكروتك <span>من مزود الخدمة</span></h1>
+    <p class="lede">ولّد سكربت <b>RouterOS</b> يقلّل الخدمات والبروتوكولات التي تكشف وجود راوتر MikroTik من جهة مزوّد الإنترنت (WAN)، مع إبقاء إدارة الشبكة المحلية سهلة.</p>
+  </header>
+
+  <div class="notice-wrap">
+    <div class="notice">
+      <b>قبل التطبيق:</b> احتفظ بنسخة احتياطية من إعدادات الراوتر، وتأكد من اسم الواجهة الفعلية المتصلة بمزوّد الإنترنت. جميع القواعد هنا مقيّدة بقائمة الواجهات <code>WAN-PROTECT</code> فقط، ولا تؤثر على شبكتك الداخلية.
+    </div>
+    <div class="notice danger">
+      <b>تحذير خاص:</b> خيار «تعطيل جميع خدمات IP» يضبط <code>disabled=yes</code> على Winbox وSSH وWebFig وAPI معًا — فعّله فقط إن كان لديك وصول محلي بديل (منفذ Console أو كابل مباشر).
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- ===== CARD 1: identity ===== -->
+    <section class="card">
+      <h2><span class="n">1</span> الهوية والواجهة</h2>
+
+      <label class="field">
+        <span>واجهة الاتصال الفعلية بمزوّد الإنترنت</span>
+        <input type="text" id="wanInterface" value="ether1" placeholder="مثال: ether1">
+        <small>استخدم اسم واجهة Ethernet الحقيقية — أي خطأ هنا يطبّق القواعد على واجهة خاطئة.</small>
+      </label>
+
+      <label class="field">
+        <span>هوية الراوتر الجديدة (اختياري)</span>
+        <div class="row-input">
+          <input type="text" id="routerIdentity" placeholder="مثال: Gateway-04">
+          <button class="btn-mini" id="randomIdentityBtn" type="button">🎲 توليد</button>
+        </div>
+      </label>
+
+      <label class="field">
+        <span>عنوان MAC جديد للواجهة (اختياري)</span>
+        <div class="row-input">
+          <input type="text" id="routerMac" placeholder="مثال: 02:7A:34:91:BC:55">
+          <button class="btn-mini" id="randomMacBtn" type="button">🎲 توليد</button>
+        </div>
+        <small>عنوان محلي الإدارة (Locally-Administered) وأحادي الإرسال — يبدأ بـ 02.</small>
+      </label>
+
+      <label class="opt">
+        <input type="checkbox" id="optRandomMac">
+        <span>
+          <span class="t">تدوير MAC عشوائيًا عند كل إقلاع بدل القيمة الثابتة</span>
+          <span class="d">ينشئ سكربت مجدول (Scheduler) يولّد MAC جديد عند كل Startup</span>
+        </span>
+      </label>
+    </section>
+
+    <!-- ===== CARD 2: protections ===== -->
+    <section class="card">
+      <h2><span class="n">2</span> خيارات تقليل البصمة على WAN</h2>
+      <div id="protectionList"><!-- injected --></div>
+    </section>
+
+    <!-- ===== output ===== -->
+    <section class="card output-card">
+      <div class="output-head">
+        <h2><span class="n">3</span> السكربت الناتج (بالإنجليزية — RouterOS v6/v7)</h2>
+        <div class="toolbar" style="margin:0;">
+          <button class="btn btn-primary" onclick="generate()">⚙️ إنشاء السكربت</button>
+          <button class="btn btn-outline" onclick="copyScript()">⧉ نسخ</button>
+          <button class="btn btn-outline" onclick="downloadScript()">⭳ تنزيل .rsc</button>
+          <button class="btn btn-outline warn" onclick="clearOptions()">↺ إلغاء الخيارات</button>
+        </div>
+      </div>
+      <div class="term">
+        <div class="term-top"><i class="r"></i><i class="y"></i><i class="g"></i><span class="path">mikrotik-ninja.rsc — RouterOS v6/v7</span></div>
+        <pre id="output"><span class="empty-hint">Set the WAN interface, pick your options, then click "إنشاء السكربت" / Generate Script.</span></pre>
+      </div>
+      <div class="status" id="status"></div>
+    </section>
+
+  </div>
+
+  <footer>
+    برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+  </footer>
+
+  <div class="toast" id="toast">Copied ✓</div>
+
+<script>
+'use strict';
+
+const $ = id => document.getElementById(id);
+const escapeRos = value => String(value).replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+
+/* ---------------- validators ---------------- */
+function isValidInterface(v){ return /^[^\s"\\]+$/.test(v) && v.length<=64; }
+function isValidMac(v){ return /^([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}$/.test(v); }
+
+/* ---------------- random generators ---------------- */
+function randomByte(){ return Math.floor(Math.random()*256).toString(16).toUpperCase().padStart(2,'0'); }
+function generateRandomMAC(){
+  // 02 = locally administered + unicast
+  return '02:'+[1,2,3,4,5].map(randomByte).join(':');
+}
+function generateRandomIdentity(){
+  const names=['Gateway','Edge-Router','Secure-GW','Uplink','Border-RT'];
+  const n = names[Math.floor(Math.random()*names.length)];
+  return n+'-'+Math.floor(Math.random()*900+100);
+}
+
+/* ---------------- protection catalogue ---------------- */
+// Each: id, title, desc, tag(optional), critical(bool), build(lines,wan)
+const PROTECTIONS = [
+  { id:'blockWinbox', title:'حظر Winbox من WAN', desc:'يمنع الوصول للمنفذ 8291 من خارج الشبكة فقط، Winbox يبقى يعمل محليًا.',
+    build:(L)=>{ L.push('## --- Block Winbox from WAN ---'); dropRaw(L,'tcp','8291','Block Winbox from WAN'); L.push(''); } },
+
+  { id:'blockNeighbor', title:'تعطيل Neighbor Discovery على WAN فقط', desc:'يوقف بث MNDP نحو الخارج فقط، ويبقيه يعمل على الشبكة الداخلية (مفيد لاكتشاف الأجهزة عبر Winbox).',
+    build:(L)=>{ L.push('## --- Disable Neighbor Discovery on WAN only ---'); L.push('/ip neighbor discovery-settings set discover-interface-list=!WAN-PROTECT'); L.push(''); } },
+
+  { id:'blockMacServer', title:'تقييد إدارة MAC-Telnet/Winbox على WAN فقط', desc:'يمنع الوصول عبر MAC من الخارج فقط، ويُبقيه متاحًا محليًا لاستعادة الوصول عند فقدان IP.',
+    build:(L)=>{
+      L.push('## --- Restrict MAC-based management to LAN only ---');
+      L.push('/tool mac-server set allowed-interface-list=!WAN-PROTECT');
+      L.push('/tool mac-server mac-winbox set allowed-interface-list=!WAN-PROTECT');
+      L.push('/tool mac-server ping set enabled=no');
+      L.push('');
+    } },
+
+  { id:'blockTraceroute', title:'تقليل استجابات Traceroute من WAN', desc:'يحظر نطاق UDP الشائع للتتبع، ويمنع رسائل ICMP Time-Exceeded الصادرة عبر WAN.',
+    build:(L)=>{
+      L.push('## --- Reduce Traceroute visibility on WAN ---');
+      dropRaw(L,'udp','33434-33534','Block common Traceroute UDP range');
+      L.push('/ip firewall filter add chain=output out-interface-list=WAN-PROTECT protocol=icmp icmp-options=11:0 action=drop comment="Shield: Drop outgoing ICMP Time-Exceeded on WAN"');
+      L.push('');
+    } },
+
+  { id:'blockRoMON', title:'تعطيل RoMON', desc:'يوقف خدمة RoMON بالكامل لمنع مشاركة الجهاز في شبكة إدارة طبقة MAC.',
+    build:(L)=>{ L.push('## --- Disable RoMON ---'); L.push('/tool romon set enabled=no'); L.push(''); } },
+
+  { id:'blockDNS', title:'منع استعلامات DNS من WAN', desc:'يعطّل الاستعلامات البعيدة، ويسقط منفذ 53 (TCP/UDP) القادم من الخارج.',
+    build:(L)=>{
+      L.push('## --- Block DNS queries from WAN ---');
+      L.push('/ip dns set allow-remote-requests=no');
+      dropRaw(L,'udp','53','Block DNS from WAN — UDP');
+      dropRaw(L,'tcp','53','Block DNS from WAN — TCP');
+      L.push('');
+    } },
+
+  { id:'blockProxy', title:'تعطيل Web Proxy المفتوح', desc:'يعطّل خدمة Web Proxy ويغلق منفذها القياسي 8080 من الخارج.',
+    build:(L)=>{ L.push('## --- Disable open Web Proxy ---'); L.push('/ip proxy set enabled=no'); dropRaw(L,'tcp','8080','Block Web Proxy from WAN'); L.push(''); } },
+
+  { id:'blockSocks', title:'تعطيل SOCKS Proxy', desc:'يعطّل خادم SOCKS ويغلق منفذه القياسي 1080 من الخارج.',
+    build:(L)=>{ L.push('## --- Disable SOCKS Proxy ---'); L.push('/ip socks set enabled=no'); dropRaw(L,'tcp','1080','Block SOCKS from WAN'); L.push(''); } },
+
+  { id:'blockPing', title:'حظر Ping الوارد على WAN', desc:'يُسقط طلبات ICMP Echo القادمة من مزوّد الخدمة أو أي فاحص خارجي.',
+    build:(L)=>{ L.push('## --- Block incoming Ping (ICMP Echo) on WAN ---'); L.push('/ip firewall raw add chain=prerouting in-interface-list=WAN-PROTECT protocol=icmp icmp-options=8:0 action=drop comment="Shield: Drop Ping on WAN"'); L.push(''); } },
+
+  { id:'blockSSDP', title:'تعطيل UPnP وحظر SSDP', desc:'يعطّل UPnP ويمنع حزم الاكتشاف التلقائي على UDP 1900.',
+    build:(L)=>{ L.push('## --- Disable UPnP / block SSDP ---'); L.push('/ip upnp set enabled=no'); dropRaw(L,'udp','1900','Block SSDP on WAN'); L.push(''); } },
+
+  { id:'blockBTest', title:'تعطيل خادم اختبار السرعة (BTest)', desc:'يعطّل الخدمة ويطلب مصادقة كإجراء احتياطي، ويغلق منفذها 2000.',
+    build:(L)=>{ L.push('## --- Disable Bandwidth Test server ---'); L.push('/tool bandwidth-server set enabled=no authenticate=yes'); dropRaw(L,'tcp','2000','Block BTest on WAN'); L.push(''); } },
+
+  { id:'blockSNMP', title:'تعطيل SNMP', desc:'يعطّل SNMP ويمنع منافذ 161/162 من WAN.',
+    build:(L)=>{ L.push('## --- Disable SNMP ---'); L.push('/snmp set enabled=no'); dropRaw(L,'udp','161,162','Block SNMP on WAN — UDP'); dropRaw(L,'tcp','161,162','Block SNMP on WAN — TCP'); L.push(''); } },
+
+  { id:'blockTheDude', title:'حظر The Dude من WAN', desc:'يعطّل خدمة The Dude (إن كانت الحزمة مثبّتة) عبر /dude مباشرة، ويمنع منافذها من الخارج.',
+    build:(L)=>{
+      L.push('## --- Block The Dude from WAN ---');
+      L.push(':do { /dude set enabled=no } on-error={ :log warning "Shield: Dude package not installed, skipped" }');
+      dropRaw(L,'tcp','2210,2211','Block The Dude ports on WAN');
+      L.push('');
+    } },
+
+  { id:'blockIPCloud', title:'تعطيل نشر الهوية عبر IP Cloud', desc:'يمنع نشر DDNS للراوتر — يتعامل تلقائيًا مع اختلاف القيم بين الإصدارات (no مقابل auto).',
+    build:(L)=>{
+      L.push('## --- Disable IP Cloud DDNS publication ---');
+      L.push('## RouterOS 7.17+ only accepts "auto"; older v6/v7 builds require "no" — try both.');
+      L.push(':do { /ip cloud set ddns-enabled=no } on-error={ /ip cloud set ddns-enabled=auto }');
+      L.push('');
+    } },
+
+  { id:'logPortScan', title:'تسجيل محاولات TCP الجديدة من WAN', desc:'تسجيل فقط دون حظر، للمساعدة على رصد عمليات الفحص.', tag:'info',
+    build:(L)=>{ L.push('## --- Log new inbound TCP connections on WAN ---'); L.push('/ip firewall raw add chain=prerouting in-interface-list=WAN-PROTECT protocol=tcp tcp-flags=syn action=log log-prefix="NINJA-WAN-SCAN " comment="Shield: Log new TCP attempts"'); L.push(''); } },
+
+  { id:'maskTTL', title:'تثبيت TTL للحزم الصادرة (IPv4)', desc:'يضبط TTL الصادر عبر WAN إلى قيمة ثابتة (65) — تمويه وليس إخفاءً كاملًا.', tag:'info',
+    build:(L)=>{ L.push('## --- Mask outgoing IPv4 TTL ---'); L.push('/ip firewall mangle add chain=postrouting out-interface-list=WAN-PROTECT protocol=ip action=change-ttl new-ttl=set:65 comment="Shield: TTL=65 on WAN"'); L.push(''); } },
+
+  { id:'dropBogon', title:'إسقاط مصادر IPv4 غير صالحة (Bogon) من WAN', desc:'ينشئ قائمة بالنطاقات المحجوزة وغير القابلة للاستخدام كمصدر عام، ثم يُسقطها.',
+    build:(L)=>{
+      L.push('## --- Drop Bogon IPv4 sources on WAN ---');
+      const bogons=[['0.0.0.0/8','Current network'],['10.0.0.0/8','RFC1918'],['100.64.0.0/10','CGNAT'],
+        ['127.0.0.0/8','Loopback'],['169.254.0.0/16','Link-Local'],['172.16.0.0/12','RFC1918'],
+        ['192.0.0.0/24','IETF Protocol'],['192.0.2.0/24','TEST-NET-1'],['192.168.0.0/16','RFC1918'],
+        ['198.18.0.0/15','Benchmark'],['198.51.100.0/24','TEST-NET-2'],['203.0.113.0/24','TEST-NET-3'],
+        ['224.0.0.0/4','Multicast'],['240.0.0.0/4','Reserved']];
+      bogons.forEach(([addr,label])=>{
+        L.push(`:if ([:len [/ip firewall address-list find where list="NINJA-BOGON" and address="${addr}"]] = 0) do={ /ip firewall address-list add list="NINJA-BOGON" address=${addr} comment="Shield: ${label}" }`);
+      });
+      L.push('/ip firewall raw add chain=prerouting in-interface-list=WAN-PROTECT src-address-list=NINJA-BOGON action=drop comment="Shield: Drop Bogon sources"');
+      L.push('');
+    } },
+
+  { id:'disableServices', title:'تعطيل جميع خدمات IP', desc:'يضبط كل عناصر /ip service على disabled=yes — قد يقطع Winbox وSSH وWebFig وAPI فورًا.', tag:'risk', critical:true,
+    build:(L)=>{ L.push('## --- Disable ALL IP services ---'); L.push('## WARNING: this may cut off Winbox, SSH, WebFig, and API access immediately.'); L.push('/ip service set [find] disabled=yes'); L.push(''); } },
+];
+
+function dropRaw(L, proto, ports, title){
+  L.push(`/ip firewall raw add chain=prerouting in-interface-list=WAN-PROTECT protocol=${proto}${ports?` dst-port=${ports}`:''} action=drop comment="Shield: ${title}"`);
+}
+
+/* build option checkboxes */
+const listEl = $('protectionList');
+PROTECTIONS.forEach(p=>{
+  const label = document.createElement('label');
+  label.className = 'opt' + (p.critical ? ' critical' : '');
+  const tag = p.tag ? `<span class="tag ${p.tag}">${p.tag==='risk'?'خطر مرتفع':'تسجيل فقط'}</span>` : '';
+  label.innerHTML = `
+    <input type="checkbox" id="p_${p.id}">
+    <span><span class="t">${p.title}</span><span class="d">${p.desc}</span>${tag}</span>`;
+  listEl.appendChild(label);
+});
+
+/* ---------------- random buttons ---------------- */
+$('randomMacBtn').addEventListener('click', ()=>{ $('routerMac').value = generateRandomMAC(); $('optRandomMac').checked = false; });
+$('randomIdentityBtn').addEventListener('click', ()=>{ $('routerIdentity').value = generateRandomIdentity(); });
+
+/* ---------------- highlighting ---------------- */
+function highlight(line){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if(line.trim().startsWith('#')) return `<span class="c-comment">${esc(line)}</span>`;
+  let out = esc(line);
+  out = out.replace(/^(:?\/?[a-z0-9\- ]+)/, m=>`<span class="c-flag">${m}</span>`);
+  out = out.replace(/=([^\s"]+|"[^"]*")/g, (m,v)=>`=<span class="c-val">${v}</span>`);
+  return `<span class="c-cmd">${out}</span>`;
+}
+
+/* ---------------- validation ---------------- */
+function validate(){
+  const wan = $('wanInterface').value.trim();
+  const identity = $('routerIdentity').value.trim();
+  const mac = $('routerMac').value.trim().toUpperCase();
+  const randomMac = $('optRandomMac').checked;
+
+  $('wanInterface').classList.remove('invalid');
+  $('routerMac').classList.remove('invalid');
+
+  if(!isValidInterface(wan)){
+    $('wanInterface').classList.add('invalid');
+    return 'Invalid WAN interface name — use something like ether1, without spaces or quotes.';
+  }
+  if(identity.length > 64) return 'Router identity is too long.';
+  if(mac && !isValidMac(mac)){
+    $('routerMac').classList.add('invalid');
+    return 'Invalid MAC address — expected format like 02:7A:34:91:BC:55.';
+  }
+  if(randomMac && mac) return 'Choose either a manual MAC address or startup randomization, not both.';
+  return null;
+}
+
+/* ---------------- generation ---------------- */
+function generate(){
+  const err = validate();
+  if(err){ setStatus(err,'error'); return; }
+
+  const wan = $('wanInterface').value.trim();
+  const identity = $('routerIdentity').value.trim();
+  const mac = $('routerMac').value.trim().toUpperCase();
+  const randomMac = $('optRandomMac').checked;
+
+  const L = [];
+  L.push('# ============================================================');
+  L.push('# Mikrotik Ninja — WAN Fingerprint Shield');
+  L.push('# Generated: ' + new Date().toISOString().replace('T',' ').slice(0,19) + ' UTC');
+  L.push('# Target WAN interface: ' + wan);
+  L.push('# ============================================================');
+  L.push('#');
+  L.push('# NOTE: all rules are scoped to the WAN-PROTECT interface list —');
+  L.push('# your LAN / management access is not affected.');
+  L.push('');
+
+  L.push('## --- Prepare WAN interface list ---');
+  L.push(`:if ([:len [/interface list find where name="WAN-PROTECT"]] = 0) do={ /interface list add name="WAN-PROTECT" comment="Mikrotik Ninja" }`);
+  L.push(`:if ([:len [/interface list member find where list="WAN-PROTECT" and interface="${escapeRos(wan)}"]] = 0) do={ /interface list member add list="WAN-PROTECT" interface="${escapeRos(wan)}" comment="Mikrotik Ninja" }`);
+  L.push('');
+
+  if(identity){
+    L.push('## --- Change router identity ---');
+    L.push(`/system identity set name="${escapeRos(identity)}"`);
+    L.push('');
+  }
+
+  if(randomMac){
+    L.push('## --- Randomize WAN MAC on every boot ---');
+    L.push(`:if ([:len [/system script find where name="Ninja-Random-MAC"]] = 0) do={`);
+    L.push(`    /system script add name="Ninja-Random-MAC" policy=read,write,test source={`);
+    L.push(`        :local r [:rndstr from="0123456789ABCDEF" length=10]`);
+    L.push(`        :local mac ("02:" . [:pick $r 0 2] . ":" . [:pick $r 2 4] . ":" . [:pick $r 4 6] . ":" . [:pick $r 6 8] . ":" . [:pick $r 8 10])`);
+    L.push(`        /interface ethernet set [find where name="${escapeRos(wan)}"] mac-address=$mac`);
+    L.push(`    }`);
+    L.push(`}`);
+    L.push(`:if ([:len [/system scheduler find where name="Ninja-MAC-Startup"]] = 0) do={ /system scheduler add name="Ninja-MAC-Startup" start-time=startup on-event="/system script run Ninja-Random-MAC" comment="Shield: Random MAC on boot" }`);
+    L.push(`/system script run Ninja-Random-MAC`);
+    L.push('');
+  } else if(mac){
+    L.push('## --- Change WAN interface MAC address ---');
+    L.push(`/interface ethernet set [find where name="${escapeRos(wan)}"] mac-address="${mac}"`);
+    L.push('');
+  }
+
+  let count = 0;
+  PROTECTIONS.forEach(p=>{
+    const box = $('p_'+p.id);
+    if(box && box.checked){ p.build(L, wan); count++; }
+  });
+
+  if(count===0 && !identity && !mac && !randomMac){
+    L.push('# No protections selected — enable options above, then regenerate.');
+  }
+
+  L.push('## --- End of script ---');
+  L.push('## Review the current firewall rule order before relying on this in production.');
+  L.push('## Some services blocked here may be required in special setups (VPN endpoints, management protocols).');
+
+  const script = L.join('\n').replace(/\n{3,}/g,'\n\n').trim()+'\n';
+  window.__generatedScript = script;
+  $('output').innerHTML = script.split('\n').map(highlight).join('\n');
+  setStatus(`Script generated — ${script.split('\n').length} lines.`, 'ok');
+}
+
+function setStatus(text,type=''){
+  const el = $('status');
+  el.textContent = text; el.className = 'status'+(type?' '+type:'');
+}
+
+function copyScript(){
+  if(!window.__generatedScript) generate();
+  if(!window.__generatedScript) return;
+  navigator.clipboard.writeText(window.__generatedScript).then(()=>{ showToast(); setStatus('Copied to clipboard.','ok'); });
+}
+function downloadScript(){
+  if(!window.__generatedScript) generate();
+  if(!window.__generatedScript) return;
+  const blob = new Blob([window.__generatedScript], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mikrotik-ninja-wan-shield.rsc';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  setStatus('File downloaded.','ok');
+}
+function clearOptions(){
+  document.querySelectorAll('#protectionList input[type=checkbox]').forEach(i=>i.checked=false);
+  setStatus('Options cleared.');
+}
+function showToast(){
+  const t = $('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ---------------- init ---------------- */
+$('routerMac').value = generateRandomMAC();
+</script>
+</body>
+</html>

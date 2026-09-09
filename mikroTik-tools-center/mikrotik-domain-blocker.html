@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>حجب المواقع للمايكروتيك</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg:            #f1f5f9;
+    --panel:         #ffffff;
+    --panel-2:       #f8fafc;
+    --card-bg:       rgba(255,255,255,.9);
+    --line:          #e2e8f0;
+    --text:          #0f172a;
+    --muted:         #64748b;
+    --brand:         #0284c7;
+    --brand-hover:   #0369a1;
+    --ok:            #16a34a;
+    --warn:          #d97706;
+    --danger:        #dc2626;
+    --shadow:        0 8px 32px 0 rgba(31, 38, 135, 0.08);
+    --shadow-hover:  0 12px 40px 0 rgba(2, 132, 199, 0.15);
+    --mono: 'JetBrains Mono', ui-monospace, monospace;
+    --sans: 'Cairo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--text); font-family:var(--sans); line-height:1.6; min-height:100vh;
+  }
+  a{color:inherit;}
+
+  .page-icon{
+    width:70px; height:70px; border-radius:50%;
+    background:rgba(2,132,199,.1); color:var(--brand);
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.8rem; margin:0 auto 18px;
+  }
+
+  header{max-width:1180px; margin:0 auto; padding:46px 20px 24px; text-align:center;}
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px; font-family:var(--sans); font-weight:600; font-size:12.5px;
+    letter-spacing:.02em; color:var(--brand); background:rgba(2,132,199,.10);
+    border:1px solid rgba(2,132,199,.30); border-radius:999px; padding:5px 12px; margin-bottom:18px;
+  }
+  h1{font-size:clamp(26px,4.2vw,40px); line-height:1.2; margin:0 0 14px; font-weight:800; letter-spacing:-.01em; color:var(--text);}
+  h1 span{color:var(--brand);}
+  .lede{color:var(--muted); font-size:16px; max-width:700px; margin:0 auto; }
+  .lede b{color:var(--text);}
+
+  .notice-wrap{max-width:1180px; margin:16px auto 0; padding:0 20px; display:grid; gap:10px;}
+  .notice{border-inline-start:3px solid var(--warn); background:#fffbeb; border-radius:8px; padding:13px 15px; font-size:13.5px; color:#92400e; box-shadow:var(--shadow);}
+  .notice b{color:var(--warn);}
+  .notice.info{border-color:#0284c7; background:#f0f9ff; color:#075985;}
+  .notice.info b{color:#0284c7;}
+
+  .layout{max-width:1180px; margin:26px auto 70px; padding:0 20px; display:grid; grid-template-columns:1fr 1fr; gap:22px;}
+  @media (max-width:960px){ .layout{grid-template-columns:1fr;} }
+
+  .card{background:var(--card-bg,var(--panel)); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid var(--line); border-radius:20px; padding:26px; box-shadow:var(--shadow); transition:box-shadow .3s ease, transform .3s ease;}
+  .card h2{font-size:14px; letter-spacing:.02em; color:var(--text); margin:0 0 16px; font-weight:700; display:flex; align-items:center; gap:10px;}
+  .card h2 .n{font-family:var(--sans); color:var(--brand); background:rgba(2,132,199,.12); border-radius:6px; width:24px;height:24px; display:inline-flex; align-items:center; justify-content:center; font-size:12.5px; font-weight:800;}
+
+  label.field{display:block; margin-bottom:16px;}
+  label.field span{display:block; font-size:13.5px; color:var(--text); margin-bottom:7px; font-weight:600;}
+  label.field small{display:block; color:var(--muted); font-size:11.5px; margin-top:5px; font-weight:400;}
+  input[type=text], select{
+    width:100%; background:#f8fafc; border:1px solid var(--line); color:var(--text);
+    border-radius:9px; padding:11px 13px; font-family:var(--mono); font-size:13.5px; outline:none; transition:border-color .15s, box-shadow .15s;
+  }
+  input[type=text]:focus, select:focus{border-color:var(--brand); box-shadow:0 0 0 3px rgba(2,132,199,.12);}
+  input[type=text]::placeholder{color:#94a3b8;}
+  select{font-family:var(--sans); cursor:pointer;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:0 14px;}
+  @media (max-width:520px){.grid2{grid-template-columns:1fr;}}
+
+  .badge{display:inline-block; font-family:var(--sans); font-weight:700; font-size:10px; padding:2px 7px; border-radius:5px; margin-inline-start:6px; vertical-align:middle;}
+  .badge.v6{background:rgba(22,163,74,.12); color:var(--ok);}
+  .badge.v7{background:rgba(2,132,199,.12); color:var(--brand);}
+  .badge.v75{background:rgba(217,119,6,.14); color:var(--warn);}
+
+  /* domain table */
+  .domain-panel{border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#f8fafc; margin-top:6px;}
+  .panel-head{padding:12px 14px; background:#eef2f7; border-bottom:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; font-weight:700; font-size:13px;}
+  .panel-head .count{font-family:var(--sans); color:var(--muted); font-weight:600; font-size:11.5px;}
+  .domain-rows{max-height:260px; overflow:auto;}
+  .domain-row{display:flex; gap:8px; align-items:center; padding:8px 12px; border-bottom:1px solid var(--line);}
+  .domain-row:last-child{border-bottom:none;}
+  .domain-row input{flex:1; min-width:0; background:#fff;}
+  .preview{font-family:var(--mono); font-size:11.5px; color:var(--muted); direction:ltr; min-width:110px; text-align:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .btn-x{flex:none; background:rgba(220,38,38,.08); color:var(--danger); border:1px solid rgba(220,38,38,.25); border-radius:7px; width:30px; height:30px; cursor:pointer; font-size:14px;}
+  .btn-x:hover{background:rgba(220,38,38,.16);}
+
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin:16px 0 0;}
+  .btn{border-radius:10px; padding:11px 18px; font-weight:700; font-size:13.5px; border:1px solid transparent; cursor:pointer; font-family:var(--sans); display:inline-flex; align-items:center; gap:8px; transition:all .2s ease;}
+  .btn-primary{background:var(--brand); color:#fff;}
+  .btn-primary:hover{background:var(--brand-hover);}
+  .btn-outline{background:transparent; border-color:var(--line); color:var(--text);}
+  .btn-outline:hover{border-color:var(--ok); color:var(--ok);}
+  .btn-outline.warn:hover{border-color:var(--brand); color:var(--brand);}
+  .btn-sm{padding:8px 13px; font-size:12.5px; border-radius:8px;}
+
+  .output-card{grid-column:1/-1;}
+  .output-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;}
+  .output-head h2{margin:0;}
+  .term{background:#0f172a; border:1px solid var(--line); border-radius:12px; max-height:560px; overflow:auto; box-shadow:var(--shadow);}
+  .term-top{display:flex; align-items:center; gap:7px; padding:11px 14px; border-bottom:1px solid #1e293b; position:sticky; top:0; background:#111c30; z-index:2;}
+  .term-top i{width:10px;height:10px;border-radius:50%;display:inline-block;}
+  .term-top .r{background:#ff5f57;} .term-top .y{background:#febc2e;} .term-top .g{background:#28c840;}
+  .term-top .path{margin-inline-start:8px; font-family:var(--mono); font-size:11.5px; color:#94a3b8;}
+  pre#output{margin:0; padding:18px 20px; font-family:var(--mono); font-size:12.8px; line-height:1.65; white-space:pre-wrap; word-break:break-word; direction:ltr; text-align:left; color:#e2e8f0;}
+  .c-comment{color:#64d69a;} .c-cmd{color:#e2e8f0;} .c-flag{color:#38bdf8;} .c-val{color:#fbbf24;}
+  .empty-hint{color:#64748b; font-family:var(--mono); font-size:13px; padding:40px 20px; text-align:center; display:block;}
+
+  .status{font-size:12.5px; margin-top:10px; font-weight:600; min-height:16px;}
+  .status.ok{color:var(--ok);} .status.error{color:var(--danger);}
+
+  .toast{position:fixed; bottom:24px; inset-inline-start:24px; z-index:50; background:var(--ok); color:#fff; font-weight:700; font-size:13.5px; padding:12px 18px; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.2); opacity:0; transform:translateY(10px); transition:.25s; pointer-events:none;}
+  .toast.show{opacity:1; transform:translateY(0);}
+
+  footer{width:100%; text-align:center; padding:15px 0; color:var(--muted); font-size:0.9rem; border-top:1px solid var(--line); margin-top:20px; max-width:1180px; margin-inline:auto;}
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="page-icon"><i class="fa-solid fa-ban"></i></div>
+    <div class="eyebrow"><i class="fa-solid fa-shield-halved"></i> أداة توليد قواعد حجب النطاقات</div>
+    <h1>حجب المواقع <span>للمايكروتيك</span></h1>
+    <p class="lede">ولّد سكربت <b>RouterOS</b> جاهزًا لحجب مواقع ونطاقات محددة، باختيار الطريقة المناسبة لنوع حركة المرور (DNS / محتوى غير مشفّر / TLS-Host / Layer7 / بروكسي).</p>
+  </header>
+
+  <div class="notice-wrap">
+    <div class="notice">
+      <b>قبل التطبيق:</b> بعض طرق الحجب (Content وTLS-Host) تعتمد على رؤية اسم المضيف داخل الحزمة الأولى فقط — لن تعمل إن كانت مجزّأة على عدة حزم. تجنّب Layer7 لحجب الويب العام لأنه يستهلك موارد المعالج بشدة. اختبر دائمًا على شبكة غير حرجة أولاً.
+    </div>
+    <div class="notice">
+      <b>مهم جدًا — ترتيب القواعد:</b> إن كان لديك بالفعل قاعدة <code>accept</code> عامة في <code>chain=forward</code>، فستُضاف قواعد الحجب الجديدة في آخر القائمة ولن يتم تنفيذها. انقلها يدويًا إلى أعلى القائمة بعد اللصق (Move to Top في Winbox، أو <code>/ip firewall filter move</code>).
+    </div>
+    <div class="notice info">
+      <b>ملاحظة توافق:</b> جميع الطرق متوافقة مع <b>RouterOS v6 وv7</b> ما عدا الطريقة "DNS Regexp + Address-List" التي تتطلب <b>v7.5 فأعلى</b> (سيظهر ذلك في وصف الطريقة أدناه).
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- ===== CARD 1: method ===== -->
+    <section class="card">
+      <h2><span class="n">1</span> طريقة الحجب</h2>
+
+      <label class="field">
+        <span>اختر الطريقة المناسبة لنوع حركة المرور</span>
+        <select id="blockMethod"></select>
+        <small id="methodHelp"></small>
+      </label>
+
+      <div class="grid2">
+        <label class="field">
+          <span>بداية Regexp</span>
+          <input type="text" id="firstRegexp" value="(^|.*\.)">
+        </label>
+        <label class="field">
+          <span>نهاية Regexp</span>
+          <input type="text" id="lastRegexp" value="$">
+        </label>
+      </div>
+
+      <label class="field" id="forwardToWrap">
+        <span>خادم DNS يُوجَّه إليه الاستعلام (forward-to) <span class="badge v75">مطلوب لهذه الطريقة</span></span>
+        <input type="text" id="forwardTo" value="1.1.1.1" placeholder="مثال: 1.1.1.1">
+        <small>مطلوب إلزاميًا مع النوع FWD — بدونه لن يعمل تحويل الاستعلام ولا تعبئة قائمة العناوين.</small>
+      </label>
+    </section>
+
+    <!-- ===== CARD 2: domains ===== -->
+    <section class="card">
+      <h2><span class="n">2</span> قائمة النطاقات</h2>
+
+      <div class="domain-panel">
+        <div class="panel-head"><span>النطاقات المُضافة</span><span class="count" id="domainCount">0</span></div>
+        <div class="domain-rows" id="domainRows"></div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn-outline btn-sm" onclick="addRow()">+ إضافة نطاق</button>
+        <button class="btn btn-outline btn-sm warn" onclick="clearAll()">↺ مسح الكل</button>
+      </div>
+      <small style="color:var(--muted); display:block; margin-top:10px;">اكتب النطاق بدون <code>http://</code>، مثال: <code>example.com</code> أو <code>www.example.com</code></small>
+    </section>
+
+    <!-- ===== output ===== -->
+    <section class="card output-card">
+      <div class="output-head">
+        <h2><span class="n">3</span> السكربت الناتج (بالإنجليزية — RouterOS)</h2>
+        <div class="toolbar" style="margin:0;">
+          <button class="btn btn-primary" onclick="generate()">⚙️ إنشاء السكربت</button>
+          <button class="btn btn-outline" onclick="copyScript()">⧉ نسخ</button>
+          <button class="btn btn-outline" onclick="downloadScript()">⭳ تنزيل .rsc</button>
+        </div>
+      </div>
+
+      <div class="term">
+        <div class="term-top"><i class="r"></i><i class="y"></i><i class="g"></i><span class="path">domain-blocker.rsc — RouterOS v6/v7</span></div>
+        <pre id="output"><span class="empty-hint">Add at least one domain and click "إنشاء السكربت" / Generate Script.</span></pre>
+      </div>
+      <div class="status" id="status"></div>
+    </section>
+
+  </div>
+
+  <footer>
+    برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+  </footer>
+
+  <div class="toast" id="toast">Copied ✓</div>
+
+<script>
+'use strict';
+
+const COMMENT = 'Domain-Blocker';
+const LIST_NAME = 'blocked-domains';
+
+/* ---------------- methods catalogue ---------------- */
+const METHODS = {
+  '01':{ label:'DNS Regexp (NXDOMAIN)', ver:['v6','v7'],
+         help:'Blocks queries that pass through the router\'s own DNS by returning NXDOMAIN. Requires clients to use this router as their DNS server.', regex:true, forward:false },
+  '02':{ label:'RAW — Content match (plaintext HTTP)', ver:['v6','v7'],
+         help:'Matches the domain string inside unencrypted HTTP packets (port 80) in the RAW table, before connection tracking. Does not work on HTTPS.', regex:false, forward:false },
+  '03':{ label:'RAW — TLS-Host (SNI, port 443)', ver:['v6','v7'],
+         help:'Matches the TLS ClientHello hostname (SNI) on port 443 in the RAW table. Fails if the TLS handshake is fragmented across multiple TCP segments.', regex:false, forward:false },
+  '04':{ label:'DNS Regexp + Address-List (FWD)', ver:['v7.5+'],
+         help:'Forwards matching queries to the DNS server set below and tags the resolved IP into an address-list, which a separate rule then drops. Requires RouterOS 7.5 or newer.', regex:true, forward:true },
+  '05':{ label:'Filter — Content match (plaintext HTTP)', ver:['v6','v7'],
+         help:'Same as RAW content match, but placed in chain=forward (after connection tracking). Slightly heavier than RAW, but works on routers without RAW support.', regex:false, forward:false },
+  '06':{ label:'Filter — TLS-Host (SNI, port 443)', ver:['v6','v7'],
+         help:'Matches the TLS SNI hostname in chain=forward and drops immediately.', regex:false, forward:false },
+  '07':{ label:'Filter — TLS-Host + Address-List', ver:['v6','v7'],
+         help:'Tags the resolved server IP (from the matched SNI) into an address-list, then drops all further traffic to that IP. Caution: shared CDN IPs (e.g. Cloudflare) may block unrelated sites.', regex:false, forward:false },
+  '08':{ label:'Layer7 (HTTP Host header only)', ver:['v6','v7'],
+         help:'Matches the plaintext HTTP "Host:" header. Only works on port 80 — HTTPS (443) traffic is encrypted and cannot match this pattern. Heavy on CPU; not recommended for large domain lists.', regex:false, forward:false },
+  '09':{ label:'Web Proxy (HTTP only)', ver:['v6','v7'],
+         help:'Blocks via the transparent web proxy. Only affects HTTP (port 80) traffic redirected to the proxy — has no effect on HTTPS.', regex:false, forward:false },
+};
+
+const sel = document.getElementById('blockMethod');
+Object.entries(METHODS).forEach(([id,m])=>{
+  const opt = document.createElement('option');
+  opt.value = id;
+  opt.textContent = `${id} — ${m.label}`;
+  sel.appendChild(opt);
+});
+
+function verBadges(ver){
+  return ver.map(v=>{
+    const cls = v==='v7.5+' ? 'v75' : (v==='v6' ? 'v6' : 'v7');
+    return `<span class="badge ${cls}">${v}</span>`;
+  }).join('');
+}
+
+function updateMethodUI(){
+  const m = METHODS[sel.value];
+  document.getElementById('methodHelp').innerHTML = m.help + ' ' + verBadges(m.ver);
+  document.getElementById('firstRegexp').disabled = !m.regex;
+  document.getElementById('lastRegexp').disabled = !m.regex;
+  document.getElementById('forwardToWrap').style.display = m.forward ? 'block' : 'none';
+}
+sel.addEventListener('change', updateMethodUI);
+
+/* ---------------- domain rows ---------------- */
+let rowId = 0;
+const rowsEl = document.getElementById('domainRows');
+
+function normalizeDomain(s){
+  return s.trim().toLowerCase().replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+}
+function addRow(value=''){
+  rowId++;
+  const row = document.createElement('div');
+  row.className = 'domain-row';
+  row.dataset.id = rowId;
+  row.innerHTML = `
+    <input type="text" placeholder="example.com" value="${value}">
+    <span class="preview">—</span>
+    <button class="btn-x" title="Remove">✕</button>`;
+  const input = row.querySelector('input');
+  const preview = row.querySelector('.preview');
+  const del = row.querySelector('.btn-x');
+  input.addEventListener('input', ()=>{ preview.textContent = normalizeDomain(input.value)||'—'; updateCount(); });
+  del.addEventListener('click', ()=>{ row.remove(); updateCount(); });
+  rowsEl.appendChild(row);
+  updateCount();
+  input.focus();
+}
+function clearAll(){ rowsEl.innerHTML=''; updateCount(); addRow(); resetOutput(); }
+function updateCount(){
+  const n = getDomains().length;
+  document.getElementById('domainCount').textContent = n;
+}
+function getDomains(){
+  const out=[]; const seen=new Set();
+  rowsEl.querySelectorAll('input').forEach(inp=>{
+    const d = normalizeDomain(inp.value);
+    if(!d || /[\s"'<>]/.test(d)) return;
+    if(!seen.has(d)){ seen.add(d); out.push(d); }
+  });
+  return out;
+}
+
+/* ---------------- RouterOS-safe string builders ---------------- */
+// Escape a LOGICAL string (may contain single backslashes meaning "regex escape")
+// for embedding inside a RouterOS double-quoted attribute value.
+function rosEscape(s){
+  return String(s).replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+}
+// Build a domain-matching regex with the literal dots properly escaped
+// (single backslash at the LOGICAL level; rosEscape() below doubles it for the file).
+function domainRegex(first,last,domain){
+  const escapedDomain = domain.replace(/\./g, '\\.');
+  return `${first}${escapedDomain}${last}`;
+}
+function safeName(s){
+  return (s.toLowerCase().replace(/[^a-z0-9_-]+/g,'_').replace(/^_+|_+$/g,'').slice(0,48)) || 'domain';
+}
+
+/* ---------------- highlighting ---------------- */
+function highlight(line){
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  if(line.trim().startsWith('#')) return `<span class="c-comment">${esc(line)}</span>`;
+  let out = esc(line);
+  out = out.replace(/^(\/[a-z0-9\- ]+)/, m=>`<span class="c-flag">${m}</span>`);
+  out = out.replace(/=([^\s"]+|"[^"]*")/g, (m,v)=>`=<span class="c-val">${v}</span>`);
+  return `<span class="c-cmd">${out}</span>`;
+}
+
+/* ---------------- script generation ---------------- */
+function generateScript(){
+  const method = sel.value;
+  const m = METHODS[method];
+  const domains = getDomains();
+  if(!domains.length) throw new Error('Add at least one valid domain first.');
+
+  const first = document.getElementById('firstRegexp').value;
+  const last  = document.getElementById('lastRegexp').value;
+  const fwdTo = document.getElementById('forwardTo').value.trim();
+  if(m.forward && !fwdTo) throw new Error('This method requires a DNS forward-to server address.');
+
+  const lines = [];
+  const stamp = new Date().toISOString().replace('T',' ').slice(0,19)+' UTC';
+  lines.push(`# Mikrotik Domain Blocker`);
+  lines.push(`# Generated: ${stamp}`);
+  lines.push(`# Method: [${method}] ${m.label} (${m.ver.join(', ')})`);
+  lines.push(`# Domains: ${domains.length}`);
+  lines.push(`#`);
+  lines.push(`# IMPORTANT: if a general "accept" rule already exists in chain=forward,`);
+  lines.push(`# move these rules ABOVE it, otherwise they will never be reached.`);
+  lines.push('');
+
+  switch(method){
+    case '01':
+      lines.push('# Requires clients to use this router as their DNS resolver.');
+      domains.forEach(d=>{
+        lines.push(`/ip dns static add regexp="${rosEscape(domainRegex(first,last,d))}" type=NXDOMAIN comment="${COMMENT}"`);
+      });
+      lines.push('/ip dns cache flush');
+      break;
+
+    case '02':
+      lines.push('# HTTP only (port 80). Works only if the domain string is not split across packets.');
+      domains.forEach(d=>{
+        lines.push(`/ip firewall raw add chain=prerouting protocol=tcp dst-port=80 content="${rosEscape(d)}" action=drop comment="${COMMENT}"`);
+      });
+      break;
+
+    case '03':
+      lines.push('# HTTPS/TLS (port 443). Matches the TLS ClientHello SNI hostname (GLOB pattern).');
+      domains.forEach(d=>{
+        const host = d.startsWith('*.') ? d : `*.${d}`;
+        lines.push(`/ip firewall raw add chain=prerouting protocol=tcp dst-port=443 tls-host="${rosEscape(host)}" action=drop comment="${COMMENT}"`);
+      });
+      break;
+
+    case '04':
+      lines.push(`# Requires RouterOS 7.5+. Forwards to ${fwdTo} and tags resolved IPs into ${LIST_NAME}.`);
+      domains.forEach(d=>{
+        lines.push(`/ip dns static add regexp="${rosEscape(domainRegex(first,last,d))}" type=FWD forward-to=${fwdTo} address-list=${LIST_NAME} address-list-timeout=1d comment="${COMMENT}"`);
+      });
+      lines.push(`/ip firewall filter add chain=forward dst-address-list=${LIST_NAME} action=drop comment="${COMMENT}"`);
+      lines.push('/ip dns cache flush');
+      break;
+
+    case '05':
+      lines.push('# HTTP only (port 80), chain=forward.');
+      domains.forEach(d=>{
+        lines.push(`/ip firewall filter add chain=forward protocol=tcp dst-port=80 content="${rosEscape(d)}" action=drop comment="${COMMENT}"`);
+      });
+      break;
+
+    case '06':
+      lines.push('# HTTPS/TLS (port 443), chain=forward.');
+      domains.forEach(d=>{
+        const host = d.startsWith('*.') ? d : `*.${d}`;
+        lines.push(`/ip firewall filter add chain=forward protocol=tcp dst-port=443 tls-host="${rosEscape(host)}" action=drop comment="${COMMENT}"`);
+      });
+      break;
+
+    case '07':
+      lines.push(`# Caution: blocking by resolved IP may affect other sites sharing the same CDN IP.`);
+      domains.forEach(d=>{
+        const host = d.startsWith('*.') ? d : `*.${d}`;
+        lines.push(`/ip firewall filter add chain=forward protocol=tcp dst-port=443 tls-host="${rosEscape(host)}" action=add-dst-to-address-list address-list=${LIST_NAME} address-list-timeout=1d comment="${COMMENT}"`);
+      });
+      lines.push(`/ip firewall filter add chain=forward dst-address-list=${LIST_NAME} action=drop comment="${COMMENT}"`);
+      break;
+
+    case '08':
+      lines.push('# HTTP only (port 80) — a plaintext HTTP Host: header cannot match encrypted HTTPS traffic.');
+      domains.forEach((d,i)=>{
+        const name = `l7_${safeName(d)}_${i+1}`;
+        const regex = `(^|\\r?\\n)Host:[ ]*([^\\r\\n]*\\.)?${d.replace(/\./g,'\\.')}(:[0-9]+)?([\\r\\n]|$)`;
+        lines.push(`/ip firewall layer7-protocol add name="${name}" regexp="${rosEscape(regex)}" comment="${COMMENT}"`);
+        lines.push(`/ip firewall filter add chain=forward protocol=tcp dst-port=80 layer7-protocol="${name}" action=drop comment="${COMMENT}"`);
+      });
+      break;
+
+    case '09':
+      lines.push('# HTTP only. Requires redirecting client HTTP traffic to the proxy via NAT.');
+      lines.push('/ip proxy set enabled=yes');
+      domains.forEach(d=>{
+        lines.push(`/ip proxy access add dst-host="*${rosEscape(d)}*" action=deny comment="${COMMENT}"`);
+      });
+      lines.push('/ip firewall nat add chain=dstnat protocol=tcp dst-port=80 in-interface-list=LAN action=redirect to-ports=8080 comment="Redirect LAN HTTP to Web Proxy"');
+      break;
+  }
+
+  return lines.join('\n');
+}
+
+function generate(){
+  try{
+    const script = generateScript();
+    window.__generatedScript = script;
+    document.getElementById('output').innerHTML = script.split('\n').map(highlight).join('\n');
+    setStatus('Script generated successfully.', 'ok');
+  }catch(e){
+    document.getElementById('output').innerHTML = `<span class="empty-hint">${e.message}</span>`;
+    setStatus(e.message, 'error');
+    window.__generatedScript = null;
+  }
+}
+function resetOutput(){
+  window.__generatedScript = null;
+  document.getElementById('output').innerHTML = '<span class="empty-hint">Add at least one domain and click "إنشاء السكربت" / Generate Script.</span>';
+  setStatus('');
+}
+function setStatus(text,type=''){
+  const el = document.getElementById('status');
+  el.textContent = text; el.className = 'status'+(type?' '+type:'');
+}
+
+function copyScript(){
+  if(!window.__generatedScript) generate();
+  if(!window.__generatedScript) return;
+  navigator.clipboard.writeText(window.__generatedScript+'\n').then(()=>{
+    showToast(); setStatus('Copied to clipboard.', 'ok');
+  });
+}
+function downloadScript(){
+  if(!window.__generatedScript) generate();
+  if(!window.__generatedScript) return;
+  const blob = new Blob([window.__generatedScript+'\n'], {type:'text/plain;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mikrotik-domain-blocker.rsc';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  setStatus('File downloaded.', 'ok');
+}
+function showToast(){
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+/* ---------------- init ---------------- */
+updateMethodUI();
+addRow();
+</script>
+</body>
+</html>
