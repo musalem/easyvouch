@@ -142,6 +142,33 @@
             border-top: 1px solid var(--card-border);
             margin-top: 20px;
         }
+
+        /* Logo-based icon (image instead of font icon) */
+        .icon-wrapper.logo-icon {
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid var(--card-border);
+        }
+
+        .icon-wrapper.logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Exclusive badge */
+        .exclusive-badge {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            background: rgba(220, 38, 38, 0.1);
+            color: #dc2626;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 20px;
+        }
     </style>
 </head>
 <body>
@@ -270,6 +297,17 @@
                 </div>
                 <h2 class="tool-title">مولد التوجيه الثابت (Static Routing)</h2>
                 <p class="tool-desc">توليد سكربتات RouterOS لتوجيه يوتيوب، تيك توك، فيسبوك، واتساب، وغيرها الكثير عبر خط ISP محدد.</p>
+                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+            </a>
+
+            <!-- Tool 13: MikroTrick Scanner -->
+            <a href="mikrotrick-scanner.html" class="tool-card">
+                <span class="exclusive-badge">حصري</span>
+                <div class="icon-wrapper logo-icon">
+                    <img src="image/msslogo.png" alt="شعار فاحص MikroTrick">
+                </div>
+                <h2 class="tool-title">فاحص MikroTrick</h2>
+                <p class="tool-desc">أداة فحص أمني دفاعي تتحقق من تعرّض راوترك لثغرة MikroTrick الحرجة وتساعدك على تأمينه بسرعة.</p>
                 <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
             </a>
         </div>
