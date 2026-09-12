@@ -5,73 +5,170 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>مركز أدوات إدارة MikroTik</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-color: #f1f5f9;
-            --card-bg: rgba(255, 255, 255, 0.9);
-            --card-border: rgba(0, 0, 0, 0.08);
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --card-border: rgba(15, 23, 42, 0.08);
             --text-color: #0f172a;
-            --text-muted: #64748b;
+            --text-muted: #475569;
             --accent-color: #0284c7;
             --accent-hover: #0369a1;
-            --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
-            --shadow-hover: 0 12px 40px 0 rgba(2, 132, 199, 0.15);
+            --shadow: 0 6px 24px 0 rgba(15, 23, 42, 0.07);
+            --shadow-hover: 0 14px 36px 0 rgba(2, 132, 199, 0.16);
+
+            --c-security: #dc2626;
+            --c-setup: #16a34a;
+            --c-network: #7c3aed;
+            --c-utility: #ea580c;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Tajawal', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
             background-color: var(--bg-color);
+            background-image:
+                radial-gradient(circle at 15% 0%, rgba(2, 132, 199, 0.07), transparent 45%),
+                radial-gradient(circle at 85% 10%, rgba(124, 58, 237, 0.06), transparent 40%);
             color: var(--text-color);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
             align-items: center;
             padding: 20px;
         }
 
         .container {
             width: 100%;
-            max-width: 1100px;
-            margin-top: 20px;
+            max-width: 1180px;
+            margin-top: 10px;
             margin-bottom: 20px;
         }
 
+        /* ---------- Header ---------- */
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 34px;
         }
 
+        .social-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 26px;
+        }
+
+        .social-link {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            font-size: 1.15rem;
+            text-decoration: none;
+            box-shadow: var(--shadow);
+            transition: all 0.25s ease;
+            overflow: hidden;
+        }
+
+        .social-link img {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+        }
+
+        .social-link:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .social-link.site:hover { color: var(--accent-color); border-color: var(--accent-color); }
+        .social-link.telegram:hover { color: #229ED9; border-color: #229ED9; }
+        .social-link.whatsapp:hover { color: #25D366; border-color: #25D366; }
+        .social-link.youtube:hover { color: #FF0000; border-color: #FF0000; }
+
         header h1 {
-            font-size: 2.2rem;
+            font-size: 2.3rem;
+            font-weight: 800;
             color: var(--accent-color);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         header p {
             color: var(--text-muted);
-            font-size: 1rem;
+            font-size: 1.02rem;
+            max-width: 680px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* ---------- Category sections ---------- */
+        .category-section {
+            margin-bottom: 40px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-inline-start: 4px;
+        }
+
+        .category-header .cat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            color: #fff;
+            background: var(--cat-color);
+            flex-shrink: 0;
+        }
+
+        .category-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .category-header .cat-line {
+            flex-grow: 1;
+            height: 2px;
+            background: linear-gradient(to left, var(--cat-color), transparent);
+            border-radius: 2px;
+            opacity: 0.5;
         }
 
         .tools-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 25px;
+            gap: 22px;
         }
 
+        /* ---------- Cards ---------- */
         .tool-card {
+            --cat-color: var(--accent-color);
             background: var(--card-bg);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 30px 20px;
+            border-radius: 18px;
+            padding: 28px 20px 22px;
             box-shadow: var(--shadow);
             text-decoration: none;
             color: var(--text-color);
@@ -79,68 +176,73 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
             position: relative;
             overflow: hidden;
+        }
+
+        .tool-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            left: 0;
+            height: 4px;
+            background: var(--cat-color);
         }
 
         .tool-card:hover {
             transform: translateY(-5px);
             box-shadow: var(--shadow-hover);
-            border-color: var(--accent-color);
+            border-color: var(--cat-color);
         }
 
+        .cat-security { --cat-color: var(--c-security); }
+        .cat-setup { --cat-color: var(--c-setup); }
+        .cat-network { --cat-color: var(--c-network); }
+        .cat-utility { --cat-color: var(--c-utility); }
+
         .icon-wrapper {
-            width: 70px;
-            height: 70px;
+            width: 66px;
+            height: 66px;
             border-radius: 50%;
-            background: rgba(2, 132, 199, 0.1);
-            color: var(--accent-color);
+            background: color-mix(in srgb, var(--cat-color) 12%, transparent);
+            color: var(--cat-color);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.8rem;
-            margin-bottom: 20px;
+            font-size: 1.7rem;
+            margin-bottom: 18px;
             transition: all 0.3s ease;
         }
 
         .tool-card:hover .icon-wrapper {
-            background: var(--accent-color);
+            background: var(--cat-color);
             color: #ffffff;
         }
 
         .tool-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 700;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
             line-height: 1.4;
         }
 
         .tool-desc {
             font-size: 0.85rem;
             color: var(--text-muted);
-            margin-bottom: 20px;
-            line-height: 1.5;
+            margin-bottom: 18px;
+            line-height: 1.6;
             flex-grow: 1;
         }
 
         .btn-open {
             font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--accent-color);
+            font-weight: 700;
+            color: var(--cat-color);
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-
-        footer {
-            width: 100%;
-            text-align: center;
-            padding: 15px 0;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            border-top: 1px solid var(--card-border);
-            margin-top: 20px;
         }
 
         /* Logo-based icon (image instead of font icon) */
@@ -166,8 +268,74 @@
             border: 1px solid rgba(220, 38, 38, 0.3);
             font-size: 0.7rem;
             font-weight: 700;
-            padding: 3px 10px;
+            padding: 4px 11px 4px 9px;
             border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .exclusive-badge i { font-size: 0.65rem; }
+
+        .exclusive-card {
+            border-color: rgba(220, 38, 38, 0.35);
+            background: linear-gradient(180deg, rgba(220, 38, 38, 0.05), var(--card-bg) 45%);
+        }
+
+        /* ---------- Footer ---------- */
+        footer {
+            width: 100%;
+            max-width: 1180px;
+            text-align: center;
+            padding: 32px 20px 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--card-border);
+            margin-top: 10px;
+        }
+
+        .footer-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 0 auto 16px;
+            box-shadow: var(--shadow);
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .footer-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .license-text {
+            max-width: 640px;
+            margin: 0 auto 14px;
+            line-height: 1.9;
+        }
+
+        .license-text strong {
+            color: var(--text-color);
+        }
+
+        .copyright-line {
+            margin-bottom: 6px;
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .made-with-love {
+            font-size: 0.88rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
     </style>
 </head>
@@ -175,176 +343,228 @@
 
     <div class="container">
         <header>
+            <div class="social-row">
+                <a href="https://musalem.github.io/easyvouch/" target="_blank" rel="noopener" class="social-link site" title="الموقع الرسمي">
+                    <img src="image/minilogo.png" alt="الموقع الرسمي">
+                </a>
+                <a href="https://t.me/EasyVouch" target="_blank" rel="noopener" class="social-link telegram" title="تليجرام">
+                    <i class="fa-brands fa-telegram"></i>
+                </a>
+                <a href="https://wa.me/201223084810" target="_blank" rel="noopener" class="social-link whatsapp" title="واتساب">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </a>
+                <a href="https://www.youtube.com/@musalem" target="_blank" rel="noopener" class="social-link youtube" title="يوتيوب">
+                    <i class="fa-brands fa-youtube"></i>
+                </a>
+            </div>
+
             <h1>مركز أدوات إدارة MikroTik</h1>
-            <p>منصة شاملة لمولدات الأدوات والسكربتات الخاصة بشبكات الميكروتك والهوتسبوت</p>
+            <p>منصة عربية شاملة تجمع مولدات السكربتات وأدوات التشخيص الخاصة بشبكات ميكروتك والهوتسبوت، لتسهّل عليك الإعداد والحماية والصيانة اليومية دون الحاجة لكتابة الأكواد يدويًا.</p>
         </header>
 
-        <div class="tools-grid">
-            <!-- Tool 1: Initial Setup -->
-            <a href="initial-setup.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-sliders"></i>
-                </div>
-                <h2 class="tool-title">تهيئة أولية للهوتسبوت</h2>
-                <p class="tool-desc">مولد خطوة بخطوة لتهيئة شبكات الهوتسبوت الأساسية وعناوين الـ IP وتحديد السرعات.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+        <!-- ================= الحماية والأمان ================= -->
+        <section class="category-section">
+            <div class="category-header" style="--cat-color: var(--c-security);">
+                <div class="cat-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <h2>الحماية والأمان</h2>
+                <div class="cat-line"></div>
+            </div>
+            <div class="tools-grid">
 
-            <!-- Tool 2: User Generator -->
-            <a href="user-generator.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-users-gear"></i>
-                </div>
-                <h2 class="tool-title">سكربت مولد مستخدمين الهوتسبوت</h2>
-                <p class="tool-desc">إنشاء سكربتات توليد الكروت والمستخدمين دفعة واحدة بأطوال ومدد محددة.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+                <a href="mikrotrick-scanner.html" class="tool-card cat-security exclusive-card">
+                    <span class="exclusive-badge"><i class="fa-solid fa-star"></i> حصري</span>
+                    <div class="icon-wrapper logo-icon">
+                        <img src="image/msslogo.png" alt="شعار فاحص MikroTrick">
+                    </div>
+                    <h2 class="tool-title">فاحص MikroTrick</h2>
+                    <p class="tool-desc">أداة فحص أمني دفاعي تتحقق من تعرّض راوترك لثغرة MikroTrick الحرجة وتساعدك على تأمينه بسرعة.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
 
-            <!-- Tool 3: QR Generator -->
-            <a href="qr-generator.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-qrcode"></i>
-                </div>
-                <h2 class="tool-title">إنشاء QR لشبكات MikroTik / Wi-Fi</h2>
-                <p class="tool-desc">توليد رموز استجابة سريعة (QR Code) لتسهيل الاتصال التلقائي بالواي فاي والهوتسبوت.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+                <a href="mikrotik-security-hardening.html" class="tool-card cat-security">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <h2 class="tool-title">الحماية المتقدمة لراوتر ميكروتك</h2>
+                    <p class="tool-desc">مرجع شامل لسكربتات تحصين RouterOS، مرتّب في أقسام قابلة للطي مع نسخ سريع لكل سكربت.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
 
-            <!-- Tool 4: Expiration Page -->
-            <a href="expiration-page.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                </div>
-                <h2 class="tool-title">صفحة انتهاء الخدمة / الاشتراك للمايكروتيك</h2>
-                <p class="tool-desc">تخصيص وتوليد صفحات التنبيه بانتهاء الاشتراك لـ (Hotspot, PPPoE, Static-IP).</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+                <a href="mikrotik-ninja.html" class="tool-card cat-security">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-user-ninja"></i>
+                    </div>
+                    <h2 class="tool-title">إخفاء معلومات المايكروتك من مزود الخدمة</h2>
+                    <p class="tool-desc">توليد سكربت لتقليل الخدمات والبروتوكولات التي تكشف وجود راوتر MikroTik من جهة الإنترنت (WAN).</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
 
-            <!-- Tool 5: PCC Bonding / Load Balancing -->
-            <a href="load-balancing.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-network-wired"></i>
-                </div>
-                <h2 class="tool-title">دمج خطوط ميكروتك</h2>
-                <p class="tool-desc">توليد سكربتات دمج وإعادة توزيع أحمال الإنترنت (PCC Load Balancing) لعدة خطوط بسهولة.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+                <a href="mikrotik-port-scanner.html" class="tool-card cat-security">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-ethernet"></i>
+                    </div>
+                    <h2 class="tool-title">أداة فحص منافذ ميكروتك</h2>
+                    <p class="tool-desc">فحص حالة أهم منافذ جهاز RouterOS (Winbox، API، SSH وغيرها) خلال ثوانٍ من واجهة عربية بسيطة.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
 
-            <!-- Tool 6: Muzawwe3 QoS Planner -->
-            <a href="muwazzi_qos_planner.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-gauge-high"></i>
-                </div>
-                <h2 class="tool-title">مُوزِّع — حاسبة QoS/Queue الاحترافية</h2>
-                <p class="tool-desc">تخطيط توزيع الباندويدث على أجهزة ميكروتك وتوليد أوامر Simple Queue وQueue Tree جاهزة لـ v6 وv7.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+            </div>
+        </section>
 
-            <!-- Tool 7: Diff Tool -->
-            <a href="diff_tool.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-code-compare"></i>
-                </div>
-                <h2 class="tool-title">مُقارِن — مقارنة إعدادات ميكروتك</h2>
-                <p class="tool-desc">أداة تعمل داخل المتصفح لمقارنة ملفات export لميكروتك وإظهار الإضافات والحذف والتعديلات بدقة.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+        <!-- ================= الإعداد والتشغيل الأساسي ================= -->
+        <section class="category-section">
+            <div class="category-header" style="--cat-color: var(--c-setup);">
+                <div class="cat-icon"><i class="fa-solid fa-sliders"></i></div>
+                <h2>الإعداد والتشغيل الأساسي</h2>
+                <div class="cat-line"></div>
+            </div>
+            <div class="tools-grid">
 
-            <!-- Tool 8: Domain Blocker -->
-            <a href="mikrotik-domain-blocker.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-ban"></i>
-                </div>
-                <h2 class="tool-title">حجب المواقع للمايكروتيك</h2>
-                <p class="tool-desc">توليد سكربتات RouterOS لحجب مواقع ونطاقات محددة بعدة طرق (DNS, Content, TLS-Host, Layer7, Proxy).</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+                <a href="initial-setup.html" class="tool-card cat-setup">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-power-off"></i>
+                    </div>
+                    <h2 class="tool-title">تهيئة أولية للهوتسبوت</h2>
+                    <p class="tool-desc">مولد خطوة بخطوة لتهيئة شبكات الهوتسبوت الأساسية وعناوين الشبكة وتحديد السرعات.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
 
-            <!-- Tool 9: Mikrotik Ninja -->
-            <a href="mikrotik-ninja.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-user-ninja"></i>
-                </div>
-                <h2 class="tool-title">إخفاء معلومات المايكروتك من مزود الخدمة</h2>
-                <p class="tool-desc">توليد سكربت لتقليل الخدمات والبروتوكولات التي تكشف وجود راوتر MikroTik من جهة الإنترنت (WAN).</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+                <a href="user-generator.html" class="tool-card cat-setup">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-users-gear"></i>
+                    </div>
+                    <h2 class="tool-title">سكربت مولد مستخدمين الهوتسبوت</h2>
+                    <p class="tool-desc">إنشاء سكربتات توليد الكروت والمستخدمين دفعة واحدة بأطوال ومدد محددة.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
 
-            <!-- Tool 10: Mikrotik Port Scanner -->
-            <a href="mikrotik-port-scanner.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-ethernet"></i>
-                </div>
-                <h2 class="tool-title">أداة فحص منافذ ميكروتك</h2>
-                <p class="tool-desc">فحص حالة أهم منافذ جهاز RouterOS (Winbox, API, SSH وغيرها) خلال ثوانٍ من واجهة عربية بسيطة.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+                <a href="qr-generator.html" class="tool-card cat-setup">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-qrcode"></i>
+                    </div>
+                    <h2 class="tool-title">إنشاء رمز QR لشبكات المايكروتك والواي فاي</h2>
+                    <p class="tool-desc">توليد رموز استجابة سريعة لتسهيل الاتصال التلقائي بالواي فاي والهوتسبوت.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
 
-            <!-- Tool 11: Winbox Session Manager -->
-            <a href="winbox-session-manager.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-folder-open"></i>
-                </div>
-                <h2 class="tool-title">إدارة جلسات وينبوكس</h2>
-                <p class="tool-desc">عرض وحذف جلسات Winbox المحفوظة على جهازك بشكل انتقائي، مع بحث فوري وتأكيد قبل الحذف.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+            </div>
+        </section>
 
-            <!-- Tool 12: Static Routing Generator -->
-            <a href="static-routing-generator.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-route"></i>
-                </div>
-                <h2 class="tool-title">مولد التوجيه الثابت (Static Routing)</h2>
-                <p class="tool-desc">توليد سكربتات RouterOS لتوجيه يوتيوب، تيك توك، فيسبوك، واتساب، وغيرها الكثير عبر خط ISP محدد.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+        <!-- ================= إدارة الشبكة والأداء ================= -->
+        <section class="category-section">
+            <div class="category-header" style="--cat-color: var(--c-network);">
+                <div class="cat-icon"><i class="fa-solid fa-gauge-high"></i></div>
+                <h2>إدارة الشبكة والأداء</h2>
+                <div class="cat-line"></div>
+            </div>
+            <div class="tools-grid">
 
-            <!-- Tool 13: MikroTrick Scanner -->
-            <a href="mikrotrick-scanner.html" class="tool-card">
-                <span class="exclusive-badge">حصري</span>
-                <div class="icon-wrapper logo-icon">
-                    <img src="image/msslogo.png" alt="شعار فاحص MikroTrick">
-                </div>
-                <h2 class="tool-title">فاحص MikroTrick</h2>
-                <p class="tool-desc">أداة فحص أمني دفاعي تتحقق من تعرّض راوترك لثغرة MikroTrick الحرجة وتساعدك على تأمينه بسرعة.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+                <a href="load-balancing.html" class="tool-card cat-network">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-network-wired"></i>
+                    </div>
+                    <h2 class="tool-title">دمج وتوزيع خطوط ميكروتك</h2>
+                    <p class="tool-desc">توليد سكربتات دمج وإعادة توزيع أحمال الإنترنت على عدة خطوط بسهولة (PCC).</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
 
-            <!-- Tool 14: Advanced Router Security -->
-            <a href="mikrotik-security-hardening.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-shield-halved"></i>
-                </div>
-                <h2 class="tool-title">الحماية المتقدمة لراوتر ميكروتك</h2>
-                <p class="tool-desc">مرجع شامل لسكربتات تحصين RouterOS، مرتّب في أقسام قابلة للطي مع نسخ سريع لكل سكربت.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+                <a href="muwazzi_qos_planner.html" class="tool-card cat-network">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h2 class="tool-title">مُوزِّع — حاسبة توزيع الباندويدث الاحترافية</h2>
+                    <p class="tool-desc">تخطيط توزيع الباندويدث على أجهزة ميكروتك وتوليد أوامر جاهزة لقوائم الانتظار (Queue) على النسختين v6 وv7.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
 
-            <!-- Tool 15: Failover Script Generator -->
-            <a href="mikrotik-failover-generator.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-right-left"></i>
-                </div>
-                <h2 class="tool-title">مولد سكربت Failover لتبديل خطوط الإنترنت</h2>
-                <p class="tool-desc">حافظ على استمرار اتصال شبكتك بالإنترنت تلقائيًا عند انقطاع أي خط، عبر توليد سكربت Failover جاهز يناسب عدد خطوطك وطريقة المراقبة التي تفضلها.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
+                <a href="mikrotik-failover-generator.html" class="tool-card cat-network">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-right-left"></i>
+                    </div>
+                    <h2 class="tool-title">مولد سكربت التبديل التلقائي بين خطوط الإنترنت</h2>
+                    <p class="tool-desc">حافظ على استمرار اتصال شبكتك بالإنترنت تلقائيًا عند انقطاع أي خط، عبر توليد سكربت يناسب عدد خطوطك وطريقة المراقبة التي تفضلها.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
 
-            <!-- Tool 16: Auto Backup to E-Mail Generator -->
-            <a href="mikrotik-backup-email-generator.html" class="tool-card">
-                <div class="icon-wrapper">
-                    <i class="fa-solid fa-database"></i>
-                </div>
-                <h2 class="tool-title">مولد سكربت النسخ الاحتياطي التلقائي عبر البريد</h2>
-                <p class="tool-desc">يولّد سكربت RouterOS يأخذ نسخة احتياطية من إعدادات راوترك بشكل دوري ويرسلها تلقائيًا إلى بريدك الإلكتروني.</p>
-                <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
-            </a>
-        </div>
+                <a href="static-routing-generator.html" class="tool-card cat-network">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-route"></i>
+                    </div>
+                    <h2 class="tool-title">مولد التوجيه الثابت</h2>
+                    <p class="tool-desc">توليد سكربتات RouterOS لتوجيه يوتيوب، تيك توك، فيسبوك، واتساب، وغيرها الكثير عبر خط إنترنت محدد.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- ================= أدوات مساعدة ومراقبة ================= -->
+        <section class="category-section">
+            <div class="category-header" style="--cat-color: var(--c-utility);">
+                <div class="cat-icon"><i class="fa-solid fa-toolbox"></i></div>
+                <h2>أدوات مساعدة ومراقبة</h2>
+                <div class="cat-line"></div>
+            </div>
+            <div class="tools-grid">
+
+                <a href="diff_tool.html" class="tool-card cat-utility">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-code-compare"></i>
+                    </div>
+                    <h2 class="tool-title">مُقارِن — مقارنة إعدادات ميكروتك</h2>
+                    <p class="tool-desc">أداة تعمل داخل المتصفح لمقارنة ملفات التصدير (Export) لميكروتك وإظهار الإضافات والحذف والتعديلات بدقة.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
+
+                <a href="winbox-session-manager.html" class="tool-card cat-utility">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-folder-open"></i>
+                    </div>
+                    <h2 class="tool-title">إدارة جلسات وينبوكس</h2>
+                    <p class="tool-desc">عرض وحذف جلسات Winbox المحفوظة على جهازك بشكل انتقائي، مع بحث فوري وتأكيد قبل الحذف.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
+
+                <a href="mikrotik-backup-email-generator.html" class="tool-card cat-utility">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                    <h2 class="tool-title">مولد سكربت النسخ الاحتياطي التلقائي عبر البريد</h2>
+                    <p class="tool-desc">يولّد سكربت RouterOS يأخذ نسخة احتياطية من إعدادات راوترك بشكل دوري ويرسلها تلقائيًا إلى بريدك الإلكتروني.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
+
+                <a href="mikrotik-domain-blocker.html" class="tool-card cat-utility">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-ban"></i>
+                    </div>
+                    <h2 class="tool-title">حجب المواقع للمايكروتيك</h2>
+                    <p class="tool-desc">توليد سكربتات RouterOS لحجب مواقع ونطاقات محددة بعدة طرق (DNS، Content، TLS-Host، Layer7، بروكسي).</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
+
+                <a href="expiration-page.html" class="tool-card cat-utility">
+                    <div class="icon-wrapper">
+                        <i class="fa-solid fa-clock-rotate-left"></i>
+                    </div>
+                    <h2 class="tool-title">صفحة انتهاء الخدمة أو الاشتراك للمايكروتيك</h2>
+                    <p class="tool-desc">تخصيص وتوليد صفحات التنبيه بانتهاء الاشتراك لأنظمة الهوتسبوت وPPPoE وStatic-IP.</p>
+                    <span class="btn-open">الدخول للأداة <i class="fa-solid fa-arrow-left"></i></span>
+                </a>
+
+            </div>
+        </section>
     </div>
 
     <footer>
-        برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+        <div class="footer-logo">
+            <img src="image/ms-logo.png" alt="شعار MusaleM for Software">
+        </div>
+        <p class="license-text">
+            جميع الأدوات المتوفرة في هذا الموقع <strong>مجانية للاستخدام</strong> بشكل كامل، ولا يُسمح بإعادة نشرها أو تعديل أكوادها أو انتحال ملكيتها دون <strong>التواصل المسبق مع المطور الأصلي</strong> عبر روابط التواصل الموضحة أعلى الصفحة.
+        </p>
+        <p class="copyright-line">برمجة وتطوير MusaleM for Software © 2026 — جميع الحقوق محفوظة</p>
+        <p class="made-with-love">Made in Egypt With Love ❤️ 🇪🇬</p>
     </footer>
 
 </body>
