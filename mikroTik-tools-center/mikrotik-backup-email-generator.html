@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مولد سكربت النسخ الاحتياطي التلقائي عبر البريد | مركز أدوات إدارة MikroTik</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+    :root {
+        --bg-color: #f1f5f9;
+        --card-bg: rgba(255, 255, 255, 0.9);
+        --card-border: rgba(0, 0, 0, 0.08);
+        --text-color: #0f172a;
+        --text-muted: #64748b;
+        --accent-color: #0284c7;
+        --accent-hover: #0369a1;
+        --error-bg: #fef2f2;
+        --error-border: #fca5a5;
+        --error-text: #dc2626;
+        --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+        --shadow-hover: 0 12px 40px 0 rgba(2, 132, 199, 0.15);
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 1000px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .logo-wrapper {
+        position: relative;
+        width: 90px;
+        height: 90px;
+        border-radius: 26px;
+        background: linear-gradient(145deg, var(--accent-color), var(--accent-hover));
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.1rem;
+        margin: 0 auto 20px;
+        box-shadow: 0 10px 28px rgba(2, 132, 199, 0.35);
+    }
+
+    .logo-wrapper .badge-scan {
+        position: absolute;
+        bottom: -8px;
+        left: -8px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #ffffff;
+        color: var(--accent-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15);
+        border: 2px solid var(--bg-color);
+    }
+
+    header h1 {
+        font-size: 2.1rem;
+        color: var(--accent-color);
+        margin-bottom: 10px;
+    }
+
+    header p {
+        color: var(--text-muted);
+        font-size: 1.02rem;
+        max-width: 680px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+
+    .detail-card {
+        background: var(--card-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--card-border);
+        border-radius: 24px;
+        padding: 40px;
+        box-shadow: var(--shadow);
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: var(--text-color);
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .section-title i { color: var(--accent-color); }
+
+    .generator-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 34px;
+    }
+
+    .settings-panel { width: 100%; }
+    .output-panel {
+        width: 100%;
+        margin-top: 4px;
+        display: flex;
+        flex-direction: column;
+        background: rgba(2, 132, 199, 0.03);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 20px;
+    }
+
+    .fields-grid {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-bottom: 6px;
+    }
+
+    .fields-grid > div { flex: 1 1 180px; }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+    }
+
+    .field-hint {
+        font-size: 0.74rem;
+        color: var(--text-muted);
+        opacity: 0.85;
+        line-height: 1.6;
+        margin: -6px 0 14px;
+    }
+
+    select, input[type="text"], input[type="number"] {
+        width: 100%;
+        padding: 9px 12px;
+        border: 1px solid var(--card-border);
+        border-radius: 10px;
+        background-color: #ffffff;
+        color: var(--text-color);
+        font-size: 0.88rem;
+        margin-bottom: 4px;
+    }
+
+    select:focus, input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    /* Info / notice boxes */
+    .notice-box {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        background: rgba(2, 132, 199, 0.06);
+        border: 1px solid rgba(2, 132, 199, 0.25);
+        border-radius: 14px;
+        padding: 14px 16px;
+        margin-bottom: 24px;
+    }
+
+    .notice-box i { color: var(--accent-color); font-size: 1.05rem; margin-top: 2px; flex-shrink: 0; }
+    .notice-box p { font-size: 0.82rem; color: var(--text-color); line-height: 1.85; margin: 0; }
+
+    .info-box {
+        background: rgba(2, 132, 199, 0.06);
+        border: 1px solid var(--card-border);
+        border-radius: 14px;
+        padding: 16px 18px;
+        margin-bottom: 24px;
+    }
+
+    .info-box ul { list-style: none; margin: 0; padding: 0; }
+
+    .info-box li {
+        font-size: 0.8rem;
+        color: var(--text-color);
+        line-height: 1.8;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+
+    .info-box li:last-child { margin-bottom: 0; }
+    .info-box li i { color: var(--accent-color); margin-top: 3px; flex-shrink: 0; }
+    .info-box a { color: var(--accent-hover); font-weight: 700; text-decoration: underline; }
+
+    /* Validation alert */
+    .alert-box {
+        display: none;
+        background: var(--error-bg);
+        border: 1px solid var(--error-border);
+        color: var(--error-text);
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        padding-top: 6px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        padding: 12px 24px;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn-primary {
+        background: var(--accent-color);
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(2, 132, 199, 0.25);
+        flex: 1 1 auto;
+    }
+
+    .btn-primary:hover {
+        background: var(--accent-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(2, 132, 199, 0.35);
+    }
+
+    .btn-secondary {
+        background: transparent;
+        color: var(--text-color);
+        border: 1px solid var(--card-border);
+    }
+
+    .btn-secondary:hover {
+        border-color: var(--accent-color);
+        color: var(--accent-color);
+    }
+
+    .btn-copy {
+        background: #16a34a;
+        color: #fff;
+        font-size: 0.82rem;
+        padding: 9px 18px;
+    }
+
+    .btn-copy:hover { background: #15803d; }
+
+    #script-output {
+        flex-grow: 1;
+        width: 100%;
+        padding: 14px;
+        border: 1px solid var(--card-border);
+        border-radius: 12px;
+        background-color: #0f172a;
+        color: #e2e8f0;
+        font-family: Consolas, Monaco, monospace;
+        font-size: 12px;
+        resize: vertical;
+        min-height: 20rem;
+        white-space: pre;
+        overflow: auto;
+        direction: ltr;
+        text-align: left;
+        line-height: 1.7;
+    }
+
+    .copy-action-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-top: 12px;
+        flex-wrap: wrap;
+    }
+
+    .copy-info { color: var(--text-muted); font-size: 0.78rem; }
+
+    .actions-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 18px;
+        border-top: 1px solid var(--card-border);
+        padding-top: 30px;
+        margin-top: 30px;
+    }
+
+    footer {
+        width: 100%;
+        text-align: center;
+        padding: 15px 0;
+        color: var(--text-muted);
+        font-size: 0.9rem;
+        border-top: 1px solid var(--card-border);
+        margin-top: 20px;
+    }
+
+    @media (max-width: 600px) {
+        .detail-card { padding: 25px 18px; }
+        header h1 { font-size: 1.6rem; }
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="logo-wrapper">
+            <i class="fa-solid fa-database"></i>
+            <span class="badge-scan"><i class="fa-solid fa-paper-plane"></i></span>
+        </div>
+        <h1>مولد سكربت النسخ الاحتياطي التلقائي عبر البريد</h1>
+        <p>يولّد سكربت RouterOS يأخذ نسخة احتياطية من إعدادات راوترك بشكل دوري ويرسلها تلقائيًا إلى بريدك الإلكتروني، دون الحاجة لأي تدخل يدوي</p>
+    </header>
+
+    <div class="detail-card">
+
+        <div class="generator-grid">
+            <!-- ================= SETTINGS PANEL ================= -->
+            <div class="settings-panel">
+
+                <div class="alert-box" id="alertBox">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                    <span id="alertMessage">يرجى التأكد من تصحيح المدخلات!</span>
+                </div>
+
+                <div class="notice-box">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <p>كل العمليات تتم محليًا داخل متصفحك فقط، ولا يتم إرسال أو تخزين أي من بياناتك (البريد أو كلمة المرور) على أي خادم خارجي. استخدم دائمًا حساب بريد إلكتروني وكلمة مرور تطبيق خاصين بك.</p>
+                </div>
+
+                <h2 class="section-title"><i class="fa-solid fa-server"></i> إعدادات خادم البريد (SMTP)</h2>
+                <div class="fields-grid">
+                    <div>
+                        <label for="input-mail-server">خادم البريد الصادر (Server)</label>
+                        <input type="text" id="input-mail-server" value="smtp.gmail.com" placeholder="smtp.gmail.com">
+                        <p class="field-hint">عنوان خادم SMTP، مثل smtp.gmail.com عند استخدام حساب Gmail.</p>
+                    </div>
+                    <div>
+                        <label for="input-mail-port">المنفذ (Port)</label>
+                        <input type="text" id="input-mail-port" value="587" placeholder="587">
+                        <p class="field-hint">منفذ الاتصال بالخادم، غالبًا 587 مع بروتوكول TLS.</p>
+                    </div>
+                </div>
+
+                <div style="width:100%">
+                    <label for="ros-version">إصدار RouterOS</label>
+                    <select id="ros-version">
+                        <option value="ROS6">RouterOS v6.xx</option>
+                        <option value="ROS7">RouterOS v7.1 → v7.12</option>
+                        <option value="ROS7+">RouterOS v7.13 → v7.xx</option>
+                    </select>
+                    <p class="field-hint">يحدد صيغة تفعيل التشفير (start-tls / tls) المناسبة لإصدار نظام تشغيل جهازك.</p>
+                </div>
+
+                <div style="width:100%">
+                    <label for="input-mail-user">بريد الإرسال (User)</label>
+                    <input type="text" id="input-mail-user" value="" placeholder="youraccount@gmail.com">
+                    <p class="field-hint">حساب البريد الذي سيسجّل الراوتر الدخول منه لإرسال النسخة الاحتياطية.</p>
+                </div>
+
+                <div style="width:100%">
+                    <label for="input-mail-password">كلمة مرور البريد (App Password)</label>
+                    <input type="text" id="input-mail-password" value="" placeholder="كلمة مرور التطبيق وليست كلمة مرور الحساب">
+                    <p class="field-hint">استخدم كلمة مرور تطبيق (App Password) وليست كلمة مرور حسابك العادية — راجع الشرح أدناه لإنشائها.</p>
+                </div>
+
+                <div class="info-box">
+                    <ul>
+                        <li><i class="fa-solid fa-circle-info"></i> لإنشاء كلمة مرور تطبيق خاصة بك: افتح <a href="https://myaccount.google.com/security" target="_blank" rel="noopener noreferrer">إعدادات أمان حساب Google</a> وفعّل خاصية "التحقق بخطوتين" أولًا.</li>
+                        <li><i class="fa-solid fa-circle-info"></i> بعدها أنشئ كلمة المرور من <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener noreferrer">صفحة كلمات مرور التطبيقات</a>، وضعها في حقل "كلمة مرور البريد" أعلاه.</li>
+                    </ul>
+                </div>
+
+                <h2 class="section-title"><i class="fa-solid fa-database"></i> إعدادات النسخة الاحتياطية</h2>
+                <div style="width:100%">
+                    <label for="input-file-option">نوع الملف المراد نسخه</label>
+                    <select id="input-file-option">
+                        <option value="allbackup">نسخة كاملة (.backup)</option>
+                        <option value="allrsc">تصدير كامل (.rsc)</option>
+                        <option value="queuesimplersc">Queue Simple فقط (.rsc)</option>
+                        <option value="queuetreersc">Queue Tree فقط (.rsc)</option>
+                        <option value="manglersc">Mangle فقط (.rsc)</option>
+                        <option value="hotspotrsc">Hotspot فقط (.rsc)</option>
+                        <option value="ppprsc">PPP / PPPoE فقط (.rsc)</option>
+                        <option value="addresslist">Address List فقط (.rsc)</option>
+                        <option value="ipaddress">IP Routes فقط (.rsc)</option>
+                        <option value="routing">Routing (BGP, RIP...) فقط (.rsc)</option>
+                    </select>
+                    <p class="field-hint">اختر "نسخة كاملة (.backup)" لنسخ كل إعدادات الجهاز، أو حدد جزءًا معينًا لتصديره فقط كملف نصي (.rsc).</p>
+                </div>
+
+                <div class="fields-grid">
+                    <div>
+                        <label for="input-to-mail">البريد المستلم للنسخة</label>
+                        <input type="text" id="input-to-mail" value="" placeholder="your-mail@mail.com">
+                        <p class="field-hint">البريد الإلكتروني الذي ستصلك عليه النسخة الاحتياطية دوريًا.</p>
+                    </div>
+                    <div>
+                        <label for="input-mail-from">وصف الراوتر / عنوان الرسالة</label>
+                        <input type="text" id="input-mail-from" value="" placeholder="Backup From My Router">
+                        <p class="field-hint">نص يظهر في حقل المرسل وعنوان الرسالة، مفيد لتمييز الراوتر عند وجود أكثر من جهاز.</p>
+                    </div>
+                </div>
+
+                <div style="width:100%">
+                    <label for="input-scheduler">تكرار الإرسال (Scheduler)</label>
+                    <input type="text" id="input-scheduler" value="7d" placeholder="7d">
+                    <p class="field-hint">كل كم مدة يتم أخذ نسخة احتياطية وإرسالها؟ استخدم d لليوم، h للساعة، m للدقيقة (مثال: 7d أو 12h أو 30m).</p>
+                </div>
+
+                <div class="action-buttons">
+                    <button id="generate-btn" class="btn btn-primary" type="button"><i class="fa-solid fa-gears"></i> توليد السكربت</button>
+                </div>
+            </div>
+
+            <!-- ================= OUTPUT PANEL ================= -->
+            <div class="output-panel">
+                <h2 class="section-title"><i class="fa-solid fa-terminal"></i> السكربت الناتج</h2>
+                <textarea id="script-output" readonly aria-label="مخرجات سكربت الميكروتك"></textarea>
+                <div class="copy-action-row">
+                    <button id="copy-script-btn" class="btn btn-copy" type="button"><i class="fa-regular fa-copy"></i> نسخ السكربت</button>
+                    <span id="copy-message" class="copy-info">انسخ والصق داخل Terminal.</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="actions-wrapper">
+            <a href="index_center.html" class="btn btn-secondary">
+                <i class="fa-solid fa-arrow-right"></i>
+                رجوع للصفحة الرئيسية
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  const $ = (id) => document.getElementById(id);
+
+  const alertBox     = $('alertBox');
+  const alertMessage = $('alertMessage');
+  const output       = $('script-output');
+  const copyMessage  = $('copy-message');
+
+  const EXPORT_CMD = {
+    allrsc:         '/export',
+    queuesimplersc: '/queue simple export',
+    queuetreersc:   '/queue tree export',
+    manglersc:      '/ip firewall mangle export',
+    hotspotrsc:     '/ip hotspot export',
+    ppprsc:         '/ppp export',
+    addresslist:    '/ip firewall address-list export',
+    ipaddress:      '/ip route export',
+    routing:        '/routing export'
+  };
+
+  function showError(msg) {
+    alertMessage.textContent = msg;
+    alertBox.style.display = 'flex';
+    return false;
+  }
+
+  function validateInputs() {
+    const server    = $('input-mail-server').value.trim();
+    const port      = $('input-mail-port').value.trim();
+    const user      = $('input-mail-user').value.trim();
+    const pass      = $('input-mail-password').value.trim();
+    const toMail    = $('input-to-mail').value.trim();
+    const scheduler = $('input-scheduler').value.trim();
+
+    const emailRegex     = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const schedulerRegex = /^\d+[dhm]$/i;
+    const portNum        = parseInt(port, 10);
+
+    alertBox.style.display = 'none';
+
+    if (!server) return showError('يرجى إدخال عنوان خادم البريد (SMTP Server)');
+    if (!port || isNaN(portNum) || portNum < 1 || portNum > 65535) {
+      return showError('يرجى إدخال رقم منفذ (Port) صحيح بين 1 و 65535');
+    }
+    if (!user || !emailRegex.test(user)) return showError('يرجى إدخال بريد إلكتروني صحيح لحساب الإرسال');
+    if (!pass) return showError('يرجى إدخال كلمة مرور البريد (App Password)');
+    if (!toMail || !emailRegex.test(toMail)) return showError('يرجى إدخال بريد إلكتروني صحيح لاستقبال النسخة الاحتياطية');
+    if (!schedulerRegex.test(scheduler)) return showError('صيغة تكرار الإرسال غير صحيحة (مثال: 7d أو 12h أو 30m)');
+
+    return true;
+  }
+
+  // Build the embedded on-event script body (readable multi-line JS string,
+  // later escaped into a single RouterOS-safe quoted parameter).
+  function buildEmbeddedScript(fileOption, toMail, mailFrom, tlsSend) {
+    const isBackup = fileOption === 'allbackup';
+    const ext = isBackup ? 'backup' : 'rsc';
+    const saveCmd = isBackup
+      ? '/system backup save name=$backupfile'
+      : `${EXPORT_CMD[fileOption] || '/export'} file=$backupfile`;
+
+    let body = '';
+    body += '#=======================================================\n';
+    body += '# MikroTik RouterOS Auto Backup to E-Mail Generator\n';
+    body += '# Generated by MusaleM for Software\n';
+    body += '#=======================================================\n';
+    body += ':log warning "-> Backup to E-Mail Now"\n';
+    body += ':local backupfile [/system identity get name]\n';
+    body += `:if ([:len [/file find name=($backupfile . ".${ext}")]] > 0) do={\n`;
+    body += `  /file remove ($backupfile . ".${ext}")\n`;
+    body += '}\n';
+    body += `${saveCmd}\n`;
+    body += `:while ([:len [/file find name=($backupfile . ".${ext}")]] = 0) do={\n`;
+    body += '  :delay 1s\n';
+    body += '}\n';
+    body += ':if ([ping 8.8.8.8 count=3] > 0) do={\n';
+    body += '  :log warning "-> Internet Connected, Sending E-Mail"\n';
+    body += `  /tool e-mail send to="${toMail}" subject=([/system identity get name] . " - " . [/system clock get time] . " - " . [/system clock get date]) from="${mailFrom}" file=("$backupfile" . ".${ext}")${tlsSend ? ' ' + tlsSend : ''}\n`;
+    body += '  :delay 10s\n';
+    body += '  :log warning "-> E-Mail Sent Task Triggered (File Kept Safely)"\n';
+    body += '} else={\n';
+    body += '  :log error "-> Internet Down / No Connection! Backup File Kept"\n';
+    body += '}\n';
+    body += ':log warning "-> Backup Process Finished"';
+
+    return body;
+  }
+
+  function generateScript() {
+    if (!validateInputs()) return;
+
+    const mailServer = $('input-mail-server').value.trim();
+    const mailPort   = $('input-mail-port').value.trim();
+    const mailUser   = $('input-mail-user').value.trim();
+    const mailPass   = $('input-mail-password').value.trim();
+    const toMail     = $('input-to-mail').value.trim();
+    const mailFrom   = $('input-mail-from').value.trim() || 'Backup From My Router';
+    const scheduler  = $('input-scheduler').value.trim() || '7d';
+    const fileOption = $('input-file-option').value;
+    const rosVer     = $('ros-version').value;
+
+    let tlsSet  = 'start-tls="yes"';
+    let tlsSend = '';
+    if (rosVer !== 'ROS6') {
+      tlsSet  = 'tls="yes"';
+      tlsSend = 'tls=yes';
+    }
+
+    const now = new Date().toLocaleString();
+
+    const embedded = buildEmbeddedScript(fileOption, toMail, mailFrom, tlsSend)
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, '\\r\\n');
+
+    let script = '';
+    script += '# ===================================================\n';
+    script += '# MikroTik Auto Backup to E-Mail Script Generator\n';
+    script += '# Generated At: ' + now + '\n';
+    script += '# Generated by MusaleM for Software\n';
+    script += '# ===================================================\n\n';
+
+    script += `/tool e-mail set address="${mailServer}" from="${mailFrom}" password="${mailPass}" port="${mailPort}" ${tlsSet} user="${mailUser}"\n`;
+    script += '/system scheduler remove [find name=BACKUP-TO-EMAIL]\n';
+    script += `/system scheduler add interval=${scheduler} name=BACKUP-TO-EMAIL start-time=startup policy=ftp,reboot,read,write,policy,test,password,sniff,sensitive,romon comment="Auto Backup to E-Mail by MusaleM for Software" on-event="${embedded}"\n`;
+
+    output.value = script;
+  }
+
+  function copyScript() {
+    const text = output.value;
+    if (!text) return;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text)
+        .then(() => flashCopy('✅ تم النسخ!'))
+        .catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
+    output.select();
+    try { document.execCommand('copy'); flashCopy('✅ تم النسخ!'); }
+    catch (e) { flashCopy('❌ فشل النسخ'); }
+    output.setSelectionRange(0, 0);
+  }
+
+  function flashCopy(msg) {
+    const original = copyMessage.textContent;
+    copyMessage.textContent = msg;
+    setTimeout(() => { copyMessage.textContent = original; }, 1500);
+  }
+
+  $('generate-btn').addEventListener('click', generateScript);
+  $('copy-script-btn').addEventListener('click', copyScript);
+})();
+</script>
+</body>
+</html>
