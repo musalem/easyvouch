@@ -189,6 +189,71 @@
             transform: translateY(-1px);
         }
 
+        /* EasyVouch promo button */
+        .btn-easyvouch {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #7c3aed, #a855f7 50%, #d946ef);
+            background-size: 200% 200%;
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35);
+            animation: easyvouch-pulse 2.2s ease-in-out infinite, easyvouch-gradient 4s ease infinite;
+        }
+
+        .btn-easyvouch::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -150%;
+            width: 55%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            transform: skewX(-20deg);
+            animation: easyvouch-shine 2.6s ease-in-out infinite;
+        }
+
+        .btn-easyvouch img {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            object-fit: cover;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.6);
+            flex-shrink: 0;
+        }
+
+        .btn-easyvouch:hover {
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
+        }
+
+        @keyframes easyvouch-shine {
+            0% { left: -150%; }
+            55% { left: 150%; }
+            100% { left: 150%; }
+        }
+
+        @keyframes easyvouch-pulse {
+            0%, 100% { box-shadow: 0 4px 14px rgba(168, 85, 247, 0.35); }
+            50% { box-shadow: 0 4px 26px rgba(168, 85, 247, 0.65), 0 0 0 6px rgba(168, 85, 247, 0.1); }
+        }
+
+        @keyframes easyvouch-gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         /* Output Script Area */
         .output-panel {
             padding: 32px;
@@ -386,6 +451,11 @@
                     <i class="fa-solid fa-bolt"></i>
                     <span>توليد السكريبت الاحترافي</span>
                 </button>
+
+                <a href="https://musalem.github.io/easyvouch/mini.html" target="_blank" rel="noopener noreferrer" class="btn-easyvouch">
+                    <img src="image/minilogo.png" alt="شعار أيزي فوش">
+                    <span>تحميل أيزي فوش</span>
+                </a>
             </div>
 
             <!-- Code Preview Area -->
