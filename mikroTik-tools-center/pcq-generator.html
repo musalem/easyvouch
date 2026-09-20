@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المُنصِف — توزيع عادل للسرعة بين المستخدمين (PCQ)</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-color:#f1f5f9;
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --card-border: rgba(15, 23, 42, 0.08);
+    --field-bg: rgba(255, 255, 255, 0.7);
+    --text-color:#0f172a;
+    --text-muted:#64748b;
+    --accent:#7c3aed;
+    --accent-dim:#7c3aed33;
+    --accent-soft: rgba(124, 58, 237, 0.08);
+    --ok:#16a34a;
+    --danger:#dc2626;
+    --info:#0284c7;
+    --shadow: 0 6px 24px 0 rgba(15, 23, 42, 0.07);
+    --shadow-hover: 0 14px 36px 0 rgba(124, 58, 237, 0.14);
+    --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+
+    --out-bg:#0f172a;
+    --out-border:#1e293b;
+    --out-text:#e2e8f0;
+    --out-muted:#94a3b8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Tajawal','Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
+  body{
+    background-color: var(--bg-color);
+    background-image:
+      radial-gradient(circle at 15% 0%, rgba(124, 58, 237, 0.06), transparent 45%),
+      radial-gradient(circle at 85% 10%, rgba(2, 132, 199, 0.06), transparent 40%);
+    color: var(--text-color);
+    min-height:100vh;
+    padding:36px 20px 60px;
+    line-height:1.6;
+  }
+  .wrap{max-width:1100px;margin:0 auto;}
+
+  /* ---------- Header ---------- */
+  header{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;}
+  .header-icon{
+    width:56px;height:56px;border-radius:16px;flex-shrink:0;
+    background: var(--accent-soft);
+    color:var(--accent);
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.5rem;
+  }
+  h1{font-size:clamp(1.35rem,3vw,1.8rem);font-weight:800;margin-bottom:6px;color:var(--text-color);}
+  h1 span{color:var(--accent);}
+  header p{color:var(--text-muted);font-size:0.95rem;line-height:1.8;max-width:680px;}
+
+  .banner{
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border:1px solid var(--card-border);
+    border-right:3px solid #d97706;
+    border-radius:14px;
+    padding:14px 20px;
+    font-size:0.85rem;line-height:1.8;color:var(--text-muted);
+    box-shadow: var(--shadow);
+    margin:20px 0 26px;
+  }
+  .banner strong{color:var(--text-color);}
+
+  /* ---------- Main layout ---------- */
+  .main-wrap{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+  }
+
+  .panel{
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border:1px solid var(--card-border);
+    border-radius:18px;
+    padding:24px;
+    box-shadow: var(--shadow);
+    transition: box-shadow .25s ease, border-color .25s ease;
+  }
+  .panel:focus-within{border-color:var(--accent-dim);box-shadow:var(--shadow-hover);}
+
+  .sidebar{flex:1 1 340px;min-width:320px;}
+  .content{flex:1.4 1 420px;min-width:360px;display:flex;flex-direction:column;}
+
+  .panel-title{
+    display:flex;align-items:center;gap:8px;
+    font-size:1rem;font-weight:700;color:var(--text-color);
+    margin-bottom:16px;
+  }
+  .panel-title i{color:var(--accent);}
+
+  /* ---------- Form fields ---------- */
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;font-size:0.83rem;color:var(--text-color);
+    margin-bottom:5px;font-weight:600;
+  }
+  .field .hint{
+    display:block;margin:6px 0 0;
+    font-size:0.72rem;color:var(--text-muted);font-weight:400;line-height:1.6;
+  }
+  .field-row{display:flex;gap:12px;min-width:0;}
+  .field-row > div{flex:1;min-width:0;}
+
+  input[type="text"], select{
+    width:100%;
+    background: var(--field-bg);
+    border:1px solid var(--card-border);
+    border-radius:10px;
+    color:var(--text-color);
+    font-family:var(--mono);
+    font-size:0.85rem;
+    padding:9px 12px;
+    direction:ltr;text-align:left;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  input[type="text"]:focus, select:focus{
+    outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);
+  }
+
+  /* ---------- Rate (speed) fields: number + unit, native +/- steppers ---------- */
+  .rate-field{
+    display:flex;align-items:stretch;
+    min-width:0;max-width:100%;
+    background: var(--field-bg);
+    border:1px solid var(--card-border);
+    border-radius:10px;
+    overflow:hidden;
+    direction:ltr;
+    transition:border-color .2s ease, box-shadow .2s ease;
+  }
+  .rate-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .rate-field input[type="number"]{
+    flex:1 1 auto;min-width:0;width:0;border:none;background:transparent;
+    padding:9px 8px;font-family:var(--mono);font-size:0.88rem;color:var(--text-color);
+    text-align:left;
+  }
+  .rate-field input[type="number"]:focus{outline:none;}
+  .rate-field select{
+    flex:0 0 auto;
+    border:none;border-right:1px solid var(--card-border);
+    border-radius:0;background:transparent;
+    padding:9px 6px;font-family:var(--mono);font-size:0.78rem;font-weight:700;
+    color:var(--accent);width:52px;min-width:52px;
+    appearance:none;-webkit-appearance:none;-moz-appearance:none;
+    text-align:center;text-align-last:center;
+    cursor:pointer;
+    background-image:url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237c3aed' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:left 4px center;
+    background-size:11px;
+    padding-left:16px;
+  }
+  .rate-field select:focus{outline:none;box-shadow:none;}
+
+  .checkbox-row{
+    display:flex;align-items:flex-start;gap:10px;
+    font-size:0.82rem;color:var(--text-muted);
+    margin:6px 0 16px;line-height:1.7;
+  }
+  .checkbox-row input{accent-color:var(--accent);width:16px;height:16px;margin-top:2px;flex-shrink:0;}
+
+  .section-title{
+    display:flex;align-items:center;gap:8px;
+    margin:20px 0 6px;
+    padding-bottom:8px;
+    border-bottom:1px dashed var(--card-border);
+    font-weight:700;font-size:0.88rem;color:var(--accent);
+  }
+  .section-desc{
+    font-size:0.76rem;color:var(--text-muted);
+    margin:0 0 14px;line-height:1.7;
+  }
+
+  /* ---------- Buttons ---------- */
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+  button{
+    font-family:'Tajawal',sans-serif;font-size:0.88rem;font-weight:700;
+    background: var(--accent);color:#fff;border:none;
+    padding:11px 22px;border-radius:12px;cursor:pointer;
+    transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.25);
+  }
+  button:hover{background:#6d28d9;transform:translateY(-2px);box-shadow:0 8px 20px rgba(124, 58, 237, 0.3);}
+  button:active{transform:translateY(0);}
+  button.ghost{
+    background: var(--field-bg);border:1px solid var(--card-border);color:var(--text-color);
+    box-shadow:none;
+  }
+  button.ghost:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);transform:translateY(-2px);box-shadow:none;}
+  button.copy-btn{background:var(--ok);box-shadow:0 4px 14px rgba(22, 163, 74, 0.25);}
+  button.copy-btn:hover{background:#15803d;box-shadow:0 8px 20px rgba(22, 163, 74, 0.3);}
+  button.download-btn{background:var(--info);box-shadow:0 4px 14px rgba(2, 132, 199, 0.25);}
+  button.download-btn:hover{background:#0369a1;box-shadow:0 8px 20px rgba(2, 132, 199, 0.3);}
+
+  /* ---------- Output (dark terminal, stands out) ---------- */
+  .output-box{
+    flex-grow:1;
+    background: var(--out-bg);
+    border:1px solid var(--out-border);
+    border-radius:14px;
+    padding:16px;
+    margin-top:4px;
+    max-height:420px;
+    overflow:auto;
+    color: var(--out-text);
+    font-family:var(--mono);
+    font-size:0.78rem;
+    line-height:1.7;
+    white-space:pre-wrap;
+    word-break:break-all;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.35);
+  }
+  .output-box::-webkit-scrollbar{width:8px;height:8px;}
+  .output-box::-webkit-scrollbar-track{background:transparent;}
+  .output-box::-webkit-scrollbar-thumb{background:#334155;border-radius:8px;}
+  .output-box::-webkit-scrollbar-thumb:hover{background:#475569;}
+
+  .output-hint{font-size:0.78rem;color:var(--text-muted);margin-top:12px;}
+
+  /* ---------- Back link (bottom) ---------- */
+  .back-row{text-align:center;margin-top:34px;}
+  .back-link{
+    display:inline-flex;align-items:center;gap:6px;
+    font-size:0.85rem;color:var(--text-muted);text-decoration:none;
+    transition:color .2s ease;
+  }
+  .back-link:hover{color:var(--accent);}
+
+  /* ---------- Footer ---------- */
+  footer{
+    width:100%;max-width:1100px;margin:18px auto 0;
+    text-align:center;padding:20px 20px 0;
+    border-top:1px solid var(--card-border);
+    color:var(--text-color);font-size:0.85rem;font-weight:600;
+  }
+
+  @media screen and (max-width: 760px){
+    .main-wrap{display:block;}
+    .sidebar{margin-bottom:20px;}
+    .field-row{flex-direction:column;gap:0;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="header-icon"><i class="fa-solid fa-scale-balanced"></i></div>
+    <div>
+      <h1>المُنصِف — توزيع <span>عادل وتلقائي</span> للسرعة بين المستخدمين</h1>
+      <p>يولّد سكربت RouterOS جاهزًا يوزّع سرعة الإنترنت بعدالة بين كل الأجهزة المتصلة بالشبكة في نفس الوقت، بحيث لا يستأثر مستخدم واحد بكل السرعة على حساب الباقين — عبر تقنية توزيع الحصص العادلة (PCQ)، ويدعم أسلوبي التحكم الشجري (Queue Tree) والمباشر (Queue Simple).</p>
+    </div>
+  </header>
+
+  <div class="banner">
+    ⚠️ <strong>تنبيه:</strong> هذا مولّد سكربت مساعد فقط — راجع السكربت الناتج قبل تطبيقه على راوتر حي، واحتفظ بنسخة احتياطية من إعدادات الراوتر أولًا.
+  </div>
+
+  <div class="main-wrap">
+    <!-- الشريط الجانبي: الإعدادات -->
+    <div class="panel sidebar">
+      <div class="panel-title"><i class="fa-solid fa-sliders"></i> إعدادات التوزيع</div>
+
+      <div class="field">
+        <label>أسلوب التحكم</label>
+        <select id="pcqList" onchange="toggleQueueOption()">
+          <option value="queue-tree">شجري متقدّم — تحكم أدق (Queue Tree)</option>
+          <option value="queue-simple">مباشر وبسيط — أسهل وأسرع (Queue Simple)</option>
+        </select>
+        <span class="hint">اختر "مباشر وبسيط" إن أردت الإعداد الأسرع، أو "شجري متقدّم" إن احتجت تحكمًا أدق (يضيف قواعد تصنيف Mangle تلقائيًا).</span>
+      </div>
+
+      <div class="section-title"><i class="fa-solid fa-gauge-high"></i> السرعة الإجمالية للشبكة كلها</div>
+      <p class="section-desc">السقف الأقصى الذي لن تتجاوزه الشبكة بالكامل، حتى لو كان كل المستخدمين متصلين معًا في نفس الوقت.</p>
+
+      <div class="field-row">
+        <div class="field">
+          <label>أقصى سرعة رفع لكل الشبكة</label>
+          <div class="rate-field">
+            <input type="number" id="inputUpParentNum" value="10" min="0" step="0.5">
+            <select id="inputUpParentUnit">
+              <option value="K">K</option>
+              <option value="M" selected>M</option>
+              <option value="G">G</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>أقصى سرعة تنزيل لكل الشبكة</label>
+          <div class="rate-field">
+            <input type="number" id="inputDownParentNum" value="50" min="0" step="0.5">
+            <select id="inputDownParentUnit">
+              <option value="K">K</option>
+              <option value="M" selected>M</option>
+              <option value="G">G</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <span class="hint">مثال: إن كان اشتراكك بالكامل 50 ميجا تنزيل، ضع 50 هنا مع اختيار الوحدة "ميجابت" — هذا هو سقف الخط الذي يدخله كل الأجهزة معًا.</span>
+
+      <div class="section-title"><i class="fa-solid fa-users"></i> الحصة العادلة لكل مستخدم</div>
+      <p class="section-desc">أقصى سرعة يحصل عليها الجهاز الواحد بمفرده — هذا بالتحديد ما يمنع شخصًا واحدًا من استهلاك كل السرعة على حساب البقية.</p>
+
+      <div class="field-row">
+        <div class="field">
+          <label>أقصى سرعة رفع للفرد الواحد</label>
+          <div class="rate-field">
+            <input type="number" id="pcqUpRateLimitNum" value="1" min="0" step="0.5">
+            <select id="pcqUpRateLimitUnit">
+              <option value="K">K</option>
+              <option value="M" selected>M</option>
+              <option value="G">G</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>أقصى سرعة تنزيل للفرد الواحد</label>
+          <div class="rate-field">
+            <input type="number" id="pcqDownRateLimitNum" value="2" min="0" step="0.5">
+            <select id="pcqDownRateLimitUnit">
+              <option value="K">K</option>
+              <option value="M" selected>M</option>
+              <option value="G">G</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <label class="checkbox-row">
+        <input type="checkbox" id="autoShared">
+        توزيع تلقائي بدون سقف عام للشبكة (الاعتماد فقط على حصة الفرد المحدّدة أعلاه لتحقيق العدالة)
+      </label>
+
+      <div class="section-title"><i class="fa-solid fa-gear"></i> إعدادات متقدمة (اختياري)</div>
+      <p class="section-desc">القيم الافتراضية تعمل بشكل جيد لمعظم الحالات — غيّرها فقط إن كنت تعرف ما تفعله.</p>
+
+      <div class="field">
+        <label>نطاقات شبكتك المحلية (Local Subnets)</label>
+        <input type="text" id="inputLocalSubnets" value="192.168.0.0/16,172.16.0.0/12,10.0.0.0/8">
+        <span class="hint">افصل بينها بفاصلة إن وُجد أكثر من نطاق. يُفضّل تحديد نطاقك الفعلي بدل ترك النطاقات الخاصة كاملة إن أمكن.</span>
+      </div>
+
+      <div class="field">
+        <label>الاسم الرئيسي للطابور</label>
+        <input type="text" id="inputParent" value="GLOBAL-CONNECTION" placeholder="GLOBAL-CONNECTION">
+        <span class="hint">مجرد اسم تعريفي يظهر داخل واجهة الراوتر فقط، لا يؤثر على الأداء أو النتيجة.</span>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label id="labelUpSub">اسم طابور الرفع الفرعي</label>
+          <input type="text" id="inputUpSubParent" value="Upload-Client" placeholder="Upload-Client">
+        </div>
+        <div class="field" id="wrapDownSub">
+          <label>اسم طابور التنزيل الفرعي</label>
+          <input type="text" id="inputDownSubParent" value="Download-Client" placeholder="Download-Client">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>اسم نظام العدالة للرفع (PCQ)</label>
+          <input type="text" id="pcqUploadName" value="PCQ-Up" placeholder="PCQ-Up">
+        </div>
+        <div class="field">
+          <label>اسم نظام العدالة للتنزيل (PCQ)</label>
+          <input type="text" id="pcqDownloadName" value="PCQ-Down" placeholder="PCQ-Down">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" onclick="generatePCQScript()">إنشاء السكربت</button>
+        <button type="button" class="ghost" onclick="location.reload()">إعادة تعيين الكل</button>
+      </div>
+    </div>
+
+    <!-- المحتوى: نتيجة السكربت -->
+    <div class="panel content">
+      <div class="panel-title"><i class="fa-solid fa-terminal"></i> نتيجة إنشاء السكربت</div>
+      <div class="output-box">
+        <div id="showScript">
+          <span style="color:#a78bfa;">
+            ####################################################################<br>
+            # MikroTik PCQ Script Generator — المُنصِف (Fair Speed Distribution)<br>
+            # Developed by: MusaleM for Software<br>
+            # Generated: <span id="dateTime"></span><br>
+            ####################################################################<br>
+          </span>
+          <div id="listOutput"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button id="copyScriptBtn" type="button" class="copy-btn">نسخ السكربت</button>
+        <button id="downloadScriptBtn" type="button" class="download-btn">تحميل الملف (.rsc)</button>
+      </div>
+      <p class="output-hint">انسخ السكربت والصقه في نافذة الطرفية (Terminal) بميكروتك، أو حمّله كملف واستورده مباشرة.</p>
+    </div>
+  </div>
+
+  <div class="back-row">
+    <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-right"></i> العودة لمركز الأدوات</a>
+  </div>
+
+  <footer>
+    برمجة وتطوير MusaleM for Software © 2026 - جميع الحقوق محفوظة
+  </footer>
+
+</div>
+
+<script>
+    // ============================================================
+    // المُنصِف - مولد PCQ
+    // ملاحظات هذه النسخة:
+    // 1) حقول السرعة أصبحت رقمًا + وحدة (K/M/G) بدل نص حر، فتظهر
+    //    أسهم الزيادة/الإنقاص تلقائيًا من المتصفح، وتصبح القيمة
+    //    صحيحة الصيغة دائمًا (لا حاجة للتحقق اليدوي من الصيغة).
+    // 2) استبدال آلية التحميل غير الموثوقة بتحميل مباشر عبر
+    //    Blob/ObjectURL يعمل في أي متصفح دون أي اعتماديات خارجية.
+    // 3) Queue Simple طابور واحد ثنائي الاتجاه، وQueue Tree ينشئ
+    //    طابوري الرفع والتنزيل دائمًا؛ "التوزيع التلقائي" يُزيل فقط
+    //    السقف الإجمالي (max-limit) ولا تحذف أي طابور.
+    // 4) قاعدة Mangle إضافية تغطي الاتصالات المُبادَرة من خارج الشبكة
+    //    (Port Forwarding) والتي كانت تُفلت من التصنيف.
+    // 5) نطاقات الشبكة المحلية قابلة للتخصيص بدل التثبيت.
+    // 6) نسخ الحافظة عبر Clipboard API الحديث مع طريقة احتياطية.
+    // 7) اسم المطوّر (MusaleM for Software) مُضمَّن داخل رأس كل
+    //    سكربت يُنشأ ويُنسخ ويُحمَّل.
+    // ============================================================
+
+    let currentQueueType = 'queue-tree';
+
+    function rateStr(numId, unitId, fallbackNum, fallbackUnit) {
+        const numEl = document.getElementById(numId);
+        const unitEl = document.getElementById(unitId);
+        const num = (numEl.value !== '' ? numEl.value : fallbackNum);
+        const unit = unitEl.value || fallbackUnit;
+        return `${num}${unit}`;
+    }
+
+    function toggleQueueOption() {
+        const queueType = document.getElementById('pcqList').value;
+        currentQueueType = queueType;
+
+        const downWrap = document.getElementById('wrapDownSub');
+        const upLabel = document.getElementById('labelUpSub');
+
+        if (queueType === 'queue-simple') {
+            // في التحكم المباشر (Queue Simple) نستخدم طابورًا واحدًا ثنائي الاتجاه فقط
+            downWrap.style.display = 'none';
+            upLabel.textContent = 'اسم الطابور الفرعي';
+        } else {
+            downWrap.style.display = 'block';
+            upLabel.textContent = 'اسم طابور الرفع الفرعي';
+        }
+        generatePCQScript();
+    }
+
+    function downloadScript() {
+        const el = document.getElementById('showScript');
+        const text = el.innerText;
+        const ts = new Date().toISOString().replace(/[:.]/g, '-');
+        const filename = `mikrotik-pcq-script-${ts}.rsc`;
+
+        const blob = new Blob([text], {type: 'text/plain'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function copyScript() {
+        const el = document.getElementById('showScript');
+        const text = el.innerText;
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(function() {
+                alert('✅ تم نسخ السكريبت إلى الحافظة!');
+            }, function(err) {
+                fallbackCopy(el);
+            });
+        } else {
+            fallbackCopy(el);
+        }
+    }
+
+    function fallbackCopy(element) {
+        try {
+            const range = document.createRange();
+            const selection = window.getSelection();
+            range.selectNodeContents(element);
+            selection.removeAllRanges();
+            selection.addRange(range);
+            document.execCommand('copy');
+            selection.removeAllRanges();
+            alert('✅ تم نسخ السكريبت إلى الحافظة!');
+        } catch (err) {
+            alert('❌ فشل النسخ التلقائي، الرجاء تحديد النص ونسخه يدويًا.');
+        }
+    }
+
+    function generatePCQScript() {
+        const parentName = document.getElementById('inputParent').value.trim() || 'GLOBAL-CONNECTION';
+        const upSubParent = document.getElementById('inputUpSubParent').value.trim() || 'Upload-Client';
+        const downSubParent = document.getElementById('inputDownSubParent').value.trim() || 'Download-Client';
+
+        const upParentLimit = rateStr('inputUpParentNum', 'inputUpParentUnit', '10', 'M');
+        const downParentLimit = rateStr('inputDownParentNum', 'inputDownParentUnit', '50', 'M');
+        const pcqUpRateLimit = rateStr('pcqUpRateLimitNum', 'pcqUpRateLimitUnit', '1', 'M');
+        const pcqDownRateLimit = rateStr('pcqDownRateLimitNum', 'pcqDownRateLimitUnit', '2', 'M');
+
+        const pcqUploadName = document.getElementById('pcqUploadName').value.trim() || 'PCQ-Up';
+        const pcqDownloadName = document.getElementById('pcqDownloadName').value.trim() || 'PCQ-Down';
+        const autoShared = document.getElementById('autoShared').checked;
+
+        const subnetsRaw = document.getElementById('inputLocalSubnets').value.trim() || '192.168.0.0/16,172.16.0.0/12,10.0.0.0/8';
+        const subnets = subnetsRaw.split(',').map(s => s.trim()).filter(Boolean);
+        const targetList = subnets.join(',');
+
+        const outputContainer = document.getElementById('listOutput');
+
+        let scriptLines = [];
+
+        // 1. /queue type section
+        scriptLines.push('## ============================================');
+        scriptLines.push('## Create PCQ queue types for upload and download (per-client limit)');
+        scriptLines.push('## ============================================');
+        scriptLines.push('/queue type');
+        scriptLines.push(`add kind=pcq name="${pcqUploadName}" pcq-classifier=src-address pcq-rate="${pcqUpRateLimit}"`);
+        scriptLines.push(`add kind=pcq name="${pcqDownloadName}" pcq-classifier=dst-address pcq-rate="${pcqDownRateLimit}"`);
+        scriptLines.push('');
+
+        if (currentQueueType === 'queue-simple') {
+            // -------------------------------------------------------
+            // Queue Simple: a single bidirectional queue is enough
+            // (no mangle / packet marks needed, since target +
+            // max-limit=up/down together with the two PCQ types
+            // already provide fair per-client distribution).
+            // -------------------------------------------------------
+            scriptLines.push('## ============================================');
+            scriptLines.push('## Queue Simple setup (single bidirectional queue)');
+            scriptLines.push('## ============================================');
+            scriptLines.push('/queue simple');
+
+            const maxLimit = autoShared ? '0/0' : `${upParentLimit}/${downParentLimit}`;
+            scriptLines.push(`add name="${upSubParent}" target="${targetList}" max-limit="${maxLimit}" queue="${pcqUploadName}/${pcqDownloadName}"`);
+
+            if (autoShared) {
+                scriptLines.push('# Note: max-limit=0/0 means no overall cap; fair sharing relies');
+                scriptLines.push('# only on the per-client PCQ rate set above.');
+            }
+        } else {
+            // -------------------------------------------------------
+            // Queue Tree: requires Mangle to classify packets. Both
+            // the upload and download child queues are always
+            // created; "auto shared" only controls whether an
+            // overall cap (max-limit) is applied or not.
+            // -------------------------------------------------------
+            scriptLines.push('## ============================================');
+            scriptLines.push('## Queue Tree setup');
+            scriptLines.push('## ============================================');
+            scriptLines.push('/queue tree');
+            scriptLines.push(`add name="${parentName}" parent=global`);
+
+            const upMax = autoShared ? '' : ` max-limit="${upParentLimit}"`;
+            const downMax = autoShared ? '' : ` max-limit="${downParentLimit}"`;
+
+            scriptLines.push(`add name="${upSubParent}"${upMax} packet-mark="upload-client" parent="${parentName}" queue="${pcqUploadName}"`);
+            scriptLines.push(`add name="${downSubParent}"${downMax} packet-mark="download-client" parent="${parentName}" queue="${pcqDownloadName}"`);
+
+            if (autoShared) {
+                scriptLines.push('# Note: no overall cap (max-limit) here; fair sharing relies');
+                scriptLines.push('# only on the per-client PCQ rate set above.');
+            }
+            scriptLines.push('');
+
+            // Mangle is only needed for Queue Tree
+            scriptLines.push('## ============================================');
+            scriptLines.push('## Mangle setup for packet classification');
+            scriptLines.push('## (covers connections initiated from the local network');
+            scriptLines.push('##  as well as inbound ones, e.g. Port Forwarding)');
+            scriptLines.push('## ============================================');
+            scriptLines.push('/ip firewall mangle');
+            scriptLines.push('add action=mark-connection chain=forward connection-mark=no-mark new-connection-mark="global-conn" passthrough=yes src-address-list=LOCAL-IP comment="Outbound connections from local network"');
+            scriptLines.push('add action=mark-connection chain=forward connection-mark=no-mark new-connection-mark="global-conn" passthrough=yes dst-address-list=LOCAL-IP comment="Inbound connections (e.g. Port Forwarding)"');
+            scriptLines.push('add action=mark-packet chain=forward connection-mark="global-conn" src-address-list=LOCAL-IP new-packet-mark="upload-client" passthrough=no');
+            scriptLines.push('add action=mark-packet chain=forward connection-mark="global-conn" dst-address-list=LOCAL-IP new-packet-mark="download-client" passthrough=no');
+            scriptLines.push('');
+
+            scriptLines.push('## ============================================');
+            scriptLines.push('## Local address list setup');
+            scriptLines.push('## ============================================');
+            scriptLines.push('/ip firewall address-list');
+            subnets.forEach(function(subnet) {
+                scriptLines.push(`add address=${subnet} list=LOCAL-IP`);
+            });
+            scriptLines.push('');
+        }
+
+        outputContainer.innerHTML = '<pre style="margin:0; color:#4ade80; white-space:pre-wrap;">' +
+            scriptLines.join('\n') +
+            '</pre>';
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const now = new Date();
+        document.getElementById('dateTime').textContent = now.toLocaleString('en-GB');
+
+        toggleQueueOption(); // يضبط الحقول الظاهرة ثم يولّد السكربت الأولي
+
+        const inputs = document.querySelectorAll('.sidebar input, .sidebar select');
+        inputs.forEach(input => {
+            input.addEventListener('change', generatePCQScript);
+            input.addEventListener('keyup', generatePCQScript);
+            input.addEventListener('input', generatePCQScript);
+        });
+
+        document.getElementById('copyScriptBtn').addEventListener('click', copyScript);
+        document.getElementById('downloadScriptBtn').addEventListener('click', downloadScript);
+    });
+
+    console.log('✅ المُنصِف جاهز للعمل!');
+</script>
+
+</body>
+</html>
