@@ -5,19 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="index, follow">
 <!-- SEO -->
-<meta name="description" content="برنامج إيزي فوش لإدارة كروت المايكروتك بسهولة، يدعم Hotspot و User Manager و Broadband مع سرعة وأداء عالي.">
-<meta name="keywords" content="مايكروتك, hotspot, كروت انترنت, Mikrotik, EasyVouch, إدارة سيرفرات">
+<meta name="description" content="برنامج إيزي فوش لإدارة كروت المايكروتك بسهولة، يدعم Hotspot و User Manager و Broadband، بالإضافة إلى ميكروفولت لحماية وتشفير صفحات الهوتسبوت.">
+<meta name="keywords" content="مايكروتك, hotspot, كروت انترنت, Mikrotik, EasyVouch, MikroVault, حماية صفحة هوتسبوت, تشفير صفحة مايكروتك, إدارة سيرفرات">
 <meta name="author" content="MusaleM for Software">
 
 <!-- Open Graph (مهم للمشاركة) -->
 <meta property="og:title" content="EasyVouch">
-<meta property="og:description" content="أسهل وأسرع طريقة لإنشاء كروت المايكروتك">
+<meta property="og:description" content="أسهل وأسرع طريقة لإنشاء كروت المايكروتك، وحماية صفحات الهوتسبوت">
 <meta property="og:image" content="https://musalem.github.io/easyvouch/mini.png">
 <meta property="og:url" content="https://musalem.github.io/easyvouch/">
 <meta property="og:type" content="website">
 
 <title>إيزي فوش لإدارة كروت المايكروتك | EasyVouch</title>
+<link rel="icon" type="image/png" href="https://musalem.github.io/easyvouch/mslogo.png">
+<link rel="shortcut icon" type="image/png" href="https://musalem.github.io/easyvouch/mslogo.png">
+<link rel="apple-touch-icon" href="https://musalem.github.io/easyvouch/mslogo.png">
 
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 
 <link rel="canonical" href="https://musalem.github.io/easyvouch/">
@@ -47,6 +51,10 @@
     --main-hover: #0284c7;
     --green: #22c55e;
     --green-hover: #16a34a;
+    --gold: #f59e0b;
+    --gold-hover: #d97706;
+    --indigo: #818cf8;
+    --indigo-hover: #6366f1;
     --bg: #030712;
     --glass-bg: rgba(255, 255, 255, 0.04);
     --glass-border: rgba(255, 255, 255, 0.12);
@@ -176,7 +184,7 @@ header p {
     justify-content: center;
     flex-wrap: wrap;
     gap: 30px;
-    padding: 30px 20px 60px;
+    padding: 30px 20px 20px;
     max-width: 1280px;
     margin: 0 auto;
 }
@@ -219,6 +227,22 @@ header p {
     border-color: rgba(56, 189, 248, 0.4);
 }
 
+/* Paid badge — common visual mark for Mini / Lite / MikroVault */
+.badge-paid {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fbbf24;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 4px 13px;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 16px;
+    letter-spacing: 0.2px;
+}
+
 .logo {
     width: 95px;
     height: auto;
@@ -247,6 +271,12 @@ header p {
     border-radius: 20px;
     border: 1px solid rgba(56, 189, 248, 0.2);
     display: inline-block;
+}
+
+.version.gold {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .card-desc {
@@ -319,6 +349,24 @@ header p {
     box-shadow: 0 8px 25px rgba(34, 197, 94, 0.4);
 }
 
+.btn.gold {
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+}
+
+.btn.gold:hover {
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.45);
+}
+
+.btn.indigo {
+    background: linear-gradient(135deg, #a5b4fc 0%, #6366f1 100%);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+}
+
+.btn.indigo:hover {
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
+}
+
 /* Section styling */
 .section {
     max-width: 1000px;
@@ -337,35 +385,55 @@ header p {
 .section h2 {
     font-size: 28px;
     font-weight: 700;
-    margin-bottom: 25px;
+    margin-bottom: 8px;
     color: var(--text-primary);
 }
 
-/* Wide Tools Center Card Styling */
-.tools-center-card {
+.section .section-sub {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin: 0 0 25px;
+}
+
+/* Wide banner-style Card (shared by Studio + Tools Center) */
+.wide-banner {
     display: flex;
     justify-content: space-between;
     align-items: center;
     gap: 25px;
     text-align: right;
-    border-right: 4px solid var(--main);
     transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-.tools-center-card:hover {
+.wide-banner:hover {
     transform: translateY(-5px);
+}
+
+.wide-banner.tools-theme {
+    border-right: 4px solid var(--main);
+}
+.wide-banner.tools-theme:hover {
     border-right-color: #818cf8;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 189, 248, 0.2);
 }
 
-.tools-title-wrapper {
+.wide-banner.studio-theme {
+    border-right: 4px solid var(--indigo);
+}
+.wide-banner.studio-theme:hover {
+    border-right-color: #a5b4fc;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(99, 102, 241, 0.25);
+}
+
+.banner-title-wrapper {
     display: flex;
     align-items: center;
     gap: 12px;
     margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
-.tools-title-wrapper h2 {
+.banner-title-wrapper h2 {
     margin: 0;
     font-size: 26px;
     font-weight: 800;
@@ -383,7 +451,27 @@ header p {
     letter-spacing: 0.5px;
 }
 
-.tools-btn {
+.badge-opensource {
+    background: rgba(99, 102, 241, 0.15);
+    color: #a5b4fc;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    display: inline-block;
+    letter-spacing: 0.5px;
+}
+
+.banner-note {
+    color: #eab308;
+    font-weight: 600;
+    font-size: 13.5px;
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
+.banner-btn {
     width: auto;
     min-width: 200px;
     white-space: nowrap;
@@ -418,66 +506,91 @@ header p {
     transform: translateY(-3px);
 }
 
-/* Support Cards */
-.support-cards {
+/* Support — professional icon links */
+.support-links {
     display: flex;
     justify-content: center;
-    gap: 20px;
+    gap: 26px;
     flex-wrap: wrap;
-    margin-top: 20px;
+    margin-top: 22px;
 }
 
-.support-item {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--glass-border);
-    padding: 20px 30px;
-    border-radius: 18px;
-    flex: 1;
-    min-width: 250px;
-    max-width: 350px;
-    transition: 0.3s;
-}
-
-.support-item:hover {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: var(--glass-border-light);
-    transform: translateY(-4px);
-}
-
-.support-item p {
-    margin: 0;
-    font-size: 16px;
-}
-
-.support-item a {
-    color: #f43f5e;
-    font-weight: 700;
+.support-item-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
     text-decoration: none;
-    margin-right: 8px;
-    display: inline-block;
-    transition: 0.3s;
 }
 
-.support-item a:hover {
-    color: #fb7185;
-    transform: scale(1.05);
-    text-decoration: underline;
+.support-icon-circle {
+    width: 92px;
+    height: 92px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid var(--glass-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    color: #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.support-item-icon:hover .support-icon-circle {
+    transform: translateY(-6px) scale(1.05);
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.5);
+}
+
+.support-item-icon.whatsapp .support-icon-circle {
+    color: #25D366;
+    border-color: rgba(37, 211, 102, 0.35);
+    background: rgba(37, 211, 102, 0.1);
+}
+.support-item-icon.whatsapp:hover .support-icon-circle {
+    border-color: #25D366;
+    background: rgba(37, 211, 102, 0.2);
+    box-shadow: 0 18px 34px rgba(37, 211, 102, 0.3);
+}
+
+.support-item-icon.telegram .support-icon-circle {
+    color: #229ED9;
+    border-color: rgba(34, 158, 217, 0.35);
+    background: rgba(34, 158, 217, 0.1);
+}
+.support-item-icon.telegram:hover .support-icon-circle {
+    border-color: #229ED9;
+    background: rgba(34, 158, 217, 0.2);
+    box-shadow: 0 18px 34px rgba(34, 158, 217, 0.3);
+}
+
+.support-item-icon span {
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--text-primary);
+    transition: color 0.3s ease;
+}
+
+.support-item-icon:hover span {
+    color: var(--text-primary);
 }
 
 /* Footer */
 footer {
     text-align: center;
-    padding: 40px 20px;
+    padding: 45px 20px 35px;
     color: var(--text-muted);
     font-size: 14px;
     position: relative;
+    border-top: 1px solid var(--glass-border);
+    margin-top: 20px;
 }
 
 .footer-logo {
-    width: 75px;
+    width: 68px;
     display: block;
-    margin: 0 auto 15px;
-    opacity: 0.85;
+    margin: 0 auto 16px;
+    opacity: 0.9;
     transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
 }
@@ -485,6 +598,21 @@ footer {
 .footer-logo:hover {
     transform: scale(1.15) rotate(2deg);
     opacity: 1;
+}
+
+.footer-copyright {
+    font-size: 15.5px;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 6px;
+}
+
+.footer-sub {
+    font-size: 13px;
+    color: var(--text-muted);
+    max-width: 460px;
+    margin: 0 auto;
+    line-height: 1.7;
 }
 
 /* Glassmorphism Loader */
@@ -520,17 +648,36 @@ footer {
 
 /* Responsiveness */
 @media (max-width: 768px) {
+    header { padding: 60px 16px 30px; }
     header h1 { font-size: 36px; }
     header p { font-size: 16px; }
-    .container { padding: 10px; }
+    .container { padding: 10px; gap: 22px; }
     .card { width: 100%; max-width: 380px; }
-    .tools-center-card { flex-direction: column; text-align: center; border-right: 1px solid var(--glass-border); border-top: 4px solid var(--main); }
-    .tools-title-wrapper { justify-content: center; }
-    .tools-btn { width: 100%; }
+    .section { padding: 28px 20px; margin: 28px auto; }
+    .wide-banner { flex-direction: column; text-align: center; border-right: 1px solid var(--glass-border); }
+    .wide-banner.tools-theme { border-top: 4px solid var(--main); }
+    .wide-banner.studio-theme { border-top: 4px solid var(--indigo); }
+    .banner-title-wrapper { justify-content: center; }
+    .banner-btn { width: 100%; }
+    .support-links { gap: 22px; }
+    .support-icon-circle { width: 80px; height: 80px; font-size: 2.1rem; }
     .orb-1 { width: 280px; height: 280px; }
     .orb-2 { width: 320px; height: 320px; }
     .orb-3 { width: 220px; height: 220px; }
     .mouse-glow { display: none; }
+}
+
+@media (max-width: 420px) {
+    header h1 { font-size: 30px; letter-spacing: 0; }
+    header p { font-size: 14.5px; }
+    .logo { width: 80px; }
+    .card { padding: 28px 18px; }
+    .card h2 { font-size: 21px; }
+    .banner-title-wrapper h2 { font-size: 21px; }
+    .btn { font-size: 14px; padding: 12px 16px; }
+    .support-icon-circle { width: 70px; height: 70px; font-size: 1.8rem; }
+    .support-links { gap: 18px; }
+    .footer-sub { font-size: 12.5px; }
 }
 </style>
 
@@ -555,13 +702,15 @@ footer {
 
 <header>
     <h1>🚀 إيزي فوش</h1>
-    <p>حلول احترافية لإدارة سيرفرات المايكروتك بسهولة وسرعة</p>
+    <p>حلول احترافية لإدارة وحماية سيرفرات المايكروتك بسهولة وسرعة</p>
 </header>
 
+<!-- ===================== البرامج المدفوعة (تجربة 7 أيام) ===================== -->
 <div class="container">
 
     <!-- MINI -->
     <div class="card">
+        <span class="badge-paid">💎 مدفوع — تجربة 7 أيام</span>
         <img src="mini.png" class="logo" alt="برنامج إيزي فوش ميني لإدارة المايكروتك">
         <h2>⚡ إيزي فوش ميني</h2>
 
@@ -586,31 +735,9 @@ footer {
         </div>
     </div>
 
-    <!-- STUDIO (NEW) -->
-    <div class="card">
-        <img src="studio.png" class="logo" alt="إيزي لوجن ستوديو لتصميم صفحات الهوتسبوت">
-        <h2>🎨 إيزي لوجن ستوديو</h2>
-
-        <p style="margin: 0 0 15px 0; font-weight: 600;">أداة سهلة لتصميم وإنشاء صفحات الهوتسبوت بدون تعقيد أو كتابة أكواد.</p>
-
-        <p class="card-desc">
-        🎨 قوالب جاهزة وقابلة للتعديل<br>
-        📂 إضافة واستيراد القوالب<br>
-        🖥️ تصميم عصري ومتجاوب<br>
-        ⚡ واجهة بسيطة وسريعة
-        </p>
-
-        <p style="color:#eab308; font-weight:bold; margin-bottom: 20px;">
-        🚀 المشروع حاليًا تجريبي وقيد التطوير.
-        </p>
-
-        <div class="btn-container">
-            <a href="https://mikrotik-artisan.lovable.app" target="_blank" class="btn">جــرّبه الآن</a>
-        </div>
-    </div>
-
     <!-- LITE -->
     <div class="card">
+        <span class="badge-paid">💎 مدفوع — تجربة 7 أيام</span>
         <img src="lite.png" class="logo" alt="برنامج إيزي فوش لايت لإدارة الهوتسبوت">
         <h2>🌐 إيزي فوش لايت</h2>
 
@@ -635,28 +762,39 @@ footer {
         </div>
     </div>
 
-</div>
+    <!-- MIKROVAULT -->
+    <div class="card">
+        <span class="badge-paid">💎 مدفوع — تجربة 7 أيام</span>
+        <img src="mvlogo.png" class="logo" alt="برنامج ميكروفولت لحماية وتشفير صفحات الهوتسبوت">
+        <h2>🔒 ميكروفولت</h2>
 
-<!-- مركز أدوات إدارة MikroTik -->
-<div class="section tools-center-card">
-    <div>
-        <div class="tools-title-wrapper">
-            <h2>🛠️ مركز أدوات إدارة MikroTik</h2>
-            <span class="badge-free">مجاني</span>
-        </div>
-        <p style="color: var(--text-muted); margin: 0; font-size: 15px; line-height: 1.6;">
-            مجموعة شاملة ومتجددة من المولدات والسكربتات الذكية لشبكات المايكروتك والهوتسبوت (متاحة مجاناً وتحدث باستمرار).
+        <p style="margin: 0 0 8px 0; font-weight: 600;">حماية وتشفير صفحات الهوتسبوت</p>
+
+        <p class="version gold">إصدار 2026</p>
+
+        <p class="card-desc">
+        تشفير وتعتيم كامل لكود الصفحة<br>
+        ربط الصفحة بمعرّف راوتر محدد لمنع النسخ
         </p>
+
+        <div class="card-features">
+        ✔ حماية من النسخ والتعديل<br>
+        ✔ ربط مباشر بالراوتر<br>
+        ✔ ترخيص رقمي محمي
+        </div>
+
+        <div class="btn-container">
+            <a href="mikrovault.html" class="btn gold">📄 عرض التفاصيل</a>
+            <a href="mikrovault.html#contact" class="btn gold">📩 اطلب التجربة المجانية</a>
+        </div>
     </div>
-    <div>
-        <!-- تم تعديل المسار هنا ليعمل مباشرة داخل مستودع easyvouch -->
-        <a href="./mikroTik-tools-center/index_center.html" class="btn tools-btn">🚀 الدخول لمركز الأدوات</a>
-    </div>
+
 </div>
 
-<!-- المميزات العامة -->
+<!-- المميزات الخاصة ببرامج توليد الكروت (ميني ولايت) -->
 <div class="section">
-    <h2>⭐ المميزات المشتركة</h2>
+    <h2>⭐ مميزات مشتركة بين إيزي فوش ميني ولايت</h2>
+    <p class="section-sub">تنطبق تحديدًا على برنامجَي توليد كروت الهوتسبوت — وليست خاصة بميكروفولت أو ستوديو</p>
 
     <div class="features-grid">
         <div class="feature-pill">✔️ يدعم جميع إصدارات مايكروتك</div>
@@ -666,29 +804,59 @@ footer {
     </div>
 </div>
 
+<!-- إيزي لوجن ستوديو — بانر مفتوح المصدر -->
+<div class="section wide-banner studio-theme">
+    <div>
+        <div class="banner-title-wrapper">
+            <h2>🎨 إيزي لوجن ستوديو</h2>
+            <span class="badge-opensource">🌱 مفتوح المصدر</span>
+        </div>
+        <p style="color: var(--text-muted); margin: 0; font-size: 15px; line-height: 1.6;">
+            أداة سهلة لتصميم وإنشاء صفحات الهوتسبوت بدون تعقيد أو كتابة أكواد — قوالب جاهزة وقابلة للتعديل، إضافة واستيراد القوالب، وتصميم عصري ومتجاوب.
+        </p>
+        <p class="banner-note">🚀 المشروع حاليًا تجريبي وقيد التطوير المستمر.</p>
+    </div>
+    <div>
+        <a href="https://mikrotik-artisan.lovable.app" target="_blank" class="btn indigo banner-btn">جــرّبه الآن</a>
+    </div>
+</div>
+
+<!-- مركز أدوات إدارة MikroTik -->
+<div class="section wide-banner tools-theme">
+    <div>
+        <div class="banner-title-wrapper">
+            <h2>🛠️ مركز أدوات إدارة MikroTik</h2>
+            <span class="badge-free">مجاني</span>
+        </div>
+        <p style="color: var(--text-muted); margin: 0; font-size: 15px; line-height: 1.6;">
+            مجموعة شاملة ومتجددة من المولدات والسكربتات الذكية لشبكات المايكروتك والهوتسبوت (متاحة مجاناً وتحدث باستمرار).
+        </p>
+    </div>
+    <div>
+        <a href="./mikroTik-tools-center/index_center.html" class="btn banner-btn">🚀 الدخول لمركز الأدوات</a>
+    </div>
+</div>
+
 <!-- الدعم -->
 <div class="section support">
     <h2>📌 التواصل مع الدعم</h2>
 
-    <div class="support-cards">
-        <div class="support-item">
-            <p>
-                💬 واتساب:
-                <a href="https://wa.me/201223084810">اضغط هنا</a>
-            </p>
-        </div>
-        <div class="support-item">
-            <p>
-                💬 تيليجرام:
-                <a href="https://t.me/EasyVouch">انضم للجروب</a>
-            </p>
-        </div>
+    <div class="support-links">
+        <a href="https://wa.me/201223084810" target="_blank" rel="noopener" class="support-item-icon whatsapp">
+            <span class="support-icon-circle"><i class="fa-brands fa-whatsapp"></i></span>
+            <span>واتساب</span>
+        </a>
+        <a href="https://t.me/EasyVouch" target="_blank" rel="noopener" class="support-item-icon telegram">
+            <span class="support-icon-circle"><i class="fa-brands fa-telegram"></i></span>
+            <span>تيليجرام</span>
+        </a>
     </div>
 </div>
 
 <footer>
     <img src="mslogo.png" class="footer-logo" alt="MusaleM Logo">
-    © 2026 MusaleM for Software
+    <p class="footer-copyright">© 2026 مصطفى شاهين — MusaleM for Software</p>
+    <p class="footer-sub">جميع الحقوق محفوظة لكافة البرامج والأدوات المتاحة على هذا الموقع. يُحظر إعادة التوزيع أو الهندسة العكسية للبرامج المدفوعة دون إذن مسبق.</p>
 </footer>
 
 <!-- تحميل الروابط -->
@@ -696,17 +864,20 @@ footer {
 
 <script>
 
-// ربط التحميل
+// ربط التحميل (ميني ولايت فقط — روابطهما تُدار عبر downloadlinks.js)
 if (typeof DOWNLOAD_LINKS !== "undefined") {
 
-    document.getElementById("miniDownload").href = DOWNLOAD_LINKS.mini.url;
-    document.getElementById("liteDownload").href = DOWNLOAD_LINKS.lite.url;
+    if (DOWNLOAD_LINKS.mini) {
+        document.getElementById("miniDownload").href = DOWNLOAD_LINKS.mini.url;
+        document.getElementById("miniVersion").innerText =
+            "الإصدار الحالي: v" + DOWNLOAD_LINKS.mini.version;
+    }
 
-    document.getElementById("miniVersion").innerText =
-        "الإصدار الحالي: v" + DOWNLOAD_LINKS.mini.version;
-
-    document.getElementById("liteVersion").innerText =
-        "الإصدار الحالي: v" + DOWNLOAD_LINKS.lite.version;
+    if (DOWNLOAD_LINKS.lite) {
+        document.getElementById("liteDownload").href = DOWNLOAD_LINKS.lite.url;
+        document.getElementById("liteVersion").innerText =
+            "الإصدار الحالي: v" + DOWNLOAD_LINKS.lite.version;
+    }
 
 }
 
