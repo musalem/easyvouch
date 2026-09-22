@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MikroVault — نظام حماية وتشفير صفحات الهوتسبوت</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d1f;
+    --bg2:#141838;
+    --panel: rgba(255,255,255,0.045);
+    --panel-strong: rgba(255,255,255,0.07);
+    --panel-border: rgba(255,255,255,0.09);
+    --text:#e9ecf7;
+    --text-muted:#98a0c4;
+    --indigo:#6d28d9;
+    --indigo-2:#4c1d95;
+    --amber:#f59e0b;
+    --amber-2:#d97706;
+    --danger:#ef4444;
+    --ok:#22c55e;
+    --mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+    --shadow: 0 10px 40px rgba(0,0,0,0.35);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Tajawal','Segoe UI',Tahoma,Geneva,Verdana,sans-serif;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:
+      radial-gradient(circle at 15% 0%, rgba(109,40,217,0.28), transparent 45%),
+      radial-gradient(circle at 90% 15%, rgba(245,158,11,0.10), transparent 40%),
+      radial-gradient(circle at 50% 100%, rgba(76,29,149,0.25), transparent 50%),
+      var(--bg);
+    color:var(--text);
+    line-height:1.7;
+    min-height:100vh;
+  }
+  .container{max-width:1160px;margin:0 auto;padding:0 22px;}
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+
+  /* ---------- Nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,13,31,0.75);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--panel-border);
+  }
+  .nav-inner{
+    max-width:1160px;margin:0 auto;padding:14px 22px;
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;}
+  .brand img{width:34px;height:34px;border-radius:9px;}
+  .nav-links{display:flex;gap:26px;align-items:center;flex-wrap:wrap;}
+  .nav-links a{
+    font-size:0.9rem;color:var(--text-muted);text-decoration:none;font-weight:500;
+    transition:color .2s ease;
+  }
+  .nav-links a:hover{color:var(--text);}
+  .nav-cta{
+    background:linear-gradient(135deg,var(--amber),var(--amber-2));
+    color:#1a1200;font-weight:800;font-size:0.85rem;
+    padding:9px 18px;border-radius:10px;text-decoration:none;
+    box-shadow:0 4px 16px rgba(245,158,11,0.3);
+    white-space:nowrap;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{padding:70px 0 50px;}
+  .hero-inner{
+    display:flex;align-items:center;gap:50px;flex-wrap:wrap;
+  }
+  .hero-text{flex:1.2;min-width:320px;}
+  .hero-visual{flex:1;min-width:260px;display:flex;justify-content:center;}
+  .hero-visual img{
+    width:260px;height:260px;object-fit:contain;
+    filter:drop-shadow(0 20px 50px rgba(109,40,217,0.45));
+    animation:float 5s ease-in-out infinite;
+  }
+  @keyframes float{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-14px);}
+  }
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--panel);border:1px solid var(--panel-border);
+    padding:6px 14px;border-radius:20px;
+    font-size:0.78rem;color:var(--amber);font-weight:700;
+    margin-bottom:18px;
+  }
+  .hero h1{
+    font-size:clamp(2.1rem,5vw,3.2rem);font-weight:900;
+    background:linear-gradient(90deg,#fff,#c4b5fd);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin-bottom:10px;line-height:1.2;
+  }
+  .hero h2{
+    font-size:clamp(1.1rem,2.4vw,1.35rem);font-weight:600;color:#c9cbe8;
+    margin-bottom:18px;
+  }
+  .hero p{color:var(--text-muted);font-size:1rem;max-width:600px;margin-bottom:26px;}
+
+  .badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:28px;}
+  .badge{
+    display:flex;align-items:center;gap:8px;
+    background:var(--panel);border:1px solid var(--panel-border);
+    padding:8px 14px;border-radius:10px;font-size:0.8rem;color:var(--text-muted);
+  }
+  .badge i{color:var(--indigo);}
+
+  .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    font-weight:800;font-size:0.95rem;
+    padding:13px 26px;border-radius:12px;text-decoration:none;
+    cursor:pointer;border:none;
+    transition:transform .15s ease, box-shadow .2s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+  .btn-primary{
+    background:linear-gradient(135deg,var(--amber),var(--amber-2));
+    color:#1a1200;box-shadow:0 6px 22px rgba(245,158,11,0.35);
+  }
+  .btn-ghost{
+    background:var(--panel);border:1px solid var(--panel-border);color:var(--text);
+  }
+  .btn-ghost:hover{border-color:var(--indigo);}
+
+  /* ---------- Sections generic ---------- */
+  section{padding:60px 0;}
+  .section-head{text-align:center;max-width:680px;margin:0 auto 40px;}
+  .section-tag{
+    color:var(--amber);font-weight:800;font-size:0.8rem;letter-spacing:.05em;
+    text-transform:uppercase;margin-bottom:10px;display:block;
+  }
+  .section-head h2{font-size:clamp(1.5rem,3vw,2rem);font-weight:800;margin-bottom:12px;}
+  .section-head p{color:var(--text-muted);font-size:0.95rem;}
+
+  /* ---------- Why box ---------- */
+  .why-box{
+    background:var(--panel);border:1px solid var(--panel-border);
+    border-radius:20px;padding:30px 34px;
+    display:flex;align-items:flex-start;gap:18px;
+    box-shadow:var(--shadow);
+  }
+  .why-box i{font-size:1.7rem;color:var(--amber);flex-shrink:0;margin-top:3px;}
+  .why-box p{color:#d7d9ee;font-size:1rem;line-height:1.9;}
+
+  /* ---------- Features ---------- */
+  .features-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:22px;
+  }
+  .feature-card{
+    background:var(--panel);border:1px solid var(--panel-border);
+    border-radius:18px;padding:26px;
+    transition:transform .25s ease, border-color .25s ease, background .25s ease;
+  }
+  .feature-card:hover{transform:translateY(-4px);border-color:rgba(109,40,217,0.5);background:var(--panel-strong);}
+  .feature-icon{
+    width:52px;height:52px;border-radius:14px;
+    background:linear-gradient(135deg, rgba(109,40,217,0.35), rgba(76,29,149,0.35));
+    display:flex;align-items:center;justify-content:center;
+    font-size:1.3rem;color:#c4b5fd;margin-bottom:16px;
+  }
+  .feature-card h3{font-size:1.05rem;font-weight:700;margin-bottom:8px;}
+  .feature-card p{color:var(--text-muted);font-size:0.88rem;line-height:1.8;}
+
+  /* ---------- Screenshot ---------- */
+  .screenshot-frame{
+    max-width:920px;margin:0 auto;
+    background:var(--panel);border:1px solid var(--panel-border);
+    border-radius:18px;overflow:hidden;box-shadow:var(--shadow);
+  }
+  .screenshot-topbar{
+    display:flex;gap:6px;padding:12px 16px;
+    background:rgba(255,255,255,0.04);border-bottom:1px solid var(--panel-border);
+  }
+  .screenshot-topbar span{width:11px;height:11px;border-radius:50%;background:#4b5065;}
+  .screenshot-topbar span:nth-child(1){background:#ef4444;}
+  .screenshot-topbar span:nth-child(2){background:#f59e0b;}
+  .screenshot-topbar span:nth-child(3){background:#22c55e;}
+  .screenshot-frame img{width:100%;display:block;}
+  .screenshot-fallback{
+    padding:80px 20px;text-align:center;color:var(--text-muted);
+    font-family:var(--mono);font-size:0.85rem;display:none;
+  }
+
+  /* ---------- Timeline ---------- */
+  .timeline{max-width:720px;margin:0 auto;}
+  .t-item{
+    display:flex;gap:20px;position:relative;padding-bottom:34px;
+  }
+  .t-item:last-child{padding-bottom:0;}
+  .t-item::before{
+    content:"";position:absolute;top:44px;bottom:0;right:21px;
+    width:2px;background:linear-gradient(var(--indigo), transparent);
+  }
+  .t-item:last-child::before{display:none;}
+  .t-num{
+    flex-shrink:0;width:44px;height:44px;border-radius:50%;
+    background:linear-gradient(135deg,var(--indigo),var(--indigo-2));
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;color:#fff;font-size:1rem;
+    box-shadow:0 4px 14px rgba(109,40,217,0.4);
+  }
+  .t-content{
+    background:var(--panel);border:1px solid var(--panel-border);
+    border-radius:14px;padding:16px 20px;flex-grow:1;
+  }
+  .t-content h4{font-size:0.98rem;font-weight:700;margin-bottom:5px;}
+  .t-content p{color:var(--text-muted);font-size:0.85rem;line-height:1.8;}
+
+  /* ---------- Encryption-only notice ---------- */
+  .enc-box{
+    max-width:900px;margin:0 auto;
+    background:linear-gradient(135deg, rgba(34,197,94,0.07), var(--panel));
+    border:1px solid rgba(34,197,94,0.3);
+    border-radius:20px;padding:34px;
+    box-shadow:var(--shadow);
+  }
+  .enc-head{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+  .enc-icon{
+    width:52px;height:52px;border-radius:14px;flex-shrink:0;
+    background:rgba(34,197,94,0.12);color:var(--ok);
+    display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+  }
+  .enc-head h3{font-size:1.15rem;font-weight:800;}
+  .enc-box p{color:#d7d9ee;font-size:0.92rem;line-height:1.9;}
+  .enc-box p strong{color:#fff;}
+  .enc-tags{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+  .enc-tag{
+    display:flex;align-items:center;gap:6px;
+    background:rgba(255,255,255,0.05);border:1px solid var(--panel-border);
+    padding:6px 12px;border-radius:8px;font-size:0.78rem;color:var(--text-muted);
+  }
+  .enc-tag i{color:var(--ok);}
+
+  /* ---------- Requirements table ---------- */
+  .req-table{
+    width:100%;border-collapse:collapse;
+    background:var(--panel);border:1px solid var(--panel-border);
+    border-radius:16px;overflow:hidden;
+  }
+  .req-table th{
+    background:linear-gradient(135deg,var(--indigo-2),var(--indigo));
+    color:#fff;font-size:0.9rem;font-weight:700;
+    padding:14px 20px;text-align:start;
+  }
+  .req-table td{
+    padding:14px 20px;font-size:0.88rem;color:var(--text-muted);
+    border-top:1px solid var(--panel-border);
+  }
+  .req-table td:first-child{color:var(--text);font-weight:700;width:220px;}
+
+  /* ---------- License ---------- */
+  .license-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+  .license-card{
+    background:var(--panel);border:1px solid var(--panel-border);
+    border-top:3px solid var(--amber);
+    border-radius:16px;padding:26px;text-align:center;
+  }
+  .license-card i{font-size:1.6rem;color:var(--amber);margin-bottom:14px;}
+  .license-card h4{font-size:1rem;font-weight:700;margin-bottom:8px;}
+  .license-card p{color:var(--text-muted);font-size:0.85rem;line-height:1.8;}
+
+  /* ---------- IP legal box ---------- */
+  .legal-box{
+    max-width:900px;margin:0 auto;
+    background:rgba(239,68,68,0.06);
+    border:1px solid rgba(239,68,68,0.35);
+    border-radius:18px;padding:28px 32px;
+  }
+  .legal-head{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+  .legal-head i{color:var(--danger);font-size:1.3rem;}
+  .legal-head h3{font-size:1.05rem;font-weight:800;}
+  .legal-box p{color:#d7d9ee;font-size:0.88rem;line-height:1.9;}
+  .legal-box p strong{color:#fff;}
+
+  /* ---------- Contact ---------- */
+  .contact-card{
+    max-width:640px;margin:0 auto;text-align:center;
+    background:var(--panel);border:1px solid var(--panel-border);
+    border-radius:20px;padding:40px 30px;
+  }
+  .contact-card .dev-name{font-size:1.3rem;font-weight:800;margin-bottom:4px;}
+  .contact-card .dev-sub{color:var(--text-muted);font-size:0.9rem;margin-bottom:24px;}
+  .contact-links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+  .contact-pill{
+    display:flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,0.05);border:1px solid var(--panel-border);
+    padding:10px 18px;border-radius:12px;font-size:0.85rem;text-decoration:none;color:var(--text);
+    transition:all .2s ease;
+  }
+  .contact-pill i{color:var(--amber);}
+  .contact-pill:hover{border-color:var(--amber);transform:translateY(-2px);}
+
+  /* ---------- Footer ---------- */
+  footer{
+    border-top:1px solid var(--panel-border);
+    padding:34px 20px;text-align:center;
+  }
+  footer img{width:38px;height:38px;border-radius:10px;margin:0 auto 12px;}
+  footer p{color:var(--text-muted);font-size:0.85rem;font-weight:600;}
+
+  @media (max-width:760px){
+    .features-grid{grid-template-columns:1fr;}
+    .license-grid{grid-template-columns:1fr;}
+    .req-table td:first-child{width:auto;}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="brand"><img src="mvlogo.png" alt="MikroVault"> MikroVault</div>
+    <div class="nav-links">
+      <a href="#features">المميزات</a>
+      <a href="#how-to">طريقة الاستخدام</a>
+      <a href="#license">الترخيص</a>
+      <a href="#contact">التواصل</a>
+    </div>
+    <a href="#contact" class="nav-cta">جرّب 7 أيام مجانًا</a>
+  </div>
+</nav>
+
+<!-- ================= Hero ================= -->
+<header class="hero">
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <span class="eyebrow"><i class="fa-solid fa-crown"></i> برنامج مدفوع — MusaleM for Software</span>
+      <h1>MikroVault</h1>
+      <h2>النظام الرسمي لحماية وتشفير صفحات الهوتسبوت الخاصة بك</h2>
+      <p>أداة سطح مكتب متطورة صُممت خصيصًا لمزودي خدمات الإنترنت ومصممي الشبكات، لحماية صفحات تسجيل الدخول (Hotspot) الخاصة بأجهزة MikroTik. يقفل البرنامج صفحاتك ويحميها من السرقة أو إعادة الاستخدام غير المصرح به، ليضمن حفظ حقوقك المادية والفكرية وتوزيع أعمالك بأمان تام.</p>
+
+      <div class="badges">
+        <span class="badge"><i class="fa-brands fa-windows"></i> Windows 7 / 8 / 10 / 11</span>
+        <span class="badge"><i class="fa-solid fa-server"></i> جميع أجهزة MikroTik RouterOS</span>
+      </div>
+
+      <div class="hero-actions">
+        <a href="#contact" class="btn btn-primary"><i class="fa-solid fa-download"></i> تحميل النسخة التجريبية</a>
+        <a href="#contact" class="btn btn-ghost"><i class="fa-brands fa-whatsapp"></i> تواصل للشراء</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img src="mvlogo.png" alt="شعار MikroVault">
+    </div>
+  </div>
+</header>
+
+<!-- ================= Why ================= -->
+<section>
+  <div class="container">
+    <div class="why-box">
+      <i class="fa-solid fa-lightbulb"></i>
+      <p>عندما تصمم صفحة هوتسبوت مميزة لعميل معين، <strong style="color:#fff;">يمنع MikroVault العميل من نسخ الصفحة وتوزيعها لشبكات أخرى</strong>، ويضمن لك تقاضي مقابل عادل عن كل شبكة تُشغّل تصميمك.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Features ================= -->
+<section id="features">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">المميزات</span>
+      <h2>أبرز الحمايات التي يقدمها البرنامج</h2>
+      <p>كل ما تحتاجه لحماية تصميمك وحقوقك من النسخ والتعديل غير المصرح به.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-code"></i></div>
+        <h3>الحماية من التعديل والنسخ</h3>
+        <p>يقوم البرنامج بخلط وتعتيم كافة النصوص والأكواد الداخلية لصفحة الهوتسبوت، مما يجعل قراءتها أو تعديلها من قبل الآخرين أمرًا غير ممكن.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-link"></i></div>
+        <h3>الربط المباشر بالراوتر</h3>
+        <p>يمكنك ربط الصفحة برقم أو اسم راوتر معين، بحيث لا تعمل الصفحة إطلاقًا إذا تم نقلها إلى راوتر آخر أو شبكة منافسة.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-palette"></i></div>
+        <h3>محرر صفحات مرن ومتكامل</h3>
+        <p>يحتوي البرنامج على محرر مدمج يتيح لك معاينة الصفحات، وتعديل الأحجام، واختيار الألوان المناسبة لرؤية الكود بوضوح تام.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-floppy-disk"></i></div>
+        <h3>حفظ تلقائي للإعدادات</h3>
+        <p>يحفظ البرنامج خياراتك التفضيلية وطريقة الحماية التي تفضلها تلقائيًا، لاسترجاعها فور تشغيل البرنامج في كل مرة.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Screenshot ================= -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">لقطة من الداخل</span>
+      <h2>واجهة البرنامج</h2>
+    </div>
+    <div class="screenshot-frame">
+      <div class="screenshot-topbar"><span></span><span></span><span></span></div>
+      <img src="screenshot/mvscreen.png" alt="لقطة شاشة من برنامج MikroVault"
+           onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="screenshot-fallback">ضع لقطة شاشة البرنامج في: screenshot/mvscreen.png</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= How to ================= -->
+<section id="how-to">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">خطوة بخطوة</span>
+      <h2>طريقة الاستخدام</h2>
+    </div>
+    <div class="timeline">
+      <div class="t-item">
+        <div class="t-num">١</div>
+        <div class="t-content">
+          <h4>تحميل ملفات الصفحة</h4>
+          <p>من التبويب الرئيسي، اختر مجلد صفحة الهوتسبوت الخاصة بك من جهاز الكمبيوتر.</p>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-num">٢</div>
+        <div class="t-content">
+          <h4>تحديد خيارات الحماية والتعتيم</h4>
+          <p>اذهب إلى تبويب "خيارات الحماية"، وفعّل خيارات إخفاء النصوص وتشفير البيانات لضمان أعلى مستوى حماية.</p>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-num">٣</div>
+        <div class="t-content">
+          <h4>قفل الصفحة براوتر معين (اختياري)</h4>
+          <p>ادخل إلى تبويب "قفل الهوية"، وأدخل اسم أو معرف الراوتر المسموح له بتشغيل الصفحة فقط.</p>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-num">٤</div>
+        <div class="t-content">
+          <h4>تحديد إجراء عند المخالفة</h4>
+          <p>اختر ما يحدث إذا حاول شخص تشغيل الصفحة على راوتر غير مرخص: عرض رسالة تنبيه، إظهار صفحة فارغة، أو التحويل لرابط خاص بك.</p>
+        </div>
+      </div>
+      <div class="t-item">
+        <div class="t-num">٥</div>
+        <div class="t-content">
+          <h4>التوليد والحفظ</h4>
+          <p>اضغط على زر "توليد الصفحة المحمية"، ثم عاينها واحفظ المجلد النهائي الجاهز للرفع على جهاز MikroTik.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Encryption-only notice ================= -->
+<section>
+  <div class="container">
+    <div class="enc-box">
+      <div class="enc-head">
+        <div class="enc-icon"><i class="fa-solid fa-lock"></i></div>
+        <h3>تشفير فقط — بلا أي إمكانية لفك التشفير</h3>
+      </div>
+      <p>
+        <strong>MikroVault مصمم من الأساس ليكون أداة تشفير باتجاه واحد فقط:</strong> يحوّل صفحتك إلى نسخة محمية ومُعتّمة، ولا يحتوي إطلاقًا على أي خاصية لفك التشفير أو إلغاء الحماية عن أي صفحة — لا صفحتك، ولا صفحة أي مستخدم آخر.
+        <br><br>
+        هذا ليس نقصًا في البرنامج، بل <strong>قرار حماية مقصود</strong>: فحتى لو وصلت نسخة من البرنامج إلى يد طرف آخر، لن يتمكن أبدًا من فك حماية أي صفحة مشفّرة به — مما يحمي حقوقك وحقوق كل مصمم آخر يستخدم النظام على حد سواء.
+      </p>
+      <div class="enc-tags">
+        <span class="enc-tag"><i class="fa-solid fa-circle-check"></i> تشفير باتجاه واحد فقط</span>
+        <span class="enc-tag"><i class="fa-solid fa-circle-check"></i> لا توجد خاصية فك تشفير داخل البرنامج</span>
+        <span class="enc-tag"><i class="fa-solid fa-circle-check"></i> حماية لك ولكل مستخدمي البرنامج</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Requirements ================= -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">قبل التثبيت</span>
+      <h2>متطلبات تشغيل البرنامج</h2>
+    </div>
+    <table class="req-table">
+      <tr><th>المتطلب</th><th>الوصف والحد الأدنى</th></tr>
+      <tr><td>نظام التشغيل</td><td>Windows 7 / Windows 8 / Windows 10 / Windows 11</td></tr>
+      <tr><td>شاشة العرض</td><td>دقة 1024×768 أو أعلى للحصول على أفضل تجربة واجهة</td></tr>
+      <tr><td>نوع الشبكات المدعومة</td><td>جميع أجهزة شبكات MikroTik RouterOS التي تدعم نظام الهوتسبوت</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ================= License ================= -->
+<section id="license">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">الترخيص</span>
+      <h2>نظام الترخيص وتفعيل البرنامج</h2>
+      <p>برنامج MikroVault مدفوع وغير مجاني، ومحمي بنظام ترخيص رقمي خاص بـ MusaleM for Software.</p>
+    </div>
+    <div class="license-grid">
+      <div class="license-card">
+        <i class="fa-solid fa-hourglass-half"></i>
+        <h4>الفترة التجريبية</h4>
+        <p>تمنحك 7 أيام لتجربة كافة خصائص البرنامج قبل الشراء، لتضمن ملاءمته لاحتياجاتك.</p>
+      </div>
+      <div class="license-card">
+        <i class="fa-solid fa-desktop"></i>
+        <h4>رمز الجهاز الفريد</h4>
+        <p>يرتبط ترخيص البرنامج بجهاز الكمبيوتر الخاص بك، ولا يمكن نقل الترخيص لجهاز آخر بدون مراجعة الدعم.</p>
+      </div>
+      <div class="license-card">
+        <i class="fa-solid fa-key"></i>
+        <h4>مفتاح التفعيل</h4>
+        <p>يصدر لك مفتاح تفعيل خاص بعد إتمام عملية الشراء لفتح النسخة الكاملة بشكل دائم.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= IP legal ================= -->
+<section>
+  <div class="container">
+    <div class="legal-box">
+      <div class="legal-head">
+        <i class="fa-solid fa-scale-balanced"></i>
+        <h3>حقوق الطبع والملكية الفكرية</h3>
+      </div>
+      <p>
+        جميع الحقوق محفوظة لصالح <strong>مصطفى شاهين (MusaleM for Software) © 2026</strong>.
+        يُحظر تمامًا هندسة البرنامج عكسيًا، أو إعادة توزيعه، أو تزوير مفاتيح التفعيل بأي شكل من الأشكال.
+        أي استخدام غير مصرح به يحرم المستخدم من الدعم والتحديثات، ويُعرّضه للمساءلة القانونية بموجب قوانين حماية الملكية الفكرية.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= Contact ================= -->
+<section id="contact">
+  <div class="container">
+    <div class="contact-card">
+      <div class="dev-name">مصطفى شاهين</div>
+      <div class="dev-sub">المطوّر المسؤول — MusaleM for Software</div>
+      <div class="contact-links">
+        <a href="mailto:m.shaheenx@gmail.com" class="contact-pill"><i class="fa-solid fa-envelope"></i> m.shaheenx@gmail.com</a>
+        <a href="tel:+201223084810" class="contact-pill"><i class="fa-solid fa-phone"></i> 00201223084810</a>
+        <a href="https://wa.me/201223084810" target="_blank" rel="noopener" class="contact-pill"><i class="fa-brands fa-whatsapp"></i> واتساب مباشر</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <img src="mvlogo.png" alt="MikroVault">
+  <p>© 2026 مصطفى شاهين — MusaleM for Software — جميع الحقوق محفوظة</p>
+</footer>
+
+</body>
+</html>
