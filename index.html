@@ -498,7 +498,12 @@ header p {
     color: #e2e8f0;
     backdrop-filter: blur(10px);
     transition: 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
 }
+
+.feature-pill i { color: var(--green); font-size: 14px; }
 
 .feature-pill:hover {
     background: rgba(56, 189, 248, 0.15);
@@ -524,15 +529,15 @@ header p {
 }
 
 .support-icon-circle {
-    width: 92px;
-    height: 92px;
+    width: 104px;
+    height: 104px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid var(--glass-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2.4rem;
+    font-size: 3.4rem;
     color: #e2e8f0;
     transition: all 0.3s ease;
 }
@@ -562,6 +567,17 @@ header p {
     border-color: #229ED9;
     background: rgba(34, 158, 217, 0.2);
     box-shadow: 0 18px 34px rgba(34, 158, 217, 0.3);
+}
+
+.support-item-icon.email .support-icon-circle {
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.35);
+    background: rgba(248, 113, 113, 0.1);
+}
+.support-item-icon.email:hover .support-icon-circle {
+    border-color: #f87171;
+    background: rgba(248, 113, 113, 0.2);
+    box-shadow: 0 18px 34px rgba(248, 113, 113, 0.3);
 }
 
 .support-item-icon span {
@@ -660,7 +676,7 @@ footer {
     .banner-title-wrapper { justify-content: center; }
     .banner-btn { width: 100%; }
     .support-links { gap: 22px; }
-    .support-icon-circle { width: 80px; height: 80px; font-size: 2.1rem; }
+    .support-icon-circle { width: 90px; height: 90px; font-size: 2.9rem; }
     .orb-1 { width: 280px; height: 280px; }
     .orb-2 { width: 320px; height: 320px; }
     .orb-3 { width: 220px; height: 220px; }
@@ -675,7 +691,7 @@ footer {
     .card h2 { font-size: 21px; }
     .banner-title-wrapper h2 { font-size: 21px; }
     .btn { font-size: 14px; padding: 12px 16px; }
-    .support-icon-circle { width: 70px; height: 70px; font-size: 1.8rem; }
+    .support-icon-circle { width: 78px; height: 78px; font-size: 2.5rem; }
     .support-links { gap: 18px; }
     .footer-sub { font-size: 12.5px; }
 }
@@ -797,10 +813,10 @@ footer {
     <p class="section-sub">تنطبق تحديدًا على برنامجَي توليد كروت الهوتسبوت — وليست خاصة بميكروفولت أو ستوديو</p>
 
     <div class="features-grid">
-        <div class="feature-pill">✔️ يدعم جميع إصدارات مايكروتك</div>
-        <div class="feature-pill">✔️ لا يوجد حد لعدد السيرفرات أو الراوترات</div>
-        <div class="feature-pill">✔️ مناسب للفنيين وشركات الإنترنت والمستخدمين الأفراد</div>
-        <div class="feature-pill">✔️ العمل على عدد غير محدود من راوترات مايكروتك دون أي قيود</div>
+        <div class="feature-pill"><i class="fa-solid fa-check"></i> يدعم جميع إصدارات مايكروتك</div>
+        <div class="feature-pill"><i class="fa-solid fa-check"></i> لا يوجد حد لعدد السيرفرات أو الراوترات</div>
+        <div class="feature-pill"><i class="fa-solid fa-check"></i> مناسب للفنيين وشركات الإنترنت والمستخدمين الأفراد</div>
+        <div class="feature-pill"><i class="fa-solid fa-check"></i> العمل على عدد غير محدود من راوترات مايكروتك دون أي قيود</div>
     </div>
 </div>
 
@@ -817,7 +833,7 @@ footer {
         <p class="banner-note">🚀 المشروع حاليًا تجريبي وقيد التطوير المستمر.</p>
     </div>
     <div>
-        <a href="https://mikrotik-artisan.lovable.app" target="_blank" class="btn indigo banner-btn">جــرّبه الآن</a>
+        <a href="studio.html" class="btn indigo banner-btn">استعرض التفاصيل</a>
     </div>
 </div>
 
@@ -849,6 +865,10 @@ footer {
         <a href="https://t.me/EasyVouch" target="_blank" rel="noopener" class="support-item-icon telegram">
             <span class="support-icon-circle"><i class="fa-brands fa-telegram"></i></span>
             <span>تيليجرام</span>
+        </a>
+        <a href="mailto:m.shaheenx@gmail.com" class="support-item-icon email">
+            <span class="support-icon-circle"><i class="fa-solid fa-envelope"></i></span>
+            <span>البريد الإلكتروني</span>
         </a>
     </div>
 </div>
