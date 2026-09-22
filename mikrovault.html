@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MikroVault — نظام حماية وتشفير صفحات الهوتسبوت</title>
+<link rel="icon" type="image/png" href="mvlogo.png">
+<link rel="shortcut icon" type="image/png" href="mvlogo.png">
+<link rel="apple-touch-icon" href="mvlogo.png">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -310,6 +313,39 @@
     .features-grid{grid-template-columns:1fr;}
     .license-grid{grid-template-columns:1fr;}
     .req-table td:first-child{width:auto;}
+
+    .nav-inner{padding:12px 16px;}
+    .nav-links{gap:14px 18px;order:3;width:100%;justify-content:center;padding-top:10px;border-top:1px solid var(--panel-border);}
+    .nav-links a{font-size:0.82rem;}
+    .nav-cta{font-size:0.8rem;padding:8px 14px;}
+
+    .hero{padding:44px 0 34px;}
+    .hero-inner{gap:30px;}
+    .hero-text{min-width:0;flex-basis:100%;}
+    .hero-visual{min-width:0;flex-basis:100%;order:-1;}
+    .hero-visual img{width:150px;height:150px;}
+    .hero-actions{flex-direction:column;}
+    .hero-actions .btn{width:100%;justify-content:center;}
+
+    section{padding:40px 0;}
+    .why-box{padding:22px 20px;flex-direction:column;text-align:center;}
+    .why-box i{margin:0 auto;}
+
+    .enc-box{padding:24px 20px;}
+    .enc-head{flex-direction:column;text-align:center;}
+    .legal-box{padding:22px 20px;}
+    .legal-head{flex-direction:column;text-align:center;}
+
+    .contact-card{padding:30px 20px;}
+    .contact-links{flex-direction:column;align-items:stretch;}
+    .contact-pill{justify-content:center;word-break:break-word;}
+  }
+
+  @media (max-width:420px){
+    .hero h1{font-size:2rem;}
+    .badges{flex-direction:column;align-items:flex-start;}
+    .req-table th, .req-table td{padding:11px 14px;font-size:0.82rem;}
+    .footer p{font-size:0.78rem;}
   }
 </style>
 </head>
