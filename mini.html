@@ -3,548 +3,437 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link rel="sitemap" type="application/xml" href="/sitemap.xml">
 
 <title>إيزي فوش ميني</title>
+<link rel="icon" type="image/png" href="mini.png">
+<link rel="shortcut icon" type="image/png" href="mini.png">
+<link rel="apple-touch-icon" href="mini.png">
 
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
 
 <style>
 :root {
-    --main: #38bdf8;
-    --main-hover: #0284c7;
-    --bg: #030712;
-    --glass-bg: rgba(255, 255, 255, 0.04);
+    --dark: #2A428C;
+    --accent: #3C58A0;
+    --light: #BEC8F7;
+    --bg: #05070f;
+    --glass-bg: rgba(255, 255, 255, 0.045);
+    --glass-strong: rgba(255, 255, 255, 0.075);
     --glass-border: rgba(255, 255, 255, 0.12);
     --glass-border-light: rgba(255, 255, 255, 0.25);
     --glass-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     --text-primary: #f8fafc;
-    --text-muted: #94a3b8;
+    --text-muted: #c2cbef;
 }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
-    margin: 0;
     font-family: 'Cairo', sans-serif;
     background-color: var(--bg);
+    background-image:
+        radial-gradient(circle at 15% 0%, rgba(42, 66, 140, 0.38), transparent 45%),
+        radial-gradient(circle at 90% 12%, rgba(190, 200, 247, 0.12), transparent 40%),
+        radial-gradient(circle at 50% 100%, rgba(60, 88, 160, 0.32), transparent 50%);
     color: var(--text-primary);
-    padding: 40px 20px;
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+    line-height: 1.75;
 }
 
-/* Background Architecture (Animated Orbs) */
-.background-orbs {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -2;
-    overflow: hidden;
-    pointer-events: none;
-}
+.container { max-width: 1160px; margin: 0 auto; padding: 0 22px; }
+a { color: inherit; }
+img { max-width: 100%; display: block; }
 
-.orb {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(90px);
-    opacity: 0.5;
-    animation: floatOrb 18s ease-in-out infinite alternate;
-}
-
-.orb-1 {
-    top: -10%;
-    right: 10%;
-    width: 450px;
-    height: 450px;
-    background: radial-gradient(circle, #38bdf8 0%, #0284c7 100%);
-    animation-duration: 16s;
-}
-
-.orb-2 {
-    bottom: -15%;
-    left: -5%;
-    width: 550px;
-    height: 550px;
-    background: radial-gradient(circle, #6366f1 0%, #4338ca 100%);
-    animation-duration: 22s;
-}
-
-.orb-3 {
-    top: 40%;
-    left: 30%;
-    width: 350px;
-    height: 350px;
-    background: radial-gradient(circle, #a855f7 0%, #7e22ce 100%);
-    animation-duration: 19s;
-}
-
+/* Background Orbs */
+.background-orbs { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -2; overflow: hidden; pointer-events: none; }
+.orb { position: absolute; border-radius: 50%; filter: blur(90px); opacity: 0.5; animation: floatOrb 18s ease-in-out infinite alternate; }
+.orb-1 { top: -10%; right: 10%; width: 450px; height: 450px; background: radial-gradient(circle, #3C58A0 0%, #2A428C 100%); animation-duration: 16s; }
+.orb-2 { bottom: -15%; left: -5%; width: 550px; height: 550px; background: radial-gradient(circle, #BEC8F7 0%, #3C58A0 100%); animation-duration: 22s; }
+.orb-3 { top: 40%; left: 30%; width: 350px; height: 350px; background: radial-gradient(circle, #2A428C 0%, #101a40 100%); animation-duration: 19s; }
 @keyframes floatOrb {
     0% { transform: translate(0, 0) scale(1); }
     50% { transform: translate(60px, 80px) scale(1.15); }
     100% { transform: translate(-40px, -50px) scale(0.9); }
 }
 
-/* Mouse Glow Trail */
 .mouse-glow {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 350px;
-    height: 350px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-    z-index: -1;
+    position: fixed; top: 0; left: 0; width: 350px; height: 350px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(60, 88, 160, 0.18) 0%, rgba(0,0,0,0) 70%);
+    pointer-events: none; transform: translate(-50%, -50%); z-index: -1;
     transition: width 0.3s, height 0.3s;
 }
 
-/* Container */
-.container {
-    max-width: 900px;
-    margin: auto;
+/* ---------- Nav ---------- */
+nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(5, 7, 15, 0.75);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--glass-border);
+}
+.nav-inner {
+    max-width: 1160px; margin: 0 auto; padding: 14px 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.1rem; text-decoration: none; }
+.brand img { width: 34px; height: 34px; border-radius: 9px; }
+.nav-links { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+.nav-links a { font-size: 0.9rem; color: var(--text-muted); text-decoration: none; font-weight: 600; transition: color .2s ease; }
+.nav-links a:hover { color: var(--light); }
+.nav-cta {
+    background: linear-gradient(135deg, var(--light), var(--accent));
+    color: #0a0d1f; font-weight: 800; font-size: 0.85rem;
+    padding: 9px 18px; border-radius: 10px; text-decoration: none;
+    box-shadow: 0 4px 16px rgba(60, 88, 160, 0.35);
+    white-space: nowrap;
 }
 
-/* Header Title */
-h1 {
-    text-align: center;
-    font-size: 48px;
-    font-weight: 800;
-    margin: 0 0 10px 0;
-    background: linear-gradient(135deg, #ffffff 0%, #38bdf8 50%, #818cf8 100%);
+/* ---------- Hero ---------- */
+.hero { padding: 60px 0 44px; }
+.hero-inner { display: flex; align-items: center; gap: 46px; flex-wrap: wrap; }
+.hero-text { flex: 1.2; min-width: 300px; }
+.hero-visual { flex: 1; min-width: 220px; display: flex; justify-content: center; }
+.hero-visual img { width: 220px; height: 220px; object-fit: contain; filter: drop-shadow(0 20px 50px rgba(60, 88, 160, 0.5)); animation: float 5s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-14px); } }
+
+.eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    padding: 6px 14px; border-radius: 20px;
+    font-size: 0.78rem; color: var(--light); font-weight: 700; margin-bottom: 18px;
+}
+.hero h1 {
+    font-size: clamp(2rem,5vw,3rem); font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, var(--light) 50%, var(--accent) 100%);
     background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
     animation: shimmer 6s linear infinite;
-    letter-spacing: -1px;
+    margin-bottom: 8px; line-height: 1.2;
 }
+@keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
+.hero h2 { font-size: clamp(1.05rem,2.2vw,1.3rem); font-weight: 700; color: var(--light); margin-bottom: 16px; }
+.hero p { color: var(--text-muted); font-size: 1rem; max-width: 600px; margin-bottom: 26px; }
 
-@keyframes shimmer {
-    0% { background-position: 0% center; }
-    100% { background-position: 200% center; }
-}
-
-/* Intro highlight */
-.intro {
-    text-align: center;
-    color: var(--main);
-    font-size: 20px;
-    font-weight: 700;
-    margin-bottom: 35px;
-    text-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
-}
-
-/* Box System (Glassmorphism) */
-.box {
-    background: var(--glass-bg);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    padding: 30px;
-    border-radius: 24px;
-    margin-top: 25px;
-    line-height: 1.9;
-    border: 1px solid var(--glass-border);
-    border-top: 1px solid var(--glass-border-light);
-    border-left: 1px solid var(--glass-border-light);
-    box-shadow: var(--glass-shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-}
-
-.box:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(56, 189, 248, 0.15);
-    border-color: rgba(56, 189, 248, 0.3);
-}
-
-/* Section title */
-h3 {
-    color: var(--main);
-    font-size: 22px;
-    font-weight: 700;
-    margin-top: 0;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.box p {
-    color: #e2e8f0;
-    font-size: 16px;
-    margin: 0 0 10px 0;
-}
-
-.box p:last-child {
-    margin-bottom: 0;
-}
-
-/* Button */
+.hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
 .btn {
-    display: inline-block;
-    margin-top: 25px;
-    padding: 13px 28px;
-    background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-    color: #030712;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 15px;
-    transition: all 0.3s ease;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 15px rgba(56, 189, 248, 0.25);
-    position: relative;
-    overflow: hidden;
+    display: inline-flex; align-items: center; gap: 8px;
+    font-weight: 800; font-size: 0.95rem;
+    padding: 13px 26px; border-radius: 12px; text-decoration: none;
+    cursor: pointer; border: none;
+    transition: transform .15s ease, box-shadow .2s ease;
+    position: relative; overflow: hidden;
 }
+.btn:hover { transform: translateY(-2px); }
+.btn-primary {
+    background: linear-gradient(135deg, var(--light), var(--accent));
+    color: #0a0d1f; box-shadow: 0 6px 22px rgba(60, 88, 160, 0.4);
+}
+.btn-ghost { background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); }
+.btn-ghost:hover { border-color: var(--light); }
 
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-    transition: 0.5s;
-}
+/* ---------- Sections ---------- */
+section { padding: 54px 0; }
+.section-head { text-align: center; max-width: 680px; margin: 0 auto 36px; }
+.section-tag { color: var(--light); font-weight: 800; font-size: 0.8rem; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 10px; display: block; }
+.section-head h2 { font-size: clamp(1.4rem,3vw,1.9rem); font-weight: 800; margin-bottom: 10px; }
+.section-head p { color: var(--text-muted); font-size: 0.92rem; }
 
-.btn:hover::before {
-    left: 100%;
+.highlight-line {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    border-right: 3px solid var(--light);
+    border-radius: 12px; padding: 13px 18px;
+    max-width: 580px; margin-bottom: 26px;
 }
+.highlight-line i { color: var(--light); font-size: 1.15rem; flex-shrink: 0; }
+.highlight-line span { color: var(--text-primary); font-size: 0.92rem; font-weight: 600; line-height: 1.7; }
 
-.btn:hover {
-    transform: translateY(-2px) scale(1.03);
-    box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4);
-    color: #000;
+/* Feature cards */
+.features-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; }
+.feature-card {
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    border-radius: 18px; padding: 24px;
+    transition: transform .25s ease, border-color .25s ease, background .25s ease;
 }
+.feature-card:hover { transform: translateY(-4px); border-color: rgba(60,88,160,0.55); background: var(--glass-strong); }
+.feature-icon {
+    width: 50px; height: 50px; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(60,88,160,0.4), rgba(42,66,140,0.4));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.25rem; color: var(--light); margin-bottom: 14px;
+}
+.feature-card h3 { font-size: 1.02rem; font-weight: 700; margin-bottom: 8px; }
+.feature-card p { color: var(--text-muted); font-size: 0.89rem; line-height: 1.9; }
 
-/* ================= VIDEO ================= */
-.video-box {
-    background: var(--glass-bg);
-    padding: 25px;
+/* Media frame (video + gallery wrapper look) */
+.media-frame {
+    max-width: 920px; margin: 0 auto;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    border-radius: 18px; overflow: hidden; box-shadow: var(--glass-shadow);
 }
+.media-topbar { display: flex; gap: 6px; padding: 12px 16px; background: rgba(255,255,255,0.04); border-bottom: 1px solid var(--glass-border); }
+.media-topbar span { width: 11px; height: 11px; border-radius: 50%; background: #4b5065; }
+.media-topbar span:nth-child(1){ background:#ef4444; }
+.media-topbar span:nth-child(2){ background:#f59e0b; }
+.media-topbar span:nth-child(3){ background:#22c55e; }
+.media-body { padding: 18px; }
 
 .video-wrapper {
-    position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
-    overflow: hidden;
-    border-radius: 16px;
-    border: 1px solid var(--glass-border-light);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
+    border-radius: 14px; border: 1px solid var(--glass-border-light);
 }
-
-.video-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-}
+.video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
 /* Gallery */
-.gallery {
-    margin-top: 25px;
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-    gap: 16px;
-}
-
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 14px; }
 .gallery img {
-    width: 100%;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 14px;
-    cursor: pointer;
+    width: 100%; height: 120px; object-fit: cover; border-radius: 12px; cursor: pointer;
     border: 1px solid var(--glass-border);
     transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-
 .gallery img:hover {
-    transform: scale(1.06) translateY(-4px);
-    border-color: rgba(56, 189, 248, 0.5);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(56, 189, 248, 0.3);
+    transform: scale(1.05) translateY(-3px);
+    border-color: rgba(190, 200, 247, 0.55);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5), 0 0 20px rgba(60, 88, 160, 0.4);
 }
 
 /* Lightbox */
 .lightbox {
-    position: fixed;
-    inset: 0;
-    background: rgba(3, 7, 18, 0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-    padding: 20px;
+    position: fixed; inset: 0; background: rgba(5, 7, 15, 0.92);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    display: none; justify-content: center; align-items: center; z-index: 9999; padding: 20px;
 }
-
 .lightbox img {
-    max-width: 90%;
-    max-height: 90vh;
-    border-radius: 16px;
+    max-width: 90%; max-height: 90vh; border-radius: 16px;
     border: 1px solid var(--glass-border-light);
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 40px rgba(56, 189, 248, 0.2);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.8), 0 0 40px rgba(60, 88, 160, 0.3);
     animation: zoomIn 0.3s ease;
 }
+@keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-@keyframes zoomIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+/* Back row */
+.back-row { text-align: center; margin-top: 10px; }
+.back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.9rem; color: var(--text-muted); text-decoration: none;
+    transition: color .2s ease;
 }
+.back-link:hover { color: var(--light); }
 
-/* Glassmorphism Loader */
+/* Footer */
+footer { border-top: 1px solid var(--glass-border); padding: 34px 20px; text-align: center; margin-top: 30px; }
+footer img { width: 40px; height: 40px; border-radius: 10px; margin: 0 auto 12px; opacity: .9; }
+footer p { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
+
+/* Loader */
 .loader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(3, 7, 18, 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(5, 7, 15, 0.88); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    display: flex; justify-content: center; align-items: center; z-index: 9999;
     transition: opacity 0.5s ease, visibility 0.5s ease;
 }
-
 .loader span {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(56, 189, 248, 0.2);
-    border-top: 4px solid var(--main);
-    border-radius: 50%;
+    width: 50px; height: 50px; border: 4px solid rgba(60, 88, 160, 0.25);
+    border-top: 4px solid var(--light); border-radius: 50%;
     animation: spin 0.9s cubic-bezier(0.53, 0.21, 0.29, 0.67) infinite;
-    box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    box-shadow: 0 0 20px rgba(60, 88, 160, 0.4);
 }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+    .nav-inner { padding: 12px 16px; }
+    .nav-links { gap: 14px 18px; order: 3; width: 100%; justify-content: center; padding-top: 10px; border-top: 1px solid var(--glass-border); }
+    .nav-links a { font-size: 0.82rem; }
+    .nav-cta { font-size: 0.8rem; padding: 8px 14px; }
 
-/* Mobile */
-@media(max-width:600px){
-    body { padding: 25px 12px; }
-    h1 { font-size: 36px; }
-    .intro { font-size: 17px; }
-    .box { padding: 20px; border-radius: 18px; }
-    .gallery {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
-        gap: 10px;
-    }
-    .gallery img { height: 90px; }
+    .hero { padding: 40px 0 30px; }
+    .hero-inner { gap: 26px; }
+    .hero-text { min-width: 0; flex-basis: 100%; }
+    .hero-visual { min-width: 0; flex-basis: 100%; order: -1; }
+    .hero-visual img { width: 140px; height: 140px; }
+    .hero-actions { flex-direction: column; }
+    .hero-actions .btn { width: 100%; justify-content: center; }
+    .highlight-line { max-width: 100%; flex-wrap: wrap; }
+
+    section { padding: 36px 0; }
+    .why-box { padding: 20px; flex-direction: column; text-align: center; }
+    .why-box i { margin: 0 auto; }
+    .features-grid { grid-template-columns: 1fr; }
+
+    .gallery { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+    .gallery img { height: 92px; }
+
     .orb-1 { width: 280px; height: 280px; }
     .orb-2 { width: 320px; height: 320px; }
     .orb-3 { width: 220px; height: 220px; }
     .mouse-glow { display: none; }
+}
+
+@media (max-width: 420px) {
+    .hero h1 { font-size: 1.8rem; }
+    .hero h2 { font-size: 1rem; }
+    .media-body { padding: 12px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- Background Orbs -->
 <div class="background-orbs">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
     <div class="orb orb-3"></div>
 </div>
 
-<!-- Mouse Glow Trail -->
 <div class="mouse-glow" id="mouseGlow"></div>
 
-<!-- Loader -->
-<div class="loader" id="loader">
-    <span></span>
-</div>
+<div class="loader" id="loader"><span></span></div>
 
-<div class="container">
+<nav>
+  <div class="nav-inner">
+    <a href="index.html" class="brand"><img src="mini.png" alt="إيزي فوش ميني"> إيزي فوش ميني</a>
+    <div class="nav-links">
+      <a href="#features">المميزات</a>
+      <a href="#video">الفيديو</a>
+      <a href="#gallery">الصور</a>
+    </div>
+    <a href="index.html#miniDownload" class="nav-cta">⬇ تحميل التجربة</a>
+  </div>
+</nav>
 
-<h1>⚡ إيزي فوش ميني</h1>
+<!-- ================= Hero ================= -->
+<header class="hero">
+  <div class="container hero-inner">
+    <div class="hero-text">
+      <span class="eyebrow"><i class="fa-solid fa-bolt"></i> إيزي فوش ميني</span>
+      <h1>⚡ إيزي فوش ميني</h1>
+      <h2>إدارة احترافية لشبكات MikroTik بسرعة واستقرار أعلى</h2>
+      <p>
+        إيزي فوش ميني هو برنامج احترافي لإدارة وإنشاء كروت المايكروتك، يدعم أنظمة الهوتسبوت – يوزرمانجر – برودباند، ويمنحك تحكمًا كاملاً في الشبكات بسهولة ومرونة عالية.
+      </p>
+      <div class="highlight-line">
+        <i class="fa-solid fa-gauge-high"></i>
+        <span>يعمل بسرعة عالية ويتيح إدارة كاملة للكروت والباقات مع أدوات فحص وتهيئة متقدمة — بلا أي تعقيد.</span>
+      </div>
+      <div class="hero-actions">
+        <a href="index.html#miniDownload" class="btn btn-primary"><i class="fa-solid fa-download"></i> تحميل النسخة التجريبية</a>
+        <a href="index.html" class="btn btn-ghost"><i class="fa-solid fa-house"></i> العودة للرئيسية</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img src="mini.png" alt="شعار إيزي فوش ميني">
+    </div>
+  </div>
+</header>
 
-<div class="intro">
-إدارة احترافية لشبكات MikroTik بسرعة واستقرار أعلى
-</div>
+<!-- ================= Features ================= -->
+<section id="features">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">المميزات</span>
+      <h2>كل ما يقدمه إيزي فوش ميني</h2>
+      <p>تحكّم كامل في شبكاتك وكروتك من مكان واحد.</p>
+    </div>
 
-<!-- ================= OVERVIEW ================= -->
-<div class="box">
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-network-wired"></i></div>
+        <h3>🌐 اتصال مرن مع MikroTik</h3>
+        <p>نظام اتصال متقدم لإدارة جميع بيئات MikroTik محليًا أو عبر الإنترنت:<br>⚡ يدعم LAN<br>⚡ يدعم VPS / Cloud Servers<br>⚡ يدعم IP Public<br>⚡ إدارة مركزية لكل الشبكات</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-bolt"></i></div>
+        <h3>🚀 أداء مباشر وسريع</h3>
+        <p>✔ تنفيذ مباشر بدون سيرفر وسيط<br>✔ سرعة استجابة فورية<br>✔ استقرار عالي حتى مع ضعف الاتصال<br>✔ تحكم كامل بدون أطراف ثالثة</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-print"></i></div>
+        <h3>🖨️ نظام طباعة احترافي</h3>
+        <p>✔ طباعة متسلسلة للكروت<br>✔ تنظيم تلقائي للكروت<br>✔ تقليل الأخطاء أثناء الطباعة<br>✔ تجهيز سريع للكميات الكبيرة</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-palette"></i></div>
+        <h3>🎨 تصميم كروت متقدم</h3>
+        <p>يعتمد على محرك SkiaSharp لتصميم احترافي:<br>✔ تحريك العناصر بحرية<br>✔ تكبير وتصغير باستخدام الماوس<br>✔ تحكم دقيق بالنصوص<br>✔ إخراج عالي الجودة للطباعة</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-window-restore"></i></div>
+        <h3>🌐 إدارة صفحات تسجيل الدخول</h3>
+        <p>قسم احترافي لإدارة صفحات الهوتسبوت:<br>🎨 5 قوالب مجانية جاهزة وعصرية<br>📂 إضافة واستيراد القوالب بسهولة<br>✏️ تعديل وتخصيص الصفحات دون تعقيد<br>⚡ إدارة سريعة وسلسة لصفحات الدخول</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-gears"></i></div>
+        <h3>⚙️ إدارة ذكية ومتكاملة</h3>
+        <p>✔ إنشاء كروت بسهولة<br>✔ إدارة المستخدمين والباقات<br>✔ فحص السيرفر تلقائيًا<br>✔ إعداد الراوترات بسرعة<br>✔ دعم عدد غير محدود من الأجهزة</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon"><i class="fa-solid fa-circle-check"></i></div>
+        <h3>✔️ المميزات العامة</h3>
+        <p>✔️ يدعم جميع إصدارات MikroTik<br>✔️ بدون حدود للسيرفرات أو الراوترات<br>✔️ مناسب للفنيين والشركات<br>✔️ إدارة مركزية من مكان واحد</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-<h3>📌 نظرة عامة</h3>
+<!-- ================= Video ================= -->
+<section id="video">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">شرح مرئي</span>
+      <h2>🎬 شرح البرنامج</h2>
+    </div>
+    <div class="media-frame">
+      <div class="media-topbar"><span></span><span></span><span></span></div>
+      <div class="media-body">
+        <div class="video-wrapper">
+          <iframe src="https://www.youtube.com/embed/HhCe0XwzL_I" allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<p>
-إيزي فوش ميني هو برنامج احترافي لإدارة وإنشاء كروت المايكروتك،
-يدعم أنظمة الهوتسبوت – يوزرمانجر – برودباند،
-ويمنحك تحكمًا كاملاً في الشبكات بسهولة ومرونة عالية.
-</p>
+<!-- ================= Gallery ================= -->
+<section id="gallery">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">لقطات من الداخل</span>
+      <h2>📸 صور من البرنامج</h2>
+    </div>
+    <div class="media-frame">
+      <div class="media-topbar"><span></span><span></span><span></span></div>
+      <div class="media-body">
+        <div class="gallery">
+          <img src="screenshot/m1.png" onclick="openImg(this)">
+          <img src="screenshot/m2.png" onclick="openImg(this)">
+          <img src="screenshot/m3.png" onclick="openImg(this)">
+          <img src="screenshot/m4.png" onclick="openImg(this)">
+          <img src="screenshot/m5.png" onclick="openImg(this)">
+          <img src="screenshot/m6.png" onclick="openImg(this)">
+          <img src="screenshot/m7.png" onclick="openImg(this)">
+          <img src="screenshot/m8.png" onclick="openImg(this)">
+          <img src="screenshot/m9.png" onclick="openImg(this)">
+          <img src="screenshot/m10.png" onclick="openImg(this)">
+          <img src="screenshot/m11.png" onclick="openImg(this)">
+          <img src="screenshot/m12.png" onclick="openImg(this)">
+        </div>
+      </div>
+    </div>
+    <div class="back-row">
+      <a href="index.html" class="back-link"><i class="fa-solid fa-arrow-right"></i> العودة للرئيسية</a>
+    </div>
+  </div>
+</section>
 
-<p>
-يعمل بسرعة عالية ويتيح إدارة كاملة للكروت والباقات مع أدوات فحص وتهيئة متقدمة.
-</p>
-
-</div>
-
-<!-- ================= CONNECTION ================= -->
-<div class="box">
-
-<h3>🌐 اتصال مرن مع MikroTik</h3>
-
-<p>
-يوفر البرنامج نظام اتصال متتقدم لإدارة جميع بيئات MikroTik سواء محليًا أو عبر الإنترنت:
-</p>
-
-<p>
-⚡ يدعم LAN<br>
-⚡ يدعم VPS / Cloud Servers<br>
-⚡ يدعم IP Public<br>
-⚡ إدارة مركزية لكل الشبكات
-</p>
-
-</div>
-
-<!-- ================= PERFORMANCE ================= -->
-<div class="box">
-
-<h3>🚀 أداء مباشر وسريع</h3>
-
-<p>
-✔ تنفيذ مباشر بدون سيرفر وسيط<br>
-✔ سرعة استجابة فورية<br>
-✔ استقرار عالي حتى مع ضعف الاتصال<br>
-✔ تحكم كامل بدون أطراف ثالثة
-</p>
-
-</div>
-
-<!-- ================= PRINT ================= -->
-<div class="box">
-
-<h3>🖨️ نظام طباعة احترافي</h3>
-
-<p>
-✔ طباعة متسلسلة للكروت<br>
-✔ تنظيم تلقائي للكروت<br>
-✔ تقليل الأخطاء أثناء الطباعة<br>
-✔ تجهيز سريع للكميات الكبيرة
-</p>
-
-</div>
-
-<!-- ================= DESIGN ================= -->
-<div class="box">
-
-<h3>🎨 تصميم كروت متقدم</h3>
-
-<p>
-يعتمد على محرك SkiaSharp لتصميم احترافي:
-</p>
-
-<p>
-✔ تحريك العناصر بحرية<br>
-✔ تكبير وتصغير باستخدام الماوس<br>
-✔ تحكم دقيق بالنصوص<br>
-✔ إخراج عالي الجودة للطباعة
-</p>
-
-</div>
-
-<!-- ================= LOGIN PAGES MANAGEMENT (NEW) ================= -->
-<div class="box">
-
-<h3>🌐 إدارة صفحات تسجيل الدخول</h3>
-
-<p>
-قسم احترافي لإدارة صفحات الهوتسبوت بسهولة وسرعة، يتيح لك:
-</p>
-
-<p>
-🎨 5 قوالب مجانية جاهزة وعصرية.<br>
-📂 إضافة واستيراد القوالب بسهولة.<br>
-✏️ تعديل وتخصيص الصفحات دون تعقيد.<br>
-⚡ إدارة سريعة وسلسة لصفحات الدخول.
-</p>
-
-</div>
-
-<!-- ================= MANAGEMENT ================= -->
-<div class="box">
-
-<h3>⚙️ إدارة ذكية ومتكاملة</h3>
-
-<p>
-✔ إنشاء كروت بسهولة<br>
-✔ إدارة المستخدمين والباقات<br>
-✔ فحص السيرفر تلقائيًا<br>
-✔ إعداد الراوترات بسرعة<br>
-✔ دعم عدد غير محدود من الأجهزة
-</p>
-
-</div>
-
-<!-- ================= GENERAL ================= -->
-<div class="box">
-
-<h3>✔️ المميزات العامة</h3>
-
-<p>
-✔️ يدعم جميع إصدارات MikroTik<br>
-✔️ بدون حدود للسيرفرات أو الراوترات<br>
-✔️ مناسب للفنيين والشركات<br>
-✔️ إدارة مركزية من مكان واحد
-</p>
-
-</div>
-
-<!-- ================= VIDEO (NEW - BEFORE GALLERY) ================= -->
-<div class="box video-box">
-
-<h3>🎬 شرح البرنامج</h3>
-
-<div class="video-wrapper">
-    <iframe 
-        src="https://www.youtube.com/embed/HhCe0XwzL_I"
-        allowfullscreen>
-    </iframe>
-</div>
-
-</div>
-
-<!-- ================= GALLERY ================= -->
-<div class="box">
-
-<h3>📸 صور من البرنامج</h3>
-
-<div class="gallery">
-
-<img src="screenshot/m1.png" onclick="openImg(this)">
-<img src="screenshot/m2.png" onclick="openImg(this)">
-<img src="screenshot/m3.png" onclick="openImg(this)">
-<img src="screenshot/m4.png" onclick="openImg(this)">
-<img src="screenshot/m5.png" onclick="openImg(this)">
-<img src="screenshot/m6.png" onclick="openImg(this)">
-<img src="screenshot/m7.png" onclick="openImg(this)">
-<img src="screenshot/m8.png" onclick="openImg(this)">
-<img src="screenshot/m9.png" onclick="openImg(this)">
-<img src="screenshot/m10.png" onclick="openImg(this)">
-<img src="screenshot/m11.png" onclick="openImg(this)">
-<img src="screenshot/m12.png" onclick="openImg(this)">
-
-</div>
-
-<a href="index.html" class="btn">⬅ العودة للرئيسية</a>
-
-</div>
-
-</div>
+<footer>
+  <img src="mini.png" alt="إيزي فوش ميني">
+  <p>© 2026 مصطفى شاهين — MusaleM for Software — جميع الحقوق محفوظة</p>
+</footer>
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeImg()">
@@ -552,30 +441,25 @@ h3 {
 </div>
 
 <script>
-
 function openImg(img){
     document.getElementById("lightbox").style.display="flex";
     document.getElementById("lightbox-img").src=img.src;
 }
-
 function closeImg(){
     document.getElementById("lightbox").style.display="none";
 }
 
-// Loader with smooth fade out
 window.onload = () => {
     const loader = document.getElementById("loader");
     loader.style.opacity = "0";
     loader.style.visibility = "hidden";
 };
 
-// Mouse Glow Trail Effect
 const mouseGlow = document.getElementById("mouseGlow");
 document.addEventListener("mousemove", (e) => {
     mouseGlow.style.left = e.clientX + "px";
     mouseGlow.style.top = e.clientY + "px";
 });
-
 </script>
 
 </body>
