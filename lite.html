@@ -145,6 +145,62 @@ nav {
 .btn-ghost { background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-primary); }
 .btn-ghost:hover { border-color: var(--light); }
 
+.badges { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+.badge {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    padding: 8px 14px; border-radius: 10px; font-size: 0.8rem; color: var(--text-muted);
+}
+.badge i { color: var(--light); }
+
+.version-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.78rem; color: var(--light);
+    background: rgba(134, 239, 172, 0.1); border: 1px solid rgba(134, 239, 172, 0.25);
+    padding: 5px 13px; border-radius: 20px; margin-bottom: 18px;
+}
+
+/* Requirements table */
+.req-table {
+    width: 100%; border-collapse: collapse;
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    border-radius: 16px; overflow: hidden;
+}
+.req-table th {
+    background: linear-gradient(135deg, var(--dark), var(--accent));
+    color: #fff; font-size: 0.9rem; font-weight: 700;
+    padding: 14px 20px; text-align: start;
+}
+.req-table td {
+    padding: 14px 20px; font-size: 0.88rem; color: var(--text-muted);
+    border-top: 1px solid var(--glass-border);
+}
+.req-table td:first-child { color: var(--text-primary); font-weight: 700; width: 220px; }
+
+/* License */
+.license-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+.license-card {
+    background: var(--glass-bg); border: 1px solid var(--glass-border);
+    border-top: 3px solid var(--light);
+    border-radius: 16px; padding: 26px; text-align: center;
+}
+.license-card i { font-size: 1.6rem; color: var(--light); margin-bottom: 14px; }
+.license-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+.license-card p { color: var(--text-muted); font-size: 0.85rem; line-height: 1.8; }
+
+/* Legal box */
+.legal-box {
+    max-width: 900px; margin: 0 auto;
+    background: rgba(239, 68, 68, 0.06);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 18px; padding: 28px 32px;
+}
+.legal-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.legal-head i { color: #ef4444; font-size: 1.3rem; }
+.legal-head h3 { font-size: 1.05rem; font-weight: 800; }
+.legal-box p { color: #dfe3f7; font-size: 0.88rem; line-height: 1.9; }
+.legal-box p strong { color: #fff; }
+
 /* ---------- Sections ---------- */
 section { padding: 54px 0; }
 .section-head { text-align: center; max-width: 680px; margin: 0 auto 36px; }
@@ -256,6 +312,10 @@ footer p { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
 
     section { padding: 36px 0; }
     .features-grid { grid-template-columns: 1fr; }
+    .license-grid { grid-template-columns: 1fr; }
+    .req-table td:first-child { width: auto; }
+    .legal-box { padding: 22px 20px; }
+    .legal-head { flex-direction: column; text-align: center; }
 
     .gallery { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
     .gallery img { height: 92px; }
@@ -293,8 +353,9 @@ footer p { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
     <div class="nav-links">
       <a href="#features">المميزات</a>
       <a href="#gallery">الصور</a>
+      <a href="#license">الترخيص</a>
     </div>
-    <a href="index.html#liteDownload" class="nav-cta">⬇ تحميل التجربة</a>
+    <a id="liteDownloadNav" href="#" class="nav-cta">⬇ تحميل التجربة</a>
   </div>
 </nav>
 
@@ -305,15 +366,20 @@ footer p { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
       <span class="eyebrow"><i class="fa-solid fa-wifi"></i> إيزي فوش لايت</span>
       <h1>🌐 إيزي فوش لايت</h1>
       <h2>نسخة خفيفة وسريعة لإدارة الهوتسبوت فقط</h2>
+      <span class="version-badge" id="liteVersion"><i class="fa-solid fa-code-branch"></i> جارٍ التحميل...</span>
       <p>
         إيزي فوش لايت هو برنامج احترافي لإدارة الهوتسبوت فقط، يتميز بسرعة الاتصال مع السيرفرات البعيدة، وسهولة الإنشاء، وإدارة ذكية للكروت والباقات، وفحص السيرفرات، وتهيئة الراوترات الجديدة، مع إمكانية العمل على عدد غير محدود من الراوترات من خلال ترخيص واحد للكمبيوتر.
       </p>
+      <div class="badges">
+        <span class="badge"><i class="fa-brands fa-windows"></i> Windows 7 / 8 / 10 / 11</span>
+        <span class="badge"><i class="fa-solid fa-server"></i> جميع أجهزة MikroTik RouterOS</span>
+      </div>
       <div class="highlight-line">
         <i class="fa-solid fa-headset"></i>
         <span>تفاصيل بسيطة أعلاه — للتفاصيل الكاملة يُرجى التواصل مع الدعم.</span>
       </div>
       <div class="hero-actions">
-        <a href="index.html#liteDownload" class="btn btn-primary"><i class="fa-solid fa-download"></i> تحميل النسخة التجريبية</a>
+        <a id="liteDownload" href="#" class="btn btn-primary"><i class="fa-solid fa-download"></i> تحميل النسخة التجريبية</a>
         <a href="index.html" class="btn btn-ghost"><i class="fa-solid fa-house"></i> العودة للرئيسية</a>
       </div>
     </div>
@@ -382,6 +448,68 @@ footer p { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
   </div>
 </section>
 
+<!-- ================= Requirements ================= -->
+<section>
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">قبل التثبيت</span>
+      <h2>متطلبات تشغيل البرنامج</h2>
+    </div>
+    <table class="req-table">
+      <tr><th>المتطلب</th><th>الوصف والحد الأدنى</th></tr>
+      <tr><td>نظام التشغيل</td><td>Windows 7 / Windows 8 / Windows 10 / Windows 11</td></tr>
+      <tr><td>شاشة العرض</td><td>دقة 1024×768 أو أعلى للحصول على أفضل تجربة واجهة</td></tr>
+      <tr><td>متطلب إضافي</td><td>يتطلب تثبيت .NET Framework 4.8</td></tr>
+      <tr><td>نوع الشبكات المدعومة</td><td>جميع أجهزة شبكات MikroTik RouterOS التي تدعم نظام الهوتسبوت</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ================= License ================= -->
+<section id="license">
+  <div class="container">
+    <div class="section-head">
+      <span class="section-tag">الترخيص</span>
+      <h2>نظام الترخيص وتفعيل البرنامج</h2>
+      <p>برنامج إيزي فوش لايت مدفوع وغير مجاني، ومحمي بنظام ترخيص رقمي خاص بـ MusaleM for Software.</p>
+    </div>
+    <div class="license-grid">
+      <div class="license-card">
+        <i class="fa-solid fa-hourglass-half"></i>
+        <h4>الفترة التجريبية</h4>
+        <p>تمنحك 7 أيام لتجربة كافة خصائص البرنامج قبل الشراء، لتضمن ملاءمته لاحتياجاتك.</p>
+      </div>
+      <div class="license-card">
+        <i class="fa-solid fa-desktop"></i>
+        <h4>رمز الجهاز الفريد</h4>
+        <p>يرتبط ترخيص البرنامج بجهاز الكمبيوتر الخاص بك، ولا يمكن نقل الترخيص لجهاز آخر بدون مراجعة الدعم.</p>
+      </div>
+      <div class="license-card">
+        <i class="fa-solid fa-key"></i>
+        <h4>مفتاح التفعيل</h4>
+        <p>يصدر لك مفتاح تفعيل خاص بعد إتمام عملية الشراء لفتح النسخة الكاملة بشكل دائم.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= IP legal ================= -->
+<section>
+  <div class="container">
+    <div class="legal-box">
+      <div class="legal-head">
+        <i class="fa-solid fa-scale-balanced"></i>
+        <h3>حقوق الطبع والملكية الفكرية</h3>
+      </div>
+      <p>
+        جميع الحقوق محفوظة لصالح <strong>مصطفى شاهين (MusaleM for Software) © 2026</strong>.
+        يُحظر تمامًا هندسة البرنامج عكسيًا، أو إعادة توزيعه، أو تزوير مفاتيح التفعيل بأي شكل من الأشكال.
+        أي استخدام غير مصرح به يحرم المستخدم من الدعم والتحديثات، ويُعرّضه للمساءلة القانونية بموجب قوانين حماية الملكية الفكرية.
+      </p>
+    </div>
+  </div>
+</section>
+
 <footer>
   <img src="lite.png" alt="إيزي فوش لايت">
   <p>© 2026 مصطفى شاهين — MusaleM for Software — جميع الحقوق محفوظة</p>
@@ -392,6 +520,9 @@ footer p { color: var(--text-muted); font-size: 0.85rem; font-weight: 600; }
     <img id="lightbox-img">
 </div>
 
+<!-- تحميل الروابط -->
+<script src="downloadlinks.js"></script>
+
 <script>
 function openImg(img){
     document.getElementById("lightbox").style.display="flex";
@@ -399,6 +530,14 @@ function openImg(img){
 }
 function closeImg(){
     document.getElementById("lightbox").style.display="none";
+}
+
+// ربط زر التحميل ورقم الإصدار مباشرة بهذه الصفحة
+if (typeof DOWNLOAD_LINKS !== "undefined" && DOWNLOAD_LINKS.lite) {
+    document.getElementById("liteDownload").href = DOWNLOAD_LINKS.lite.url;
+    document.getElementById("liteDownloadNav").href = DOWNLOAD_LINKS.lite.url;
+    document.getElementById("liteVersion").innerHTML =
+        '<i class="fa-solid fa-code-branch"></i> الإصدار الحالي: v' + DOWNLOAD_LINKS.lite.version;
 }
 
 window.onload = () => {
@@ -412,6 +551,7 @@ document.addEventListener("mousemove", (e) => {
     mouseGlow.style.left = e.clientX + "px";
     mouseGlow.style.top = e.clientY + "px";
 });
+</script>
 </script>
 
 </body>
